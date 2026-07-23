@@ -19,8 +19,9 @@ game/         *** pristine originals *** — never modified; the patcher referen
 256.CC 416.CC working copies in the run dir — the game reads its .CC from the current
               directory, so KBR.EXE needs them here (identical to game/ for now).
 KBU.EXE       *** the translation base *** — fully unpacked, flat, editable. Keep pristine.
-KBR.EXE       *** our working copy *** — KBU + the one-byte protection patch. The
-              runnable/testable build (regenerate via patch_protection.py, see below).
+KBR.EXE       *** our working copy *** — KBU + the manifest patches (currently just
+              the one-byte protection flip). The runnable/testable build, regenerated
+              from KBU by tools/apply_patches.py + tools/patches.csv (see below).
 QWE.DAT       an in-game save sitting in the run dir (that is where KB reads/writes them).
 dosbox-x.conf DOSBox-X config: mounts this dir as C:, PATH includes C:\TOOLS.
 
@@ -28,8 +29,8 @@ ghidra/       *** the Ghidra project (KBR.gpr) *** — holds hand-made annotatio
               NOT disposable and deliberately not under build/. `tools/ghidra.sh gui`.
 tools/        everything hand-written: DOS utils (CUP386.COM + its README.CUP manual,
               LOADFIX.COM), the Python tools (addr.py, unpack_exepack.py,
-              patch_protection.py), ghidra.sh, and ghidra_scripts/ (Ghidra analysis
-              scripts). Full inventory under "Tooling".
+              apply_patches.py), the patch manifest patches.csv, ghidra.sh, and
+              ghidra_scripts/ (Ghidra analysis scripts). Full inventory under "Tooling".
 dumps/        extracted data + annotated listings (see "Dumps").
 build/        generated, safe to delete: KB_NWC.EXE (CUP386 intermediate), decomp/ (Ghidra
               output).
@@ -202,7 +203,7 @@ across all game logic. Translation stays **binary patching** of `KBU.EXE`. Where
 code is needed (Cyrillic renderer, string repointing), write it fresh and inject into a code
 cave — Open Watcom still targets 16-bit real mode.
 
-## Copy protection (traced — one-byte patch, `tools/patch_protection.py`)
+## Copy protection (traced — one-byte patch, `tools/patches.csv`)
 
 Two separate pieces: the **prompt routine** (shows page/line/word, collects the answer) and the
 **verification branch**, ~1.1 KB later inside an unanalyzed block. The prompt routine contains no
@@ -240,12 +241,20 @@ no relocation entries, consistent with it being data. Note the whole region `19f
 is left **unanalyzed by Ghidra** — the verification code lives there, so use
 `tools/ghidra_scripts/DisasmRange.java` rather than expecting auto-analysis to find it.
 
-Apply statically with `tools/patch_protection.py` (validates both signatures and the launcher
-arithmetic before writing; `--revert` undoes it, `--check` reports state):
+Apply statically as one entry in the patch manifest (`type: bytes`, `offset: 0xC40A`,
+`expect: 72`, `write: EB`). The generic engine `tools/apply_patches.py` builds `KBR.EXE`
+from pristine `KBU.EXE`, gated on `KBU`'s SHA-256 (baked into the script) so every offset is
+provably correct — no per-patch signature arithmetic needed. Before writing, it verifies each
+site matches its `expect` (all-or-nothing):
 
 ```
-python3 tools/patch_protection.py KBU.EXE -o KBR.EXE     # -> KBR.EXE, 1 byte differs
+python3 tools/apply_patches.py                 # KBU.EXE -> KBR.EXE (1 byte differs)
 ```
+
+The launcher-arithmetic cross-check that the old dedicated script did at runtime is now
+subsumed by the whole-file hash gate: if `KBU.EXE` hashes correctly, `0xC40A` is the right
+byte by construction. Re-apply after any `unpack_exepack.py` regeneration (and update the
+baked-in `TARGET_SHA256` if the base image legitimately changes).
 
 `KBU.EXE` stays pristine; `KBR.EXE` is our working copy / runnable-testable build. **Re-apply
 after any regeneration via `unpack_exepack.py`.**
@@ -281,9 +290,13 @@ The ten prompt strings are ordinary UI text at DS `0xAD6`, `0xAEB`, `0xAF3`, `0x
 - [x] Locate & extract all text; confirm it's translatable.
 - [x] Defeat both packing layers → `KBU.EXE`, a flat editable base that runs (incl. LOADFIX).
 - [x] **Copy protection** — fully traced. `KB!.COM` is a loader-patcher that flips one byte at
-      runtime; `tools/patch_protection.py` does the same statically (file `0xC40A`, `JC`→`JMP`)
+      runtime; the static build does the same via the patch manifest (file `0xC40A`, `JC`→`JMP`)
       producing `KBR.EXE`. Confirmed in DOSBox-X: `KBR` runs standalone and reaches the title
       screen (verified via a title-screen string edit).
+- [x] **Patch engine** — `tools/apply_patches.py` + `tools/patches.csv`: manifest-driven,
+      hash-gated builder of `KBR.EXE` (`bytes`/`string` patch types). Replaces the old
+      `patch_protection.py`; the protection flip is its first entry. String patches (with CP866
+      encoding + slot-length checks) land once translation starts.
 - [ ] **Cyrillic font** — game font is Latin-only. Find the font bitmap (in `KBU` or a `.CC`
       member), add glyphs, remap to CP866. Nothing renders in Russian until this exists.
 - [ ] **Translation** — edit strings in `KBU` respecting the two length limits; build repointing

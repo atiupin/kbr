@@ -1,0 +1,5 @@
+type,offset,expect,write
+# ── copy protection ── JC -> JMP, branch always taken
+bytes,0xC40A,"72","EB"
+# ── title screen ── credit line (example string patch)
+string,0x15E88,"Jon Van Caneghem","KBR Translation"
