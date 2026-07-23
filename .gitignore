@@ -1,0 +1,12 @@
+# Generated — safe to delete (see CLAUDE.md project layout)
+build/
+
+# Ghidra runtime lock files (the project itself — KBR.gpr, KBR.rep/ — IS tracked)
+ghidra/*.lock
+ghidra/*.lock~
+
+# DOSBox-X debugger memory dumps
+MEMDUMP.BIN
+
+# macOS
+.DS_Store
