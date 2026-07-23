@@ -79,7 +79,39 @@ far calls → "cursor moves then hangs". The fix was to strip EXEPACK, not to ad
 
 **CC archive** (`256.CC`, `416.CC`): `uint16` file count N; then N × 8-byte TOC entries:
 `uint16` filename-hash ID, `uint24` offset (LE), `uint16` size (LE), 1 pad byte. First member
-begins right after the TOC (`2 + N*8`). Holds graphics, not text. 256.CC=66 files, 416.CC=133.
+begins right after the TOC (`2 + N*8`). Holds graphics + the font, not story text. 256.CC=66
+files, 416.CC=133. Members are looked up by name: the loader hashes the requested filename
+(`hash = rol16(hash,1) + upper(ch)` per char; `FUN_230a_0160`) and matches the TOC ID.
+
+Each **member** is `[uint32 declen LE][ LZW stream ]`. Compression is **variable-width LZW**,
+LSB-first bit packing, 9→12 bits, clear=`0x100`, end=`0x101`, first dict code=`0x102`, GIF-style
+width growth (no early change), CLEAR emitted when the dictionary fills; the stream opens with a
+CLEAR. This is the game's decompressor `FUN_230a_02f1`. Decoder + encoder implemented in
+`tools/cc.py` and validated: all 199 members of both archives decode to exactly their declen, and
+`encode→decode` round-trips every one; a full archive rebuild is byte-lossless.
+
+**Font** = CC member id **`0x9bb2`** (byte-identical in both archives — it is display-mode
+independent). Decompresses to **1024 bytes = 128 glyphs × 8 rows**, 8×8, 1 byte/row, **MSB =
+leftmost pixel**. Glyphs `0x00`–`0x1F` are game UI symbols (cursor arrows, box corners,
+checkmarks, ↑↓←→ — in use, not free); `0x20`–`0x7F` are ASCII; **`0x80`–`0xFF` do not exist**
+— that is the Cyrillic gap (CP866 puts every Cyrillic letter above `0x7F`). Editable sheet:
+`tools/font.png` — a raw 1:1 128×128 RGBA rip (transparent bg, white ink, 16 glyphs/row, no
+scaling or grid); top 8 rows are the existing 128 glyphs, bottom 8 rows (`0x80`–`0xFF`) blank and
+ready to draw Cyrillic into.
+`tools/cc.py font-export` / `font-import` round-trip it; `replace` swaps any member and rebuilds
+the archive (TOC offsets recomputed, all other members copied verbatim).
+
+**Cyrillic plan.** Primary: extend the font to **256 glyphs / 2048 bytes** (CP866), so
+`apply_patches.py` can emit CP866 directly. The CC loader `malloc`s each member by its declen
+(`DAT_2369_600f`), so a 2048-byte font auto-allocates — buffer size is *not* a blocker. The one
+runtime unknown is the glyph blitter's index type: Turbo C `char` is signed, so if it does
+`font[ch*8]` with a signed `ch`, codes `0x80`–`0xFF` index negatively and need a one-byte
+signed→unsigned patch (via the manifest). Confirm in DOSBox-X: extend the font with a marker
+glyph at e.g. `0x80`, put a `0x80` byte in a visible string, and see if it renders or garbles.
+Zero-risk fallback if the blitter can't be fixed cheaply: a **7-bit custom code page** — keep the
+128-glyph font, overwrite lowercase-Latin/spare slots with Cyrillic, and map translated text to
+those bytes (no binary change; costs lowercase Latin, fine for a translation that transliterates
+names).
 
 **EXEPACK record format** (decompress reading _backward_ from stub CS:0000):
 `[cmd][len_hi][len_lo]`; `cmd & 0xFE`: `0xB0`=fill (one fill byte follows below), `0xB2`=copy
@@ -111,6 +143,10 @@ sections after the "Packed file is corrupt" string, each `uint16 count` then tha
   the same dir.** Tracers `/1` fast, `/3` V86, `/7` full emulator (slow, most robust); `/x` =
   force EXE output.
 - **ndisasm** (`brew install nasm`) for 16-bit disassembly; objdump/lldb also present.
+- **`tools/cc.py`** — NWC "CC" archive tool (needs Pillow for the font PNG paths). `list`,
+  `extract <cc> <id-hex> <out.bin>` (decoded bytes), `replace <cc> <id-hex> <in.bin> <out.cc>`,
+  `font-export <cc> <png> [--glyphs 256]`, `font-import <png> <cc> <out.cc>`. Implements the
+  LZW codec above; validated round-trip on every member of both archives.
 - **Ghidra 12.1.2** (`brew install ghidra`) — the analysis tool for this project. Drive it via
   **`tools/ghidra.sh`**, which presets the project, program and script paths:
 
@@ -297,8 +333,12 @@ The ten prompt strings are ordinary UI text at DS `0xAD6`, `0xAEB`, `0xAF3`, `0x
       hash-gated builder of `KBR.EXE` (`bytes`/`string` patch types). Replaces the old
       `patch_protection.py`; the protection flip is its first entry. String patches (with CP866
       encoding + slot-length checks) land once translation starts.
-- [ ] **Cyrillic font** — game font is Latin-only. Find the font bitmap (in `KBU` or a `.CC`
-      member), add glyphs, remap to CP866. Nothing renders in Russian until this exists.
+- [~] **Cyrillic font** — font *located and format cracked*: CC member `0x9bb2`, 8×8 128-glyph
+      Latin-only, LZW-compressed; `tools/cc.py` extracts/injects it, `tools/font.png` is the
+      editable sheet. Remaining: draw the CP866 Cyrillic glyphs into `0x80`–`0xFF`, and confirm
+      the glyph blitter indexes the font unsigned (else a one-byte signed→unsigned manifest patch).
+      See the font/Cyrillic-plan notes under "File-format reference". Nothing renders in Russian
+      until the glyphs are drawn.
 - [ ] **Translation** — edit strings in `KBU` respecting the two length limits; build repointing
       only for the strings that can't be shortened.
 - [ ] **Patcher** — ownership-gated installer producing the translated build.
