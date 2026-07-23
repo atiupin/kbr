@@ -11,6 +11,6 @@ MEMDUMP.BIN
 # macOS
 .DS_Store
 
-# Save files / game data (transient, rewritten on every run)
-*.dat
-*.DAT
+# Save files / game data in the root dir (transient, rewritten on every run)
+/*.dat
+/*.DAT
