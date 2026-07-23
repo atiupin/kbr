@@ -1,28 +1,28 @@
 #!/usr/bin/env python3
 """
-Strip the Microsoft EXEPACK layer from KB_U.EXE and emit a flat KB_F.EXE
+Strip the Microsoft EXEPACK layer from KB_NWC.EXE and emit a flat KBU.EXE
 with a proper DOS relocation table.
 
 Pipeline for the whole game:
-    KB.EXE  --(CUP386 /1 /x, in DOSBox)-->  KB_U.EXE  --(this script)-->  KB_F.EXE
+    KB.EXE  --(CUP386 /1 /x, in DOSBox)-->  KB_NWC.EXE  --(this script)-->  KBU.EXE
 
 KB.EXE is double-packed: an outer custom New World Computing packer (which
 CUP386 removes) wrapping an inner Microsoft EXEPACK layer (removed here).
-KB_F.EXE is the flat, uncompressed translation base: every string sits at a
+KBU.EXE is the flat, uncompressed translation base: every string sits at a
 fixed offset, editable in place.
 
-Validated: KB_F's decompressed image matches the live running game (dump1)
+Validated: KBU's decompressed image matches the live running game (dump1)
 98.9% after relocation; the ~1% delta is runtime-mutated variables.
 """
 import struct, sys
 
-def unpack(src_path="KB_U.EXE", dst_path="KB_F.EXE",
-           validate="dumps/memdump_base1.bin", validate_base=0x8920, load_seg=0x892):
+def unpack(src_path="KB_NWC.EXE", dst_path="KBU.EXE",
+           validate=None, validate_base=0x8920, load_seg=0x892):
     d = open(src_path, "rb").read()
-    # KB_U header is 32 bytes; declared image is 107501 bytes.
+    # KB_NWC header is 32 bytes; declared image is 107501 bytes.
     img = bytearray(d[32:32 + 107501])
 
-    # EXEPACK header lives at the packer stub's CS:0000. For KB_U that's image
+    # EXEPACK header lives at the packer stub's CS:0000. For KB_NWC that's image
     # offset 0x19350 (stub entry CS:IP = 1935:0012; IP 0x12 = past the 18-byte hdr).
     cs0 = 0x19350
     (real_ip, real_cs, _mem_start, exepack_size,

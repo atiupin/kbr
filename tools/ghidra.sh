@@ -2,7 +2,7 @@
 # Ghidra front-end for this project.
 #
 #   tools/ghidra.sh gui                      launch the Ghidra GUI
-#   tools/ghidra.sh run <Script.java> [args] run a headless script on KB_F.EXE
+#   tools/ghidra.sh run <Script.java> [args] run a headless script on KBU.EXE
 #   tools/ghidra.sh list                     show available scripts
 #   tools/ghidra.sh import <file> [opts]     import another binary into the project
 #
@@ -17,7 +17,7 @@ HEADLESS="$GHIDRA_DIR/support/analyzeHeadless"
 PROJECT_DIR="$ROOT/ghidra"
 PROJECT_NAME="KBR"
 SCRIPTS="$ROOT/tools/ghidra_scripts"
-PROGRAM="KB_F.EXE"
+PROGRAM="KBU.EXE"
 
 export JAVA_HOME="${JAVA_HOME:-/opt/homebrew/opt/openjdk@21}"
 

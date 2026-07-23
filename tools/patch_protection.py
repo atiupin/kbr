@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Apply the copy-protection bypass to KB_F.EXE statically.
+"""Apply the copy-protection bypass to KBU.EXE statically.
 
 This reproduces, at rest, exactly what KB!.COM does in memory at runtime.
 
@@ -14,13 +14,13 @@ game's keyboard-wrapper function it:
 turning the protection branch unconditional. Without KB!.COM that byte stays
 0x72, the check runs, and the game exits.
 
-Both signatures occur exactly once in KB_F.EXE, and the launcher's own address
+Both signatures occur exactly once in KBU.EXE, and the launcher's own address
 arithmetic independently predicts the patch offset -- see CLAUDE.md.
 
 Usage:
-    python3 tools/patch_protection.py KB_F.EXE -o KBR.EXE       # apply
-    python3 tools/patch_protection.py KBR.EXE -o KB_F2.EXE --revert
-    python3 tools/patch_protection.py KB_F.EXE --check          # report only
+    python3 tools/patch_protection.py KBU.EXE -o KBR.EXE       # apply
+    python3 tools/patch_protection.py KBR.EXE -o KBU2.EXE --revert
+    python3 tools/patch_protection.py KBU.EXE --check          # report only
 """
 
 import argparse

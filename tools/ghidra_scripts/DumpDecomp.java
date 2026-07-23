@@ -1,6 +1,6 @@
 // Dumps decompiled C for every function in the program, plus a map of
 // defined strings -> the functions that reference them.
-// Usage: analyzeHeadless <proj> <name> -process KB_F.EXE -noanalysis \
+// Usage: analyzeHeadless <proj> <name> -process KBU.EXE -noanalysis \
 //          -scriptPath build/ghidra_scripts -postScript DumpDecomp.java <outdir>
 
 import ghidra.app.script.GhidraScript;
