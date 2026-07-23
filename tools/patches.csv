@@ -2,6 +2,8 @@ type,offset,expect,write
 # copy protection
 bytes,0xC40A,"72","EB"
 # title screen
+string,0x15E48,"Select Char A-D or L-Load saved game","Выберите героя A-D или L-загрузитесь"
+# title screen - credits
 string,0x15E6D,"King's Bounty Designed By:","Дизайн King's Bounty:"
 string,0x15E88,"Jon Van Caneghem","Джон Ван Канегем"
 string,0x15E99,"Programmed By:","Программисты:"
@@ -11,3 +13,38 @@ string,0x15EC4,"Graphics By:","Графика:"
 string,0x15ED1,"Kenneth L. Mayfield","Кеннет Л. Мейфилд"
 string,0x15EE5,"Vincent DeQuattro, Jr.","Винсент ДеКуаттро, мл."
 string,0x15F24,"All Rights Reserved","Все права защищены"
+# title screen - new game
+string,0x15F38,"Name: ","Имя: "
+string,0x167A2,"Difficulty   Days  Score","Сложность    Дни   Очки"
+string,0x167BD,"Easy         900    x.5","Легко        900    x.5"
+string,0x167D5,"Normal       600     x1","Нормально    600     x1"
+string,0x167ED,"Hard         400     x2","Трудно       400     x2"
+string,0x16805,"Impossible?  200     x4","Невозможно?  200     x4"
+string,0x15F3F," to select   Ent to Accept",": выбрать   Enter: принять"
+# title screen - copy-protection prompt
+string,0x16166,"Please turn to page ","Откройте страницу "
+string,0x1617B,", go to",","
+string,0x16183,"line ","ряд "
+string,0x16189," and type in word ",", слово "
+string,0x16230,"Word: ","Слово:"
+# title screen - copy-protection description
+string,0x1619C,"Note: Spaces are not counted","Ладно, шучу! Не нужно никуда"
+string,0x161B9,"as words or lines.  Hyphenated","смотреть, конечно. Защита уже"
+string,0x161D8,"words are treated as one word.","снята. Просто нажмите Enter"
+string,0x161F7,"Any line that has any kind of","и вперед, к приключениям."
+string,0x16215,"text is considered a line.","Удачи, герой!"
+# title screen - new-game creation message
+string,0x1681D,"A new game is being created.","Создается новая игра."
+string,0x1683A,"Please wait while I perform","Подождите, пока я творю"
+string,0x16856,"godlike actions to make this","божественные чудеса,"
+string,0x16873,"game playable.","чтобы играть."
+# title screen - destroy-saved-game confirmation
+string,0x16758,"Do you wish to destroy the","Это имя уже было. Стереть"
+string,0x16773,"game of ","героя "
+# character classes
+string,0x1A187,"Knight","Рыцарь"
+string,0x1A1A3,"Paladin","Паладин"
+string,0x1A1C5,"Sorceress","Колдунья"
+string,0x1A1E6,"Barbarian","Варвар"
+# "(name) the (class)" connector -> ", " (Taiga the Sorceress -> Taiga, Колдунья)
+string,0x1A181," the ",", "
