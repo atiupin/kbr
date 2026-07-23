@@ -1,5 +1,13 @@
 type,offset,expect,write
-# ── copy protection ── JC -> JMP, branch always taken
+# copy protection
 bytes,0xC40A,"72","EB"
-# ── title screen ── credit line (example string patch)
-string,0x15E88,"Jon Van Caneghem","KBR Translation"
+# title screen
+string,0x15E6D,"King's Bounty Designed By:","Дизайн King's Bounty:"
+string,0x15E88,"Jon Van Caneghem","Джон Ван Канегем"
+string,0x15E99,"Programmed By:","Программисты:"
+string,0x15EA8,"Mark Caldwell","Марк Колдуэлл"
+string,0x15EB6,"Andy Caldwell","Энди Колдуэлл"
+string,0x15EC4,"Graphics By:","Графика:"
+string,0x15ED1,"Kenneth L. Mayfield","Кеннет Л. Мейфилд"
+string,0x15EE5,"Vincent DeQuattro, Jr.","Винсент ДеКуаттро, мл."
+string,0x15F24,"All Rights Reserved","Все права защищены"
