@@ -8,9 +8,9 @@ ghidra/*.lock~
 # DOSBox-X debugger memory dumps
 MEMDUMP.BIN
 
-# Transient in-game save files (the game rewrites these on every run)
-QWE.DAT
-saves/
-
 # macOS
 .DS_Store
+
+# Save files / game data (transient, rewritten on every run)
+*.dat
+*.DAT
