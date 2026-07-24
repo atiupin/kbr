@@ -472,8 +472,9 @@ itself is the `0xC40A` branch, handled by the patch above.
       character-select and copy-protection screens render clean in Russian, so **no** signed→
       unsigned manifest patch is needed. `apply_patches.py` emits CP866 directly.
 - [~] **Translation** — underway in `patches.csv`: title screen + credits, the copy-protection
-  prompt, new-game/difficulty menus, character classes and the **army screen** (25 unit names,
-  stat labels, morale words) are done. Remaining
+  prompt, new-game/difficulty menus, character classes, the **army screen** (25 unit names,
+  stat labels, morale words) and the **dwelling screen** (terrain header + underline, recruit
+  dialogue, refusals, the shared `GP=` gold readout) are done. Remaining
   prose uses `string` rows where it fits its slot and `reloc` rows (offset = ref from
   `find_ref.py`) where it doesn't. Only limit 2 (on-screen box width) still constrains — the
   memory-slot limit is lifted for good (see Overflow repointing).
@@ -489,6 +490,11 @@ itself is the `0xC40A` branch, handled by the patch above.
 
 ## Commit Guidelines
 
+- **NEVER commit unless the user explicitly asks for it.** Finish the work, leave it staged or
+  unstaged in the working tree, and report what changed. Do not commit "to be tidy", do not
+  commit because previous commits in the log follow a pattern, and do not commit as the last
+  step of a task. The user decides when a change is committed. This applies to `git commit`,
+  `git push`, `git tag` and any other history-writing command.
 - All development is ongoing in the `master` branch — only commit there, never create or commit to other branches
 - Use imperative mood: "Add feature" not "Added feature" or "Adds feature"
 - Keep first line under 70 characters
