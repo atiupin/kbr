@@ -272,6 +272,12 @@ row. Repointing elsewhere (DGROUP tables, ordinary code) is unaffected and works
   `find_ref.py "as for treason"` prints the ref offset, its current pointer bytes, and a paste-
   ready `reloc,<off>,"<hex>","<Russian>"` line. Kept out of the build so the patcher stays a dumb,
   deterministic applier of fixed offsets.
+  **Known blind spot: the first and last entry of a pointer table.** A table slot is only accepted
+  when _both_ neighbours also validate as string pointers, so the edges of a table report "no ref
+  found" even though the table is real (seen on the character-screen label table at `0x18910`:
+  entries 2–9 resolve, `Leadership` and `Current score` do not). "No ref" therefore means "not
+  repointable **by this tool**", not "not a pointer" — check the neighbouring slots before
+  concluding a string is reached by computed access.
 - **Ghidra 12.1.2** (`brew install ghidra`) — the analysis tool for this project. Drive it via
   **`tools/ghidra.sh`**, which presets the project, program and script paths:
 
@@ -473,8 +479,9 @@ itself is the `0xC40A` branch, handled by the patch above.
       unsigned manifest patch is needed. `apply_patches.py` emits CP866 directly.
 - [~] **Translation** — underway in `patches.csv`: title screen + credits, the copy-protection
   prompt, new-game/difficulty menus, character classes, the **army screen** (25 unit names,
-  stat labels, morale words) and the **dwelling screen** (terrain header + underline, recruit
-  dialogue, refusals, the shared `GP=` gold readout) are done. Remaining
+  stat labels, morale words), the **dwelling screen** (terrain header + underline, recruit
+  dialogue, refusals, the shared `GP=` gold readout) and the **character screen** (10 stat
+  labels) are done. Remaining
   prose uses `string` rows where it fits its slot and `reloc` rows (offset = ref from
   `find_ref.py`) where it doesn't. Only limit 2 (on-screen box width) still constrains — the
   memory-slot limit is lifted for good (see Overflow repointing).
