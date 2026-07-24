@@ -472,7 +472,8 @@ itself is the `0xC40A` branch, handled by the patch above.
       character-select and copy-protection screens render clean in Russian, so **no** signed→
       unsigned manifest patch is needed. `apply_patches.py` emits CP866 directly.
 - [~] **Translation** — underway in `patches.csv`: title screen + credits, the copy-protection
-  prompt, new-game/difficulty menus, and character classes are done (`string` rows). Remaining
+  prompt, new-game/difficulty menus, character classes and the **army screen** (25 unit names,
+  stat labels, morale words) are done. Remaining
   prose uses `string` rows where it fits its slot and `reloc` rows (offset = ref from
   `find_ref.py`) where it doesn't. Only limit 2 (on-screen box width) still constrains — the
   memory-slot limit is lifted for good (see Overflow repointing).
