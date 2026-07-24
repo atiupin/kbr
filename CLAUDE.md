@@ -20,10 +20,10 @@ game/         *** pristine originals *** — never modified; the patcher referen
               directory, so KBR.EXE needs them here. These now carry the Cyrillic-extended
               font (member 0x9bb2); they differ from the pristine game/ copies.
 KBU.EXE       *** the translation base *** — fully unpacked, flat, editable. Keep pristine.
-KBR.EXE       *** our working copy *** — KBU + the manifest patches (currently just
-              the one-byte protection flip). The runnable/testable build, regenerated
+KBR.EXE       *** our working copy *** — KBU + the manifest patches (protection flip +
+              the translation string edits). The runnable/testable build, regenerated
               from KBU by tools/apply_patches.py + tools/patches.csv (see below).
-QWE.DAT       an in-game save sitting in the run dir (that is where KB reads/writes them).
+*.DAT         in-game saves in the run dir (QWE/WE/ASD.DAT — where KB reads/writes them).
 dosbox-x.conf DOSBox-X config: mounts this dir as C:, PATH includes C:\TOOLS.
 
 ghidra/       *** the Ghidra project (KBR.gpr) *** — holds hand-made annotations, so it is
@@ -103,14 +103,11 @@ rows (`0x80`–`0xFF`) hold the Cyrillic.
 `tools/cc.py font-export` / `font-import` round-trip it; `replace` swaps any member and rebuilds
 the archive (TOC offsets recomputed, all other members copied verbatim).
 
-**Cyrillic plan — DONE (primary approach worked).** The font is extended to **256 glyphs /
-2048 bytes** (CP866) and `apply_patches.py` emits CP866 directly. The CC loader `malloc`s each
-member by its declen (`DAT_2369_600f`), so the 2048-byte font auto-allocates — buffer size was
-never a blocker. The one runtime unknown was the glyph blitter's index type (Turbo C `char` is
-signed, so `font[ch*8]` with a signed `ch` would index `0x80`–`0xFF` negatively); **resolved
-empirically** — the CP866 screens render clean in DOSBox-X, so the blitter indexes **unsigned**
-and **no** signed→unsigned manifest patch is needed. (The 7-bit custom-code-page fallback — keep
-128 glyphs, overwrite Latin/spare slots — was never needed and is not used.)
+**Cyrillic — DONE.** Member `0x9bb2` is extended to **256 glyphs / 2048 bytes** (CP866); the CC
+loader `malloc`s each member by its declen (`DAT_2369_600f`), so the larger font auto-allocates —
+buffer size was never a blocker. The blitter indexes the font **unsigned** (confirmed empirically,
+see Status), so no signed→unsigned patch is needed and the 7-bit custom-code-page fallback was
+never used. `apply_patches.py` emits CP866 directly.
 
 **EXEPACK record format** (decompress reading _backward_ from stub CS:0000):
 `[cmd][len_hi][len_lo]`; `cmd & 0xFE`: `0xB0`=fill (one fill byte follows below), `0xB2`=copy
@@ -350,16 +347,13 @@ provably correct — no per-patch signature arithmetic needed. Before writing, i
 site matches its `expect` (all-or-nothing):
 
 ```
-python3 tools/apply_patches.py                 # KBU.EXE -> KBR.EXE (1 byte differs)
+python3 tools/apply_patches.py                 # KBU.EXE -> KBR.EXE (applies every patches.csv row)
 ```
 
 The launcher-arithmetic cross-check that the old dedicated script did at runtime is now
 subsumed by the whole-file hash gate: if `KBU.EXE` hashes correctly, `0xC40A` is the right
-byte by construction. Re-apply after any `unpack_exepack.py` regeneration (and update the
+byte by construction. **Re-apply after any `unpack_exepack.py` regeneration** (and update the
 baked-in `TARGET_SHA256` if the base image legitimately changes).
-
-`KBU.EXE` stays pristine; `KBR.EXE` is our working copy / runnable-testable build. **Re-apply
-after any regeneration via `unpack_exepack.py`.**
 
 ### The prompt routine
 
@@ -371,8 +365,9 @@ verdict is reached later at the `0xC40A` branch. The routine is deliberately obf
 arithmetic, an always-taken `STC; JC`, split pushes) to derail linear disassemblers.
 
 The ten prompt strings are ordinary UI text at DS `0xAD6`, `0xAEB`, `0xAF3`, `0xAF9`, `0xB0C`,
-`0xB29`, `0xB48`, `0xB67`, `0xB85`, `0xBA0` — they still need translating. The gate itself is the
-`0xC40A` branch, handled by the patch above.
+`0xB29`, `0xB48`, `0xB67`, `0xB85`, `0xBA0` (file `0x16166`+) — **now translated** in
+`patches.csv`, repurposed as a note telling the player the check is already disabled. The gate
+itself is the `0xC40A` branch, handled by the patch above.
 
 ## Dumps
 
@@ -382,6 +377,7 @@ The ten prompt strings are ordinary UI text at DS `0xAD6`, `0xAEB`, `0xAF3`, `0x
   two-address pair is what let us diff out relocations.
 - `dumps/game_text.txt`, `dumps/all_strings.txt`, `dumps/text_like.txt` — extracted text.
 - `dumps/protection_table.txt` — all 128 decoded page/line/word triples.
+- `dumps/stub.bin` — the extracted ~1.2 KB NWC outer disk-streaming stub (see "The packing story").
 - `dumps/kbcom_annotated.asm` — `KB!.COM` disassembled with a comment on every line. Read this
   before touching the launcher; it is the clearest explanation of how the protection is bypassed.
 - `build/decomp/decompiled_all.c` — all 443 functions as pseudocode (regenerate with
@@ -398,7 +394,7 @@ The ten prompt strings are ordinary UI text at DS `0xAD6`, `0xAEB`, `0xAF3`, `0x
 - [x] **Patch engine** — `tools/apply_patches.py` + `tools/patches.csv`: manifest-driven,
       hash-gated builder of `KBR.EXE` (`bytes`/`string`/`reloc` patch types). Replaces the old
       `patch_protection.py`; the protection flip is its first entry. String patches (with CP866
-      encoding + slot-length checks) land once translation starts.
+      encoding + slot-length checks) now carry the translation (see below).
 - [~] **Overflow repointing** — `reloc` patch type + `tools/find_ref.py` work and repoint
       correctly (proven). **Blocked on pool safety:** the `0xD6D0` pool placement is unsafe because
       `c0` floats DGROUP to the full 64 KB (`_heaplen == 0`); the early POOLTEST pass was a false
@@ -410,20 +406,20 @@ The ten prompt strings are ordinary UI text at DS `0xAD6`, `0xAEB`, `0xAF3`, `0x
       blitter indexes the font **unsigned** — confirmed empirically in DOSBox-X: the CP866
       character-select and copy-protection screens render clean in Russian, so **no** signed→
       unsigned manifest patch is needed. `apply_patches.py` emits CP866 directly.
-- [ ] **Translation** — edit strings via `patches.csv`: `string` rows for lines that fit their
-      slot, `reloc` rows (offset = ref from `find_ref.py`) for the ones that don't. Only limit 2
-      (on-screen box width) still constrains; the memory-slot limit is lifted.
+- [~] **Translation** — underway in `patches.csv`: title screen + credits, the copy-protection
+      prompt, new-game/difficulty menus, and character classes are done (`string` rows). Remaining
+      prose uses `string` rows where it fits its slot and `reloc` rows (offset = ref from
+      `find_ref.py`) where it doesn't. Only limit 2 (on-screen box width) still constrains; the
+      memory-slot limit is lifted (pending pool safety — see Overflow repointing).
 - [ ] **Patcher** — ownership-gated installer producing the translated build.
 
 ## Conventions
 
-- `KBU.EXE` is the single source of truth for edits. Regenerate via the script; don't hand-hack
-  headers. The game needs its `.CC` files in the same directory to run.
-- Keep the pristine originals in `game/` (`KB.EXE`, `KB!.COM`, `256.CC`, `416.CC`) untouched —
-  the patcher references them, and they are the byte-source for rebuilding the run-dir archives.
-  The run-dir `.CC` copies are the *edited* ones: they now carry the Cyrillic-extended font and so
-  differ from `game/`. Regenerate them from the pristine `game/` copies via `tools/cc.py` (import
-  the font sheet into member `0x9bb2`, repack) — never hand-hack them or edit `game/` in place.
+- `KBU.EXE` is the single source of truth for edits — regenerate `KBR.EXE` via the script, don't
+  hand-hack headers. The game needs its `.CC` files in the run directory to launch.
+- Keep the pristine `game/` originals untouched. Rebuild the run-dir `.CC` copies from them with
+  `tools/cc.py` (import the font sheet into member `0x9bb2`, repack) — never hand-hack them or edit
+  `game/` in place.
 
 ## Commit Guidelines
 
