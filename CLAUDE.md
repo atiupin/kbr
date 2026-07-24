@@ -209,7 +209,15 @@ same-size control build. Part of the block also **self-decrypts**: 39 bytes at f
 stored XORed with a descending counter (`0x27`…`0x01`) and unscrambled at runtime; it decrypts
 correctly even in the crashing build, so the sabotage is a separate, later mechanism.
 
-Both tools now enforce this: `apply_patches.py` refuses such a row, and `find_ref.py` reports the
+**This is not "any byte in the block is fatal".** Our own protection flip (`bytes` row at `0xC40A`,
+`JC`→`JMP`) is inside the same range and works fine — because that byte is *exactly* the one
+`KB!.COM` patches at runtime on every launch, so no integrity check can cover it without breaking
+NWC's own loader. We do statically what the shipping launcher does dynamically. The guard is
+therefore scoped to **`reloc` rows only**, matching the evidence: every fatal ref sat in the prompt
+routine (`0xC173`–`0xC254`), ~440 B before `0xC40A`. **The checked range is not known** — `PROT_LO`/
+`PROT_HI` is a conservative fence around the whole segment, not a measured boundary.
+
+Both tools enforce it: `apply_patches.py` refuses such a `reloc` row, and `find_ref.py` reports the
 ref but won't emit a paste-ready line. **This costs nothing** — every string reached from that block
 is copy-protection UI text we rewrite freely, and all of it fits its original slot as a `string`
 row. Repointing elsewhere (DGROUP tables, ordinary code) is unaffected and works.
