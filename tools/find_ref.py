@@ -31,6 +31,9 @@ IMAGE_END = 0x1BA20      # end of the original loaded image = DS offset 0x6390
 # Opcodes that load a 16-bit immediate (Turbo C passing a near string pointer):
 # mov ax/cx/dx/bx/si/di, imm16 ; push imm16
 LOAD_OPS = frozenset({0xB8, 0xB9, 0xBA, 0xBB, 0xBE, 0xBF, 0x68})
+# Copy-protection segment: refs here are real, but repointing them is fatal on a long
+# delay (see apply_patches.py). Reported, never offered as a paste-ready reloc row.
+PROT_LO, PROT_HI = 0xBFE0, 0xCCA7
 
 
 def valid_stroff(data, dsoff):
@@ -127,6 +130,12 @@ def main(argv):
     for ref_off, kind in refs:
         ptr = struct.unpack_from("<H", data, ref_off)[0]
         print(f"ref @ {ref_off:#08x}  [{kind}]  currently -> DS {ptr:#06x}")
+        if PROT_LO <= ref_off <= PROT_HI:
+            print("  !! inside the copy-protection block -- DO NOT repoint this ref.")
+            print("     The block is integrity-checked and retaliates on a long delay")
+            print("     (game hangs much later, INT 6 in the graphics loader).")
+            print("     Translate in place with a 'string' row instead.")
+            continue
         print(f'  reloc,{ref_off:#08x},"{data[ref_off]:02X}{data[ref_off+1]:02X}",'
               f'"<Russian>"')
     if len(refs) > 1:

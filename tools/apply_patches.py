@@ -80,6 +80,20 @@ POOL_DSOFF     = 0xD6D0                    # pool base, mid cold band
 POOL_SIZE      = 0x1000                    # 4 KB budget (whole-text overflow est. ~2.4-4 KB)
 POOL_END_DSOFF = POOL_DSOFF + POOL_SIZE    # hard cap; keeps clear of the stack's descent
 
+# The copy-protection segment (Ghidra 19fe:0000-0cc7). Bytes here MUST NOT be edited
+# by a `reloc` row. The block is integrity-checked at runtime and retaliates on a
+# long delay: a single repointed immediate in here let the title screen, the whole
+# town and the contract play through normally, then hung the game with an INT 6 loop
+# on entering the king's castle, faulting in the CC graphics loader -- far from the
+# edit and utterly unlike a normal bad-pointer bug. Proven by bisection: identical
+# builds differing only in these 2-4 bytes crash vs. run, while `reloc` rows whose
+# refs are DGROUP pointer-table slots are fine. Part of the block also self-decrypts
+# at runtime (39 bytes at file 0xC4D7, descending XOR key 0x27..0x01).
+#
+# This costs nothing: every string reached from here is copy-protection UI text we
+# rewrite freely anyway, and all of it fits its original slot as a `string` row.
+PROT_LO, PROT_HI = 0xBFE0, 0xCCA7          # file offsets, inclusive
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 INPUT = os.path.join(ROOT, "KBU.EXE")
@@ -143,6 +157,13 @@ def resolve(patch, idx):
             die(f"{label}: missing {e}")
         except UnicodeEncodeError as e:
             die(f"{label}: {patch['write']!r} is not encodable in {ENCODING} ({e})")
+        if PROT_LO <= off <= PROT_HI:
+            die(f"{label}: reloc ref {off:#x} is inside the copy-protection block "
+                f"({PROT_LO:#x}-{PROT_HI:#x}).\n"
+                f"       That block is integrity-checked and retaliates on a delay -- "
+                f"the game runs, then hangs much later (INT 6 in the graphics loader).\n"
+                f"       Use a 'string' row instead: the protection UI text all fits "
+                f"its original slot.")
         return {"kind": "reloc", "off": off, "expect": expect,
                 "text": text + b"\x00", "label": label}
 
