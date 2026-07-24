@@ -34,11 +34,18 @@ LOAD_OPS = frozenset({0xB8, 0xB9, 0xBA, 0xBB, 0xBE, 0xBF, 0x68})
 
 
 def valid_stroff(data, dsoff):
-    """True if DS offset `dsoff` looks like a real string start (printable,
-    NUL-terminated, <=64 chars) -- distinguishes a genuine pointer-table entry
-    from a coincidental byte pair."""
+    """True if DS offset `dsoff` points at a real string START.
+
+    Requiring the START (a NUL immediately before it) is what makes this
+    discriminating. Merely checking "printable bytes up to a NUL" accepts any
+    offset that lands in the MIDDLE of a string, so arbitrary data validates and
+    coincidental byte pairs get promoted to refs -- the bug that let a slot
+    inside a descending counter table (file 0x18855, bytes `0c 0b`) pose as a
+    pointer to DS 0x0b0c, corrupting the table when the build rewrote it."""
     fo = DS_BASE + dsoff
     if not (DS_BASE <= fo < IMAGE_END):
+        return False
+    if fo != DS_BASE and data[fo - 1] != 0:                  # must be a string START
         return False
     end = data.find(b"\x00", fo)
     if end < 0 or not (1 <= end - fo <= 64):
@@ -47,7 +54,12 @@ def valid_stroff(data, dsoff):
 
 
 def find_refs(data, str_off):
-    """Return [(ref_off, kind)] for the string at file offset `str_off`."""
+    """Return [(ref_off, kind)] for the string at file offset `str_off`.
+
+    Conservative by design: a false ref corrupts whatever it lands on, so a site
+    is only reported when it is structurally a pointer -- an immediate operand of
+    a known load instruction, or a slot whose neighbours are themselves string
+    pointers and which is ordered like a real table."""
     dsoff = str_off - DS_BASE
     needle = struct.pack("<H", dsoff)
     refs = []
@@ -56,13 +68,18 @@ def find_refs(data, str_off):
         if i < DS_BASE:                                      # code immediate
             if data[i - 1] in LOAD_OPS:
                 refs.append((i, "code-immediate"))
-        else:                                                # candidate table entry
-            neigh = sum(
-                1 for k in (i - 2, i + 2)
-                if DS_BASE <= k < IMAGE_END - 1
-                and valid_stroff(data, struct.unpack_from("<H", data, k)[0]))
-            if neigh == 2:
-                refs.append((i, "table-entry"))
+        elif i + 3 < IMAGE_END:                              # candidate table entry
+            prev = struct.unpack_from("<H", data, i - 2)[0]
+            nxt = struct.unpack_from("<H", data, i + 2)[0]
+            # Both neighbours must be string starts too: an isolated hit inside
+            # non-pointer data fails, a genuine table's slots all pass.
+            if valid_stroff(data, prev) and valid_stroff(data, nxt):
+                # ...and the triple must be ordered like a table. Real pointer
+                # tables run monotonically; a data run that merely resembles one
+                # (e.g. the 0x14,0x13,0x12... ramp) is rejected by the strictness
+                # of the string-start test above, and this catches the rest.
+                if prev < dsoff < nxt or nxt < dsoff < prev:
+                    refs.append((i, "table-entry"))
         i = data.find(needle, i + 1)
     return refs
 
