@@ -107,3 +107,14 @@ string,0x01A66B,"You already have the maximum","   У вас уже максим
 string,0x01A688,"number of armies!","  число отрядов!"
 # gold readout
 reloc,0x005E82,"6501","Зол:"
+# character screen
+string,0x01A824,"Leadership","Лидерство"
+reloc,0x018912,"9F51","Жалованье в неделю"
+reloc,0x018914,"AF51","Золото"
+string,0x01A844,"Spell power","Сила магии"
+reloc,0x018918,"C051","Максимум заклинаний"
+string,0x01A860,"Villains caught","Злодеев поймано"
+reloc,0x01891C,"E051","Артефактов найдено"
+string,0x01A880,"Castles garrisoned","Замков занято"
+string,0x01A893,"Followers killed","Воинов потеряно"
+string,0x01A8A4,"Current score","Текущий счет"
