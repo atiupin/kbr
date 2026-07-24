@@ -31,8 +31,9 @@ IMAGE_END = 0x1BA20      # end of the original loaded image = DS offset 0x6390
 # Opcodes that load a 16-bit immediate (Turbo C passing a near string pointer):
 # mov ax/cx/dx/bx/si/di, imm16 ; push imm16
 LOAD_OPS = frozenset({0xB8, 0xB9, 0xBA, 0xBB, 0xBE, 0xBF, 0x68})
-# Copy-protection segment: refs here are real, but repointing them is fatal on a long
-# delay (see apply_patches.py). Reported, never offered as a paste-ready reloc row.
+# Copy-protection segment: refs here are genuine pointers, but repointing any of them
+# hangs the game much later (cause unknown -- see apply_patches.py / CLAUDE.md).
+# Reported, never offered as a paste-ready reloc row.
 PROT_LO, PROT_HI = 0xBFE0, 0xCCA7
 
 

@@ -81,23 +81,28 @@ POOL_SIZE      = 0x1000                    # 4 KB budget (whole-text overflow es
 POOL_END_DSOFF = POOL_DSOFF + POOL_SIZE    # hard cap; keeps clear of the stack's descent
 
 # The copy-protection segment (Ghidra 19fe:0000-0cc7). `reloc` rows MUST NOT repoint a
-# ref in here: the region detects modification and retaliates on a LONG DELAY. A single
-# repointed immediate let the title screen, the whole town and a contract play through
-# normally, then hung the game with an INT 6 loop on entering the king's castle,
-# faulting in the CC graphics loader -- far from the edit and unlike any normal
-# bad-pointer bug. Proven by bisection: identical builds differing only in those 2-4
-# bytes crash vs. run, while `reloc` rows targeting DGROUP pointer-table slots survive
-# the same repro. Part of the block also self-decrypts at runtime (39 bytes at file
-# 0xC4D7, descending XOR key 0x27..0x01) -- correctly even in a crashing build, so the
-# decryptor is not the retaliation mechanism.
+# ref in here. THE RULE IS SOLID; THE REASON IS UNKNOWN -- see CLAUDE.md "Never reloc a
+# ref inside the copy-protection block" for the full evidence table.
+#
+# Symptom: a single repointed immediate lets the title screen, the whole town and a
+# contract play through normally, then hangs the game in an INT 6 loop on entering the
+# king's castle -- a wild far jump to 0070:000E with DS=A000, i.e. dying mid-graphics
+# thousands of instructions after the edit.
+#
+# Established by bisection (builds differing only in the named bytes): repointing 2
+# bytes to another string INSIDE the original image still hangs, and swapping the two
+# immediates -- leaving the block's byte-sum AND XOR unchanged -- still hangs. So the
+# region reacts to being modified at all, and it is not a simple sum/XOR checksum.
+# Falsified along the way: heap exhaustion, stack exhaustion, pool placement (the pool
+# was intact at the crash). No checksum routine, flag, or sabotage code was ever found;
+# do not trust any mechanism story, including "tamper retaliation".
 #
 # NOT a blanket "any byte here is fatal" rule -- our own protection flip (`bytes` row
 # at 0xC40A, JC->JMP) lives in this range and is fine. That byte is exactly what NWC's
-# own KB!.COM patches at runtime on every launch, so by construction no integrity check
-# can cover it; we are doing statically what the shipping loader does dynamically. The
-# guard therefore applies to `reloc` only, which is what the evidence supports: the
-# fatal refs all sit in the prompt routine (0xC173-0xC254), ~440 B before 0xC40A. The
-# exact checked range is NOT known -- do not read this constant as its boundary.
+# own KB!.COM patches at runtime on every launch, so nothing can be guarding it without
+# breaking the shipping loader. The guard therefore applies to `reloc` only. The checked
+# range is NOT known -- this constant is a conservative fence around the whole segment,
+# not a measured boundary.
 #
 # Costs nothing: every string reached from here is copy-protection UI text we rewrite
 # freely anyway, and all of it fits its original slot as a `string` row.

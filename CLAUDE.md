@@ -140,7 +140,7 @@ lines (the overflow-prone ones) are all in that clean set.
 To lengthen a line past its slot: leave the original bytes alone, write the longer CP866 text
 into a **spare pool** somewhere in the 64 KB DGROUP window, and rewrite the string's ref to aim
 at it. Near offsets can't reach past the file image (`0x6390`) into appended data, so the pool
-*must* sit inside the window. `apply_patches.py` currently targets DS **`0xD6D0`** (the gap above
+_must_ sit inside the window. `apply_patches.py` currently targets DS **`0xD6D0`** (the gap above
 the `image + minalloc` reservation) and opens it by zero-padding the image up to it and fixing
 the MZ page count. Budget math: whole text is 16 KB; realistic RU overflow is ~2.4–4 KB, so a
 ~4–10 KB pool has ample headroom and far pointers are never needed.
@@ -157,12 +157,12 @@ puzzle map open** — the game's most allocation-hungry screen. DGROUP is locate
 searching for the Turbo C copyright string (`DS:0x0004`); subtract its DS offset from the hit to get
 `DS:0000`. Result:
 
-| | DS offset | used |
-|---|---|---|
-| `_end` (heap floor) | `0xB64C` | — |
-| near-heap high-water | `0xB6CF` | **~131 B** |
-| **cold band** | **`0xB6D0`–`0xFE2C`** | **17.8 KB untouched** |
-| stack low-water | `0xFE2C` | ~467 B |
+|                      | DS offset             | used                  |
+| -------------------- | --------------------- | --------------------- |
+| `_end` (heap floor)  | `0xB64C`              | —                     |
+| near-heap high-water | `0xB6CF`              | **~131 B**            |
+| **cold band**        | **`0xB6D0`–`0xFE2C`** | **17.8 KB untouched** |
+| stack low-water      | `0xFE2C`              | ~467 B                |
 
 The game's near-memory demand is **negligible** — the earlier fear that the heap climbs into the
 pool was wrong. The pool sits at **`0xD6D0`** (mid-band): ~8.2 KB of slack above the heap
@@ -196,26 +196,48 @@ a pointer silently corrupts whatever it overwrites, and the failure surfaces far
 
 #### ⛔ Never `reloc` a ref inside the copy-protection block (file `0xBFE0`–`0xCCA7`)
 
-The block is **integrity-checked at runtime and retaliates on a long delay**. Repointing a single
-code immediate in there (e.g. `0xC173`) lets the title screen, the town and a contract play through
-normally, then hangs the game in an `INT 6` loop **on entering the king's castle**, faulting inside
-the CC graphics loader — thousands of instructions and several minutes from the edit.
+**The rule is solid; the reason is unknown.** Repointing a single code immediate in the protection
+prompt routine (e.g. `0xC173`) lets the title screen, the town and a contract play through normally,
+then hangs the game in an `INT 6` loop **on entering the king's castle** — thousands of instructions
+and several minutes after the edit.
 
-Established by bisection, not inference: builds identical except for those 2–4 bytes crash vs. run,
-while `reloc` rows whose refs are DGROUP pointer-table slots survive the same repro. A memory dump
-at the crash ruled out every other candidate — the pool at DS `0xD6D0` was **intact**, heap
-high-water `0xB6CF`, stack low-water `0xFE32` (both far from it), and image growth was cleared by a
-same-size control build. Part of the block also **self-decrypts**: 39 bytes at file `0xC4D7` are
-stored XORed with a descending counter (`0x27`…`0x01`) and unscrambled at runtime; it decrypts
-correctly even in the crashing build, so the sabotage is a separate, later mechanism.
+**What is established**, all by bisection against builds differing _only_ in the named bytes:
+
+| probe          | change                                                                      | result                       |
+| -------------- | --------------------------------------------------------------------------- | ---------------------------- |
+| baseline       | `reloc` rows whose refs are DGROUP pointer-table slots                      | **runs** (full castle repro) |
+| growth control | image grown + pool bytes written, nothing repointed                         | **runs**                     |
+| P1             | 2 bytes at `0xC173` repointed to another string _inside the original image_ | **hangs**                    |
+| P2             | the two immediates swapped — block byte-sum **and** XOR both unchanged      | **hangs**                    |
+
+So the region reacts to _being modified at all_ — not to the pool, not to pointer magnitude, and not
+to anything a simple additive or XOR checksum would catch. A memory dump at the crash cleared every
+other suspect: pool at DS `0xD6D0` **intact**, heap high-water `0xB6CF`, stack low-water `0xFE32`.
+
+**Crash signature** (DOSBox-X register panel at the hang): `CS:IP = 0070:000E` — a wild far jump into
+low memory — with `DS=A000` (VGA), i.e. it dies mid-graphics-operation, matching the CC filenames
+found on the stack. `SS` is still DGROUP but `SP` has marched ~25 KB below the stack area; that is
+**aftermath, not cause** — an unhandled `INT 6` pushes 6 bytes per iteration and never pops, so the
+loop destroys the very stack that would name the culprit. `BP` is still sane.
+
+**Mechanism: UNKNOWN. Do not trust any explanation, including earlier ones in this file's git
+history.** Falsified so far: near-heap exhaustion, stack exhaustion, and a simple sum/XOR integrity
+check (P2). No checksum routine, flag, or sabotage code has ever been located. "Tamper detection
+that retaliates on a delay" fits the wild jump but has **no direct evidence** behind it. Related
+fact, cause unproven: 39 bytes at file `0xC4D7` are stored XORed with a descending counter
+(`0x27`…`0x01`) and **self-decrypt** at runtime — correctly even in a crashing build.
+
+**Don't try skipping the routine.** NOPing its only call site (`0x70BC`) does not isolate any check:
+`FUN_19fe_000b` also seeds the RNG from the DOS clock, so the game starts uninitialised and exits
+when loading a save — a different failure that proves nothing.
 
 **This is not "any byte in the block is fatal".** Our own protection flip (`bytes` row at `0xC40A`,
-`JC`→`JMP`) is inside the same range and works fine — because that byte is *exactly* the one
-`KB!.COM` patches at runtime on every launch, so no integrity check can cover it without breaking
-NWC's own loader. We do statically what the shipping launcher does dynamically. The guard is
-therefore scoped to **`reloc` rows only**, matching the evidence: every fatal ref sat in the prompt
-routine (`0xC173`–`0xC254`), ~440 B before `0xC40A`. **The checked range is not known** — `PROT_LO`/
-`PROT_HI` is a conservative fence around the whole segment, not a measured boundary.
+`JC`→`JMP`) is inside the range and works — that byte is _exactly_ the one `KB!.COM` patches at
+runtime on every launch, so nothing can be guarding it without breaking NWC's own loader; we do
+statically what the shipping launcher does dynamically. The guard is therefore scoped to **`reloc`
+rows only**. Every fatal ref sat in the prompt routine (`0xC173`–`0xC254`), ~440 B before `0xC40A`;
+whether the _data_ table at `0xC2CE` is sensitive was never tested. `PROT_LO`/`PROT_HI` is a
+**conservative fence around the whole segment, not a measured boundary**.
 
 Both tools enforce it: `apply_patches.py` refuses such a `reloc` row, and `find_ref.py` reports the
 ref but won't emit a paste-ready line. **This costs nothing** — every string reached from that block
@@ -264,16 +286,17 @@ row. Repointing elsewhere (DGROUP tables, ordinary code) is unaffected and works
   lock and say so; close it with File → Close Project (no need to quit). Homebrew's `ghidraRun`
   sets JAVA_HOME itself; only raw `analyzeHeadless` needs
   `export JAVA_HOME=/opt/homebrew/opt/openjdk@21`.
+
 - **Ghidra GUI orientation**: Listing = disassembly, Decompiler = C-ish pseudocode, Window →
   Bytes = hex (cursor-linked to the Listing), Window → Defined Strings = all 877 strings.
   `G` = goto address, `D` = disassemble here. To use our scripts from the GUI, Script Manager →
-  *Manage Script Directories* → add `tools/ghidra_scripts`.
+  _Manage Script Directories_ → add `tools/ghidra_scripts`.
 - **`tools/ghidra_scripts/` inventory** (each is `-postScript`-style; run via `tools/ghidra.sh
-  run <script> [args]` headless, or from the GUI Script Manager). `tools/ghidra.sh list` prints
+run <script> [args]` headless, or from the GUI Script Manager). `tools/ghidra.sh list` prints
   the same set:
   - **`DumpAsm.java <seg:off>`** — dumps one function's analyzed assembly listing with resolved
     symbols and call targets. De-noised output.
-  - **`DumpDecomp.java <outdir>`** — dumps decompiled C for *every* function plus a string→
+  - **`DumpDecomp.java <outdir>`** — dumps decompiled C for _every_ function plus a string→
     referencing-function map. Source of `build/decomp/decompiled_all.c`.
   - **`DisasmRange.java <seg:off> <len>`** — force-disassembles a range auto-analysis left as raw
     data and prints it (e.g. the unanalyzed protection block `19fe:02ee`–`0cc7`).
@@ -289,7 +312,7 @@ row. Repointing elsewhere (DGROUP tables, ordinary code) is unaffected and works
 - **Comments truncate in the Listing by default.** The EOL comment field is narrow and clips
   with "..." rather than wrapping. Fix once, in Edit → Tool Options → **Listing Fields → EOL
   Comments Field**: tick **Enable Word Wrapping** and raise **Maximum Lines** (1 → 3+). Same
-  options exist under *Pre-comments Field*. Our scripts also avoid the problem at the source:
+  options exist under _Pre-comments Field_. Our scripts also avoid the problem at the source:
   anything over 30 chars is written as a **pre-comment** (own lines above the instruction)
   instead of EOL — pass a different cutoff as the first script argument, e.g.
   `AnnotateKbCom.java 0` forces every comment into a pre-comment.
@@ -304,9 +327,9 @@ row. Repointing elsewhere (DGROUP tables, ordinary code) is unaffected and works
   addresses assume it; import at `0` and every internal reference is off by `0x100`. Decline
   auto-analysis, then disassemble by hand (`G` then `D`) at `1000:01a8` (real entry — byte 0 is
   `jmp 0x1a8`) and at `1000:011d` (the INT 16h handler, reached only via the vector, so nothing
-  points at it statically). `0x103` and `0x10D` are signature *data*, not code.
+  points at it statically). `0x103` and `0x10D` are signature _data_, not code.
   Headless equivalent: `tools/ghidra.sh import 'game/KB!.COM' -loader BinaryLoader
-  -loader-baseAddr 1000:0100 -processor 'x86:LE:16:Real Mode' -cspec default`
+-loader-baseAddr 1000:0100 -processor 'x86:LE:16:Real Mode' -cspec default`
   **Then run `AnnotateKbCom.java` on it** (Script Manager, or headless) — it does the manual
   work auto-analysis cannot: marks `0x103`–`0x11C` as data, disassembles the entry, the INT 16h
   handler and the patcher, names everything, and sets the `Analyzed` flag so Ghidra stops
@@ -348,8 +371,8 @@ Two separate pieces: the **prompt routine** (shows page/line/word, collects the 
 **verification branch**, ~1.1 KB later inside an unanalyzed block. The prompt routine contains no
 comparison; the actual gate is the verification branch at `0xC40A`, disabled by `KB!.COM` below.
 
-Address map used throughout: *Ghidra linear = image offset + `0x10000`; file offset = image
-offset + `0x2000`*.
+Address map used throughout: _Ghidra linear = image offset + `0x10000`; file offset = image
+offset + `0x2000`_.
 
 ### `KB!.COM` is a loader-patcher, not a hardware check
 
@@ -412,7 +435,7 @@ itself is the `0xC40A` branch, handled by the patch above.
 ## Dumps
 
 - RAM snapshots (deleted after they served the unpack validation; regenerate via `MEMDUMPBIN`
-  if needed): *base1* = normal launch, image at linear `0x8920`, load segment `0x892`; *loadfix*
+  if needed): _base1_ = normal launch, image at linear `0x8920`, load segment `0x892`; _loadfix_
   = under LOADFIX, image at `0x12C77`, load segment `0x10C0` (= base1 + `0x82E` paragraphs). The
   two-address pair is what let us diff out relocations.
 - `dumps/game_text.txt`, `dumps/all_strings.txt`, `dumps/text_like.txt` — extracted text.
@@ -449,10 +472,10 @@ itself is the `0xC40A` branch, handled by the patch above.
       character-select and copy-protection screens render clean in Russian, so **no** signed→
       unsigned manifest patch is needed. `apply_patches.py` emits CP866 directly.
 - [~] **Translation** — underway in `patches.csv`: title screen + credits, the copy-protection
-      prompt, new-game/difficulty menus, and character classes are done (`string` rows). Remaining
-      prose uses `string` rows where it fits its slot and `reloc` rows (offset = ref from
-      `find_ref.py`) where it doesn't. Only limit 2 (on-screen box width) still constrains — the
-      memory-slot limit is lifted for good (see Overflow repointing).
+  prompt, new-game/difficulty menus, and character classes are done (`string` rows). Remaining
+  prose uses `string` rows where it fits its slot and `reloc` rows (offset = ref from
+  `find_ref.py`) where it doesn't. Only limit 2 (on-screen box width) still constrains — the
+  memory-slot limit is lifted for good (see Overflow repointing).
 - [ ] **Patcher** — ownership-gated installer producing the translated build.
 
 ## Conventions
