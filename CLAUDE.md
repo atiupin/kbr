@@ -194,6 +194,26 @@ still finds all 11 real refs.
 **Rule: every `reloc` ref must come from `find_ref.py`, never hand-picked.** A ref that isn't really
 a pointer silently corrupts whatever it overwrites, and the failure surfaces far from the edit.
 
+#### ⛔ Never `reloc` a ref inside the copy-protection block (file `0xBFE0`–`0xCCA7`)
+
+The block is **integrity-checked at runtime and retaliates on a long delay**. Repointing a single
+code immediate in there (e.g. `0xC173`) lets the title screen, the town and a contract play through
+normally, then hangs the game in an `INT 6` loop **on entering the king's castle**, faulting inside
+the CC graphics loader — thousands of instructions and several minutes from the edit.
+
+Established by bisection, not inference: builds identical except for those 2–4 bytes crash vs. run,
+while `reloc` rows whose refs are DGROUP pointer-table slots survive the same repro. A memory dump
+at the crash ruled out every other candidate — the pool at DS `0xD6D0` was **intact**, heap
+high-water `0xB6CF`, stack low-water `0xFE32` (both far from it), and image growth was cleared by a
+same-size control build. Part of the block also **self-decrypts**: 39 bytes at file `0xC4D7` are
+stored XORed with a descending counter (`0x27`…`0x01`) and unscrambled at runtime; it decrypts
+correctly even in the crashing build, so the sabotage is a separate, later mechanism.
+
+Both tools now enforce this: `apply_patches.py` refuses such a row, and `find_ref.py` reports the
+ref but won't emit a paste-ready line. **This costs nothing** — every string reached from that block
+is copy-protection UI text we rewrite freely, and all of it fits its original slot as a `string`
+row. Repointing elsewhere (DGROUP tables, ordinary code) is unaffected and works.
+
 ## Tooling
 
 - **DOSBox-X** (`brew install --cask dosbox-x`; Gatekeeper quarantine stripped). Debug build
