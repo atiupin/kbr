@@ -127,9 +127,69 @@ sections after the "Packed file is corrupt" string, each `uint16 count` then tha
 - **Encoding: target CP866** (DOS Russian). Each Cyrillic letter = **1 byte**, same as ASCII —
   so byte budget = character count. Russian isn't heavier per letter, only per phrase.
 - **Two length limits** when translating: (1) memory slot — don't overrun into the next string
-  (same-or-shorter is safe; longer needs repointing to spare space); (2) on-screen box width —
-  a string can fit in memory yet overflow its UI field. The tight menus/labels bite hardest;
-  long prose looks pre-wrapped to ~28–30 char lines.
+  (same-or-shorter is safe; longer is **solved** by repointing — see below); (2) on-screen box
+  width — a string can fit in memory yet overflow its UI field. The tight menus/labels bite
+  hardest; long prose looks pre-wrapped to ~28–30 char lines.
+
+### String repointing (the `reloc` mechanism — solves limit 1)
+
+Game text is reached through **2-byte NEAR offsets relative to DS** (DGROUP base = file
+**`0x15690`** = `DS:0000`; near offset 0 lives there). A string is pointed at by a **ref**: the
+file offset of a 2-byte slot holding the string's DS offset. Two ref shapes exist — a **pointer-
+table entry** in DGROUP (e.g. the villain-bio table at file `0x16a30`, one entry per line) or an
+**immediate operand in code** (`mov ax,imm16` / `push imm16`, e.g. the title line's ref at
+`0x75fc`). A full sweep found **873 of ~1020 strings resolve to exactly one ref**; the box/bio
+lines (the overflow-prone ones) are all in that clean set.
+
+To lengthen a line past its slot: leave the original bytes alone, write the longer CP866 text
+into a **spare pool** somewhere in the 64 KB DGROUP window, and rewrite the string's ref to aim
+at it. Near offsets can't reach past the file image (`0x6390`) into appended data, so the pool
+*must* sit inside the window. `apply_patches.py` currently targets DS **`0xD6D0`** (the gap above
+the `image + minalloc` reservation) and opens it by zero-padding the image up to it and fixing
+the MZ page count. Budget math: whole text is 16 KB; realistic RU overflow is ~2.4–4 KB, so a
+~4–10 KB pool has ample headroom and far pointers are never needed.
+
+Mechanised as the **`reloc` patch type** (`tools/apply_patches.py`) + **`tools/find_ref.py`**
+(run-once ref discovery). A `reloc` row's `offset` is the ref, `expect` is the 2 pointer bytes
+there, `write` is the replacement text — the build just repoints, no scanning. A string used from
+several places needs one `reloc` row per ref (all its pointers must move together).
+
+#### ⚠️ Pool safety is NOT yet established (the `0xD6D0` placement is unsafe as-is)
+
+The repointing itself is correct and proven; **where the pool lives is not.** An early "POOLTEST"
+(a reloc'd title line rendering clean from `0xD6D0`) was a **false positive** — the title screen
+barely touches the heap/stack. The real picture, from disassembling the Turbo C `c0` startup
+(entry `0000:0000`, file `0x2000`):
+
+- `c0` sizes DGROUP from two DGROUP globals: **`_heaplen`** at DS `0x629a` and **`_stklen`** at DS
+  `0x62a0`. In KBU they read **`_heaplen = 0`**, **`_stklen = 0x1000`** (4 KB).
+- With `_heaplen == 0`, `c0` takes the **floating** branch: `DGROUP top = min(64 KB, available
+  memory)`. On any memory-rich machine (DOSBox) it claims the **entire 64 KB segment** — the near
+  heap grows up from `_end` (~DS `0xB64C`), the stack sits at the top (~`0xFFFF`) and grows down.
+  **The whole window is in play**, so `0xD6D0` is squarely in the heap's climb / stack's descent.
+- Static top is ~`0xB64C`; current near-heap ceiling ≈ `0x10000 − 0xB64C − 0x1000` ≈ **14.7 KB**.
+
+**Fix (planned, not yet done):** patch **`_heaplen`** to a nonzero value → `c0`'s **fixed** branch,
+`DGROUP top = 0xB64C + _stklen + _heaplen`, fixed below `0xFFFF`. Everything above that top is then
+genuinely nobody's — heap ceilinged by `_brklvl` (near `malloc`/`sbrk` refuses to cross it — worth
+confirming in the disasm to make it a proof), stack at the fixed top growing *away* from the pool.
+Cost: the pool comes out of the near-heap budget, so the cap must be ≥ the game's peak near-heap
+demand. Also flip `apply_patches.py`'s bump allocator to fill **top-down from `0xFFFF`** (max buffer
+from the rising heap) — but only *with* the `_heaplen` cap; top-down in the floating layout is
+worse (that's where the stack lives).
+
+**Heap test to run before trusting the pool (canary, in DOSBox-X debugger):**
+1. Launch a build, break right after startup (before gameplay).
+2. Paint the dynamic zone `DS:0xB64C`..~`0xFF00` with a sentinel byte (e.g. `0xE5`).
+3. Play *hard*: new game, max army, explore the whole map, cast spells, open every villain bio,
+   visit castles — drive worst-case allocation (NOT a quick title-screen poke — that's what fooled
+   POOLTEST).
+4. Break, dump `DS:0xB64C..0xFFFF`. Lowest-still-sentinel from the bottom = near-heap high-water;
+   highest-still-sentinel from the top = stack low-water; the untouched middle band is provably
+   cold for that session.
+5. If the cold band comfortably exceeds the needed pool (say ≥ 4 KB margin), cap `_heaplen` to fix
+   DGROUP just under it and confirm the capped build plays through without out-of-memory. If the
+   band is thin, the near pool is not viable → fall back to far-pointer storage (print thunk).
 
 ## Tooling
 
@@ -147,6 +207,13 @@ sections after the "Packed file is corrupt" string, each `uint16 count` then tha
   `extract <cc> <id-hex> <out.bin>` (decoded bytes), `replace <cc> <id-hex> <in.bin> <out.cc>`,
   `font-export <cc> <png> [--glyphs 256]`, `font-import <png> <cc> <out.cc>`. Implements the
   LZW codec above; validated round-trip on every member of both archives.
+- **`tools/apply_patches.py`** — manifest-driven, hash-gated builder of `KBR.EXE` from pristine
+  `KBU.EXE` (no args). Patch types `bytes` / `string` / `reloc` (see "String repointing"). Run
+  with no arguments; verifies every `expect` before writing (all-or-nothing).
+- **`tools/find_ref.py`** — run-once ref discovery for `reloc` rows: `find_ref.py 0x16e0b` or
+  `find_ref.py "as for treason"` prints the ref offset, its current pointer bytes, and a paste-
+  ready `reloc,<off>,"<hex>","<Russian>"` line. Kept out of the build so the patcher stays a dumb,
+  deterministic applier of fixed offsets.
 - **Ghidra 12.1.2** (`brew install ghidra`) — the analysis tool for this project. Drive it via
   **`tools/ghidra.sh`**, which presets the project, program and script paths:
 
@@ -330,17 +397,23 @@ The ten prompt strings are ordinary UI text at DS `0xAD6`, `0xAEB`, `0xAF3`, `0x
       producing `KBR.EXE`. Confirmed in DOSBox-X: `KBR` runs standalone and reaches the title
       screen (verified via a title-screen string edit).
 - [x] **Patch engine** — `tools/apply_patches.py` + `tools/patches.csv`: manifest-driven,
-      hash-gated builder of `KBR.EXE` (`bytes`/`string` patch types). Replaces the old
+      hash-gated builder of `KBR.EXE` (`bytes`/`string`/`reloc` patch types). Replaces the old
       `patch_protection.py`; the protection flip is its first entry. String patches (with CP866
       encoding + slot-length checks) land once translation starts.
+- [~] **Overflow repointing** — `reloc` patch type + `tools/find_ref.py` work and repoint
+      correctly (proven). **Blocked on pool safety:** the `0xD6D0` pool placement is unsafe because
+      `c0` floats DGROUP to the full 64 KB (`_heaplen == 0`); the early POOLTEST pass was a false
+      positive. Fix = cap `_heaplen` + top-down fill, gated on the canary heap test. See "String
+      repointing → Pool safety".
 - [~] **Cyrillic font** — font *located and format cracked*: CC member `0x9bb2`, 8×8 128-glyph
       Latin-only, LZW-compressed; `tools/cc.py` extracts/injects it, `tools/font.png` is the
       editable sheet. Remaining: draw the CP866 Cyrillic glyphs into `0x80`–`0xFF`, and confirm
       the glyph blitter indexes the font unsigned (else a one-byte signed→unsigned manifest patch).
       See the font/Cyrillic-plan notes under "File-format reference". Nothing renders in Russian
       until the glyphs are drawn.
-- [ ] **Translation** — edit strings in `KBU` respecting the two length limits; build repointing
-      only for the strings that can't be shortened.
+- [ ] **Translation** — edit strings via `patches.csv`: `string` rows for lines that fit their
+      slot, `reloc` rows (offset = ref from `find_ref.py`) for the ones that don't. Only limit 2
+      (on-screen box width) still constrains; the memory-slot limit is lifted.
 - [ ] **Patcher** — ownership-gated installer producing the translated build.
 
 ## Conventions
