@@ -40,12 +40,16 @@ reloc : for a translation that OVERFLOWS its original slot. `offset` is NOT the
         `offset` to aim there; the original slot is untouched. Find a ref once
         with tools/find_ref.py.
 
-WARNING: the POOL_DSOFF placement is NOT yet proven runtime-safe. Turbo C's c0
-floats DGROUP to the full 64 KB when _heaplen == 0 (it is), so the near heap and
-stack can use this region -- the early POOLTEST pass was a false positive. The
-fix (cap _heaplen, fill top-down) and the canary heap test that must precede it
-are in CLAUDE.md "String repointing -> Pool safety". Do not ship reloc'd
-translations until that test passes.
+Pool safety: measured, not assumed. A full-session memory dump (puzzle map open)
+put the near-heap high-water at DS 0xb6cf and the stack low-water at DS 0xfe2c --
+a 17.8 KB cold band -- so the pool sits mid-band with KB of slack either side.
+See the POOL_* constants below and CLAUDE.md "String repointing -> Pool safety".
+
+Every `reloc` row's ref MUST come from tools/find_ref.py, which validates that
+the site is a real code immediate or pointer-table slot. A hand-picked offset can
+land on a 2-byte value that merely happens to equal the string's DS offset --
+that mistake (a ref inside a counter table) silently corrupted game data and
+crashed the puzzle map.
 """
 
 import csv
@@ -57,10 +61,24 @@ import sys
 ENCODING = "cp866"
 TARGET_SHA256 = "a0ad8832b6a9afa7b28c7d0054a13e286d7952a558eaa12a38f6146e77339d49"
 
-# DGROUP layout of KBU.EXE (see CLAUDE.md repointing notes).
+# DGROUP layout of KBU.EXE (see CLAUDE.md "String repointing").
 DS_BASE = 0x15690        # file offset of DS:0000 -- near offset 0 lives here
-POOL_DSOFF = 0xD6D0      # overflow pool base (UNSAFE until _heaplen capped; see docstring)
-POOL_END_DSOFF = 0xFFFF  # top of the near window; pool must stay below this
+BSSEND  = 0xB64C         # _end: heap floor / top of BSS (c0 constant, verified)
+
+# Overflow-pool placement, from the MEMDUMP.BIN measurement (heavy session with
+# the puzzle map open): the game's near memory demand is tiny -- near-heap
+# high-water DS 0xb6cf (~131 B above _end) and stack low-water DS 0xfe2c (~467 B
+# below the top), leaving a 17.8 KB cold band at DS 0xb6d0..0xfe2c. The pool sits
+# mid-band, so the climbing heap and the descending stack each have several KB of
+# slack before they could reach it. c0's BSS wipe stops at _end (0xb64c), so the
+# pool's file-loaded bytes survive startup untouched.
+#
+# DGROUP is left FLOATING (_heaplen stays 0): capping it to force c0's fixed
+# branch was tried and reverted -- it buys nothing here (the heap barely grows)
+# and costs the stack its headroom.
+POOL_DSOFF     = 0xD6D0                    # pool base, mid cold band
+POOL_SIZE      = 0x1000                    # 4 KB budget (whole-text overflow est. ~2.4-4 KB)
+POOL_END_DSOFF = POOL_DSOFF + POOL_SIZE    # hard cap; keeps clear of the stack's descent
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
@@ -224,7 +242,7 @@ def main():
     if relocs:
         used = len(data) - (DS_BASE + POOL_DSOFF)
         print(f"  overflow pool: DS {POOL_DSOFF:#06x}..{POOL_DSOFF + used:#06x} "
-              f"({used}B); image grown to {len(data)} bytes")
+              f"({used}B used / {POOL_SIZE}B); image grown to {len(data)} bytes")
 
 
 if __name__ == "__main__":
