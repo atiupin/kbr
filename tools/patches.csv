@@ -23,16 +23,18 @@ string,0x16805,"Impossible?  200     x4","Невозможно?  200     x4"
 string,0x15F3F," to select   Ent to Accept",": выбрать   Enter: принять"
 # title screen - copy-protection prompt
 string,0x16166,"Please turn to page ","Откройте страницу "
-reloc,0x00c173,"EB0A",", на ней"
-reloc,0x00c18d,"F30A","строка "
+string,0x1617B,", go to",", "
+string,0x16183,"line ","стр. "
 string,0x16189," and type in word ",", слово "
 string,0x16230,"Word: ","Слово:"
 # title screen - copy-protection description
-reloc,0x00c1e6,"0C0B","Ладно, шучу! Не нужно никуда  "
-reloc,0x00c209,"290B","смотреть, конечно. Защита уже "
-reloc,0x00c222,"480B","снята. Просто нажмите Enter и "
-reloc,0x00c23b,"670B","вперед, к приключениям. Удачи,"
-reloc,0x00c254,"850B","тебе, герой!"
+# NB: in-slot (string) rows, NOT reloc -- their refs are code immediates inside the
+# copy-protection block, which is the region under investigation for the castle hang.
+string,0x1619C,"Note: Spaces are not counted","Ладно, шучу! Не нужно никуда"
+string,0x161B9,"as words or lines.  Hyphenated","смотреть, конечно. Защита уже"
+string,0x161D8,"words are treated as one word.","снята. Просто нажмите Enter и"
+string,0x161F7,"Any line that has any kind of","вперед, к приключениям. Удачи"
+string,0x16215,"text is considered a line.","тебе, герой!"
 # title screen - new-game creation message
 reloc,0x01672c,"8D11","Создается новый мир. Немного"
 reloc,0x01672e,"AA11","подождите, пока я творю     "
