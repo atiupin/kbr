@@ -150,42 +150,49 @@ Mechanised as the **`reloc` patch type** (`tools/apply_patches.py`) + **`tools/f
 there, `write` is the replacement text — the build just repoints, no scanning. A string used from
 several places needs one `reloc` row per ref (all its pointers must move together).
 
-#### ⚠️ Pool safety is NOT yet established (the `0xD6D0` placement is unsafe as-is)
+#### Pool safety — measured, `0xD6D0` confirmed cold
 
-The repointing itself is correct and proven; **where the pool lives is not.** An early "POOLTEST"
-(a reloc'd title line rendering clean from `0xD6D0`) was a **false positive** — the title screen
-barely touches the heap/stack. The real picture, from disassembling the Turbo C `c0` startup
-(entry `0000:0000`, file `0x2000`):
+Settled by a full-RAM dump (`MEMDUMPBIN 0000:0000 100000`) taken during a heavy session **with the
+puzzle map open** — the game's most allocation-hungry screen. DGROUP is located in the dump by
+searching for the Turbo C copyright string (`DS:0x0004`); subtract its DS offset from the hit to get
+`DS:0000`. Result:
 
-- `c0` sizes DGROUP from two DGROUP globals: **`_heaplen`** at DS `0x629a` and **`_stklen`** at DS
-  `0x62a0`. In KBU they read **`_heaplen = 0`**, **`_stklen = 0x1000`** (4 KB).
-- With `_heaplen == 0`, `c0` takes the **floating** branch: `DGROUP top = min(64 KB, available
-  memory)`. On any memory-rich machine (DOSBox) it claims the **entire 64 KB segment** — the near
-  heap grows up from `_end` (~DS `0xB64C`), the stack sits at the top (~`0xFFFF`) and grows down.
-  **The whole window is in play**, so `0xD6D0` is squarely in the heap's climb / stack's descent.
-- Static top is ~`0xB64C`; current near-heap ceiling ≈ `0x10000 − 0xB64C − 0x1000` ≈ **14.7 KB**.
+| | DS offset | used |
+|---|---|---|
+| `_end` (heap floor) | `0xB64C` | — |
+| near-heap high-water | `0xB6CF` | **~131 B** |
+| **cold band** | **`0xB6D0`–`0xFE2C`** | **17.8 KB untouched** |
+| stack low-water | `0xFE2C` | ~467 B |
 
-**Fix (planned, not yet done):** patch **`_heaplen`** to a nonzero value → `c0`'s **fixed** branch,
-`DGROUP top = 0xB64C + _stklen + _heaplen`, fixed below `0xFFFF`. Everything above that top is then
-genuinely nobody's — heap ceilinged by `_brklvl` (near `malloc`/`sbrk` refuses to cross it — worth
-confirming in the disasm to make it a proof), stack at the fixed top growing *away* from the pool.
-Cost: the pool comes out of the near-heap budget, so the cap must be ≥ the game's peak near-heap
-demand. Also flip `apply_patches.py`'s bump allocator to fill **top-down from `0xFFFF`** (max buffer
-from the rising heap) — but only *with* the `_heaplen` cap; top-down in the floating layout is
-worse (that's where the stack lives).
+The game's near-memory demand is **negligible** — the earlier fear that the heap climbs into the
+pool was wrong. The pool sits at **`0xD6D0`** (mid-band): ~8.2 KB of slack above the heap
+high-water, ~9.8 KB below the stack low-water, with a 4 KB cap (`POOL_SIZE`) that keeps the whole
+budget inside the band. `c0`'s BSS wipe stops at `_end`, so pool bytes loaded from the file survive
+startup untouched.
 
-**Heap test to run before trusting the pool (canary, in DOSBox-X debugger):**
-1. Launch a build, break right after startup (before gameplay).
-2. Paint the dynamic zone `DS:0xB64C`..~`0xFF00` with a sentinel byte (e.g. `0xE5`).
-3. Play *hard*: new game, max army, explore the whole map, cast spells, open every villain bio,
-   visit castles — drive worst-case allocation (NOT a quick title-screen poke — that's what fooled
-   POOLTEST).
-4. Break, dump `DS:0xB64C..0xFFFF`. Lowest-still-sentinel from the bottom = near-heap high-water;
-   highest-still-sentinel from the top = stack low-water; the untouched middle band is provably
-   cold for that session.
-5. If the cold band comfortably exceeds the needed pool (say ≥ 4 KB margin), cap `_heaplen` to fix
-   DGROUP just under it and confirm the capped build plays through without out-of-memory. If the
-   band is thin, the near pool is not viable → fall back to far-pointer storage (print thunk).
+**DGROUP stays floating — do not cap `_heaplen`.** Capping it (to force `c0`'s fixed branch) was
+implemented and reverted: it buys nothing (the heap barely grows) and costs the stack its headroom,
+since the floating layout lets the stack use the whole band while a fixed `_stklen` pins it to 4 KB.
+For reference, `c0`'s sizing (entry `0000:0000`, file `0x2000`): `_heaplen` at DS `0x629a`,
+`_stklen` at DS `0x62a0` (KBU: `0`, `0x1000`); with `_heaplen == 0` it takes the floating branch,
+`DGROUP top = min(64 KB, available)`, then `SETBLOCK`s the process block to that top.
+
+#### ⚠️ The real hazard is a false ref, not the pool
+
+The puzzle-map crash blamed on pool placement was actually a **bogus `reloc` ref**. `find_ref.py`
+reported file `0x18855` as a second ref for the string at DS `0x0B0C`, but those bytes (`0c 0b`) are
+two entries of a **descending counter table** (`14 13 12 ... 0c 0b 0a ...`) that merely happen to
+equal the string's DS offset. Repointing them corrupted data the map path reads → `INT 6` (invalid
+opcode) loop. Removing that one row fixed it; the pool was never the problem.
+
+Root cause in the tool: `valid_stroff` only checked "printable bytes up to a NUL", which **any**
+offset landing mid-string satisfies, so both neighbours validated and the slot was promoted to a
+pointer table. Now hardened — a target must be a genuine string **start** (NUL immediately before
+it) and a table triple must be **monotone**. Verified: the hardened finder rejects `0x18855` and
+still finds all 11 real refs.
+
+**Rule: every `reloc` ref must come from `find_ref.py`, never hand-picked.** A ref that isn't really
+a pointer silently corrupts whatever it overwrites, and the failure surfaces far from the edit.
 
 ## Tooling
 
@@ -194,6 +201,11 @@ worse (that's where the stack lives).
   `/Applications/dosbox-x.app/Contents/MacOS/dosbox-x -conf dosbox-x.conf`.
   Memory snapshot: run to a screen, `Debug → Start DOSBox-X Debugger` (pauses CPU), then in the
   Terminal `MEMDUMPBIN 0000:0000 100000`.
+  **Finding DGROUP in a dump** (needed for any heap/stack measurement): search the 1 MB image for
+  the `"Turbo C++ - Copyright 1990 Borla…"` literal, which lives at DS `0x0004`; `DS:0000` =
+  hit − 4. Then heap high-water = highest nonzero byte climbing from `_end` (`0xB64C`) and stack
+  low-water = lowest nonzero descending from `0xFFFF` — DOSBox starts RAM zeroed, so untouched
+  really means untouched, and unwound stack frames still show as residue.
 - **CUP386 v3.4** (archive.org item `CUP386`; full manual in `tools/README.CUP`). Generic
   unpacker. **Gotcha: fails "unable to load source file" if given paths — use bare filenames in
   the same dir.** Tracers `/1` fast, `/3` V86, `/7` full emulator (slow, most robust); `/x` =
@@ -395,11 +407,13 @@ itself is the `0xC40A` branch, handled by the patch above.
       hash-gated builder of `KBR.EXE` (`bytes`/`string`/`reloc` patch types). Replaces the old
       `patch_protection.py`; the protection flip is its first entry. String patches (with CP866
       encoding + slot-length checks) now carry the translation (see below).
-- [~] **Overflow repointing** — `reloc` patch type + `tools/find_ref.py` work and repoint
-      correctly (proven). **Blocked on pool safety:** the `0xD6D0` pool placement is unsafe because
-      `c0` floats DGROUP to the full 64 KB (`_heaplen == 0`); the early POOLTEST pass was a false
-      positive. Fix = cap `_heaplen` + top-down fill, gated on the canary heap test. See "String
-      repointing → Pool safety".
+- [x] **Overflow repointing** — `reloc` patch type + `tools/find_ref.py`, unblocked. Pool safety is
+      now **measured**, not assumed: a full-RAM dump with the puzzle map open shows a 17.8 KB cold
+      band (`0xB6D0`–`0xFE2C`; heap uses ~131 B, stack ~467 B), so the `0xD6D0` pool has KB of slack
+      either side. DGROUP stays **floating** — the `_heaplen` cap was tried and reverted. The
+      puzzle-map crash was a **false ref** (file `0x18855` was counter-table data, not a pointer),
+      not the pool; `find_ref.py` is hardened so it can't recur. See "String repointing → Pool
+      safety".
 - [x] **Cyrillic font** — done and functional. CC member `0x9bb2` extended to **256 glyphs /
       2048 bytes** (CP866): Cyrillic drawn into `0x80`–`0xFF` on `tools/font.png`, reimported and
       repacked into both `256.CC`/`416.CC` (run-dir copies now differ from `game/`). The glyph
@@ -409,8 +423,8 @@ itself is the `0xC40A` branch, handled by the patch above.
 - [~] **Translation** — underway in `patches.csv`: title screen + credits, the copy-protection
       prompt, new-game/difficulty menus, and character classes are done (`string` rows). Remaining
       prose uses `string` rows where it fits its slot and `reloc` rows (offset = ref from
-      `find_ref.py`) where it doesn't. Only limit 2 (on-screen box width) still constrains; the
-      memory-slot limit is lifted (pending pool safety — see Overflow repointing).
+      `find_ref.py`) where it doesn't. Only limit 2 (on-screen box width) still constrains — the
+      memory-slot limit is lifted for good (see Overflow repointing).
 - [ ] **Patcher** — ownership-gated installer producing the translated build.
 
 ## Conventions
