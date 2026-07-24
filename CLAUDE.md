@@ -17,7 +17,8 @@ game/         *** pristine originals *** — never modified; the patcher referen
                 hardware check — see "Copy protection".
   256.CC 416.CC graphics archives (NWC "CC" format). 256=one display mode, 416=the other.
 256.CC 416.CC working copies in the run dir — the game reads its .CC from the current
-              directory, so KBR.EXE needs them here (identical to game/ for now).
+              directory, so KBR.EXE needs them here. These now carry the Cyrillic-extended
+              font (member 0x9bb2); they differ from the pristine game/ copies.
 KBU.EXE       *** the translation base *** — fully unpacked, flat, editable. Keep pristine.
 KBR.EXE       *** our working copy *** — KBU + the manifest patches (currently just
               the one-byte protection flip). The runnable/testable build, regenerated
@@ -93,25 +94,23 @@ CLEAR. This is the game's decompressor `FUN_230a_02f1`. Decoder + encoder implem
 **Font** = CC member id **`0x9bb2`** (byte-identical in both archives — it is display-mode
 independent). Decompresses to **1024 bytes = 128 glyphs × 8 rows**, 8×8, 1 byte/row, **MSB =
 leftmost pixel**. Glyphs `0x00`–`0x1F` are game UI symbols (cursor arrows, box corners,
-checkmarks, ↑↓←→ — in use, not free); `0x20`–`0x7F` are ASCII; **`0x80`–`0xFF` do not exist**
-— that is the Cyrillic gap (CP866 puts every Cyrillic letter above `0x7F`). Editable sheet:
-`tools/font.png` — a raw 1:1 128×128 RGBA rip (transparent bg, white ink, 16 glyphs/row, no
-scaling or grid); top 8 rows are the existing 128 glyphs, bottom 8 rows (`0x80`–`0xFF`) blank and
-ready to draw Cyrillic into.
+checkmarks, ↑↓←→ — in use, not free); `0x20`–`0x7F` are ASCII. **`0x80`–`0xFF` were the
+Cyrillic gap** (CP866 puts every Cyrillic letter above `0x7F`) — **now filled**: the member is
+extended to **256 glyphs / 2048 bytes** with Cyrillic drawn into `0x80`–`0xFF` and repacked into
+both archives. Editable sheet: `tools/font.png` — a raw 1:1 128×128 RGBA rip (transparent bg,
+white ink, 16 glyphs/row, no scaling or grid); top 8 rows are the original 128 glyphs, bottom 8
+rows (`0x80`–`0xFF`) hold the Cyrillic.
 `tools/cc.py font-export` / `font-import` round-trip it; `replace` swaps any member and rebuilds
 the archive (TOC offsets recomputed, all other members copied verbatim).
 
-**Cyrillic plan.** Primary: extend the font to **256 glyphs / 2048 bytes** (CP866), so
-`apply_patches.py` can emit CP866 directly. The CC loader `malloc`s each member by its declen
-(`DAT_2369_600f`), so a 2048-byte font auto-allocates — buffer size is *not* a blocker. The one
-runtime unknown is the glyph blitter's index type: Turbo C `char` is signed, so if it does
-`font[ch*8]` with a signed `ch`, codes `0x80`–`0xFF` index negatively and need a one-byte
-signed→unsigned patch (via the manifest). Confirm in DOSBox-X: extend the font with a marker
-glyph at e.g. `0x80`, put a `0x80` byte in a visible string, and see if it renders or garbles.
-Zero-risk fallback if the blitter can't be fixed cheaply: a **7-bit custom code page** — keep the
-128-glyph font, overwrite lowercase-Latin/spare slots with Cyrillic, and map translated text to
-those bytes (no binary change; costs lowercase Latin, fine for a translation that transliterates
-names).
+**Cyrillic plan — DONE (primary approach worked).** The font is extended to **256 glyphs /
+2048 bytes** (CP866) and `apply_patches.py` emits CP866 directly. The CC loader `malloc`s each
+member by its declen (`DAT_2369_600f`), so the 2048-byte font auto-allocates — buffer size was
+never a blocker. The one runtime unknown was the glyph blitter's index type (Turbo C `char` is
+signed, so `font[ch*8]` with a signed `ch` would index `0x80`–`0xFF` negatively); **resolved
+empirically** — the CP866 screens render clean in DOSBox-X, so the blitter indexes **unsigned**
+and **no** signed→unsigned manifest patch is needed. (The 7-bit custom-code-page fallback — keep
+128 glyphs, overwrite Latin/spare slots — was never needed and is not used.)
 
 **EXEPACK record format** (decompress reading _backward_ from stub CS:0000):
 `[cmd][len_hi][len_lo]`; `cmd & 0xFE`: `0xB0`=fill (one fill byte follows below), `0xB2`=copy
@@ -405,12 +404,12 @@ The ten prompt strings are ordinary UI text at DS `0xAD6`, `0xAEB`, `0xAF3`, `0x
       `c0` floats DGROUP to the full 64 KB (`_heaplen == 0`); the early POOLTEST pass was a false
       positive. Fix = cap `_heaplen` + top-down fill, gated on the canary heap test. See "String
       repointing → Pool safety".
-- [~] **Cyrillic font** — font *located and format cracked*: CC member `0x9bb2`, 8×8 128-glyph
-      Latin-only, LZW-compressed; `tools/cc.py` extracts/injects it, `tools/font.png` is the
-      editable sheet. Remaining: draw the CP866 Cyrillic glyphs into `0x80`–`0xFF`, and confirm
-      the glyph blitter indexes the font unsigned (else a one-byte signed→unsigned manifest patch).
-      See the font/Cyrillic-plan notes under "File-format reference". Nothing renders in Russian
-      until the glyphs are drawn.
+- [x] **Cyrillic font** — done and functional. CC member `0x9bb2` extended to **256 glyphs /
+      2048 bytes** (CP866): Cyrillic drawn into `0x80`–`0xFF` on `tools/font.png`, reimported and
+      repacked into both `256.CC`/`416.CC` (run-dir copies now differ from `game/`). The glyph
+      blitter indexes the font **unsigned** — confirmed empirically in DOSBox-X: the CP866
+      character-select and copy-protection screens render clean in Russian, so **no** signed→
+      unsigned manifest patch is needed. `apply_patches.py` emits CP866 directly.
 - [ ] **Translation** — edit strings via `patches.csv`: `string` rows for lines that fit their
       slot, `reloc` rows (offset = ref from `find_ref.py`) for the ones that don't. Only limit 2
       (on-screen box width) still constrains; the memory-slot limit is lifted.
@@ -421,8 +420,10 @@ The ten prompt strings are ordinary UI text at DS `0xAD6`, `0xAEB`, `0xAF3`, `0x
 - `KBU.EXE` is the single source of truth for edits. Regenerate via the script; don't hand-hack
   headers. The game needs its `.CC` files in the same directory to run.
 - Keep the pristine originals in `game/` (`KB.EXE`, `KB!.COM`, `256.CC`, `416.CC`) untouched —
-  the patcher references them. The `.CC` copies in the run dir exist only so the game can load
-  them at runtime; edit neither set until the translation phase.
+  the patcher references them, and they are the byte-source for rebuilding the run-dir archives.
+  The run-dir `.CC` copies are the *edited* ones: they now carry the Cyrillic-extended font and so
+  differ from `game/`. Regenerate them from the pristine `game/` copies via `tools/cc.py` (import
+  the font sheet into member `0x9bb2`, repack) — never hand-hack them or edit `game/` in place.
 
 ## Commit Guidelines
 
