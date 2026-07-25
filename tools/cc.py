@@ -33,9 +33,13 @@ CLI
 Stdlib only -- the PNG read/write the font paths need is implemented below on
 zlib, so the whole build runs in a bare Python 3 with nothing installed.
 """
+import os
 import struct
 import sys
 import zlib
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import paths                                                 # noqa: E402
 
 FONT_ID = 0x9bb2
 CLEAR, END, FIRST, MAXBITS = 0x100, 0x101, 0x102, 12

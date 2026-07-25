@@ -2,7 +2,7 @@
 """Build build/KBR.EXE from pristine build/KBU.EXE by applying tools/patches.csv.
 
 This is not a universal patcher. It reads exactly one file -- build/KBU.EXE
-(with the SHA-256 baked in below) -- and writes exactly one file, build/KBR.EXE
+(whose SHA-256 gate lives in paths.py) -- and writes exactly one file, build/KBR.EXE
 next to it. Run it with no arguments:
 
     python3 tools/apply_patches.py
@@ -68,8 +68,10 @@ import os
 import struct
 import sys
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from paths import KBU as INPUT, KBR as OUTPUT, PATCHES_CSV as MANIFEST, KBU_SHA256  # noqa: E402
+
 ENCODING = "cp866"
-TARGET_SHA256 = "a0ad8832b6a9afa7b28c7d0054a13e286d7952a558eaa12a38f6146e77339d49"
 
 # DGROUP layout of KBU.EXE (see CLAUDE.md "String repointing").
 DS_BASE = 0x15690        # file offset of DS:0000 -- near offset 0 lives here
@@ -117,14 +119,6 @@ POOL_END_DSOFF = POOL_DSOFF + POOL_SIZE    # hard cap; keeps clear of the stack'
 # Costs nothing: every string reached from here is copy-protection UI text we rewrite
 # freely anyway, and all of it fits its original slot as a `string` row.
 PROT_LO, PROT_HI = 0xBFE0, 0xCCA7          # file offsets, inclusive
-
-HERE = os.path.dirname(os.path.abspath(__file__))
-ROOT = os.path.dirname(HERE)
-BUILD = os.path.join(ROOT, "build")
-INPUT = os.path.join(BUILD, "KBU.EXE")
-OUTPUT = os.path.join(BUILD, "KBR.EXE")
-MANIFEST = os.path.join(HERE, "patches.csv")
-
 
 def die(msg):
     sys.exit(f"error: {msg}")
@@ -263,9 +257,9 @@ def main():
         die(f"KBU.EXE not found at {INPUT}")
 
     digest = hashlib.sha256(data).hexdigest()
-    if digest != TARGET_SHA256:
+    if digest != KBU_SHA256:
         die(f"{INPUT} is not pristine KBU.EXE\n"
-            f"       expected sha256 {TARGET_SHA256}\n"
+            f"       expected sha256 {KBU_SHA256}\n"
             f"       got             {digest}\n"
             f"       regenerate it with unpack_exepack.py.")
 

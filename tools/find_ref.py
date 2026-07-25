@@ -25,11 +25,10 @@ import os
 import struct
 import sys
 
-KBU = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-                   "build", "KBU.EXE")
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from paths import KBU, KBU_SHA256                            # noqa: E402
 
 ENCODING = "cp866"
-TARGET_SHA256 = "a0ad8832b6a9afa7b28c7d0054a13e286d7952a558eaa12a38f6146e77339d49"
 
 # DGROUP layout of KBU.EXE (mirror of apply_patches.py).
 DS_BASE = 0x15690        # file offset of DS:0000
@@ -98,7 +97,7 @@ def main(argv):
     if len(argv) != 2:
         sys.exit(__doc__)
     data = open(KBU, "rb").read()
-    if hashlib.sha256(data).hexdigest() != TARGET_SHA256:
+    if hashlib.sha256(data).hexdigest() != KBU_SHA256:
         sys.exit(f"error: {KBU} is not pristine -- offsets would be wrong")
 
     arg = argv[1]

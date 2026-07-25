@@ -20,11 +20,11 @@ Validated: KBU's decompressed image matches the live running game (dump1)
 """
 import os, struct, sys
 
-BUILD = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-                     "build")
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from paths import KB_NWC, KBU                                # noqa: E402
 
-def unpack(src_path=os.path.join(BUILD, "KB_NWC.EXE"),
-           dst_path=os.path.join(BUILD, "KBU.EXE"),
+
+def unpack(src_path=KB_NWC, dst_path=KBU,
            validate=None, validate_base=0x8920, load_seg=0x892):
     d = open(src_path, "rb").read()
     # Take the load image exactly as the DOS header declares it -- KB_NWC's

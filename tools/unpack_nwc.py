@@ -45,10 +45,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from cc import lzw_decode                                    # noqa: E402
-
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-INPUT = os.path.join(ROOT, "game", "KB.EXE")
-OUTPUT = os.path.join(ROOT, "build", "KB_NWC.EXE")
+from paths import KB_EXE as INPUT, KB_NWC as OUTPUT          # noqa: E402
 
 BASE_PTR = 0x4B          # stub offset holding the inner header's file offset
 # The image we expect from the copy this project was reversed against. A
