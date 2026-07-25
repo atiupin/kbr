@@ -18,17 +18,43 @@ against all 199 members of both archives (each decodes to exactly its declen).
 The same codec packs KB.EXE's outer NWC layer, so tools/unpack_nwc.py imports
 lzw_decode from here -- keep this module stdlib-only and cheap to import.
 
-The font is member id 0x9bb2 (present identically in both archives): 1024 bytes =
-128 glyphs x 8 rows, 1 byte/row, MSB = leftmost pixel. Glyphs 0x00-0x1F are game
-UI symbols; 0x20-0x7F are ASCII; 0x80-0xFF do not exist (the Cyrillic gap).
+Members are looked up by name, not by index: the loader hashes the requested
+filename (hash = rol16(hash,1) + upper(ch) per char) and matches it against the
+TOC id.
+
+The font
+--------
+Member id 0x9bb2, byte-identical in both archives (it is display-mode
+independent). 8 rows per glyph, 1 byte/row, MSB = leftmost pixel. Glyphs
+0x00-0x1F are game UI symbols (cursor arrows, box corners, checkmarks, arrows --
+in use, not free) and 0x20-0x7F are ASCII.
+
+The stock member is 1024 bytes / 128 glyphs, leaving 0x80-0xFF -- where CP866
+puts every Cyrillic letter -- undefined. This project EXTENDS it to 2048 bytes /
+256 glyphs with Cyrillic drawn into the upper half; the run-dir archives in
+build/ therefore differ from the pristine game/ copies. Nothing had to be
+patched for this: the CC loader mallocs each member by its declen, so the larger
+font auto-allocates, and the glyph blitter indexes the font unsigned (confirmed
+in DOSBox-X).
+
+tools/font.png is the editable sheet -- a raw 1:1 128x128 RGBA rip, transparent
+background, white ink, 16 glyphs per row, no scaling or grid; top 8 rows are the
+original 128 glyphs, bottom 8 rows are the Cyrillic. font-export/font-import
+round-trip it.
 
 CLI
 ---
+    cc.py font-build                                   # THE BUILD STEP: font.png
+                                                       # -> both build/*.CC
     cc.py list <archive.CC>
     cc.py extract <archive.CC> <id-hex> <out.bin>      # decoded (raw) bytes
     cc.py replace <archive.CC> <id-hex> <in.bin> <out.CC>
     cc.py font-export <archive.CC> <out.png> [--glyphs 128|256]
-    cc.py font-import <in.png> <archive.CC> <out.CC>    # PNG -> font member 0x9bb2
+    cc.py font-import <in.png> <archive.CC> <out.CC>   # PNG -> font member 0x9bb2
+
+font-build is font-import run over both display modes with the project's own
+paths (from paths.py), which is all the build ever needs; the explicit form is
+kept for one-off experiments on an archive elsewhere.
 
 Stdlib only -- the PNG read/write the font paths need is implemented below on
 zlib, so the whole build runs in a bare Python 3 with nothing installed.
@@ -369,6 +395,16 @@ def png_to_font(path, glyphs):
 
 
 # -------------------------------------------------------------------------- CLI
+def font_import(png_path, cc_path, out_path):
+    """Import a font sheet into member 0x9bb2 of `cc_path`, writing `out_path`."""
+    font = png_to_font(png_path, 256)   # honor a 256-glyph sheet; declen tracks the real size
+    if font[1024:] == bytes(len(font) - 1024):   # upper half empty -> keep it stock
+        font = font[:1024]
+    data = open(cc_path, "rb").read()
+    open(out_path, "wb").write(rebuild(data, {FONT_ID: font}))
+    print(f"wrote {out_path} (font {len(font)} bytes)")
+
+
 def main(argv):
     if len(argv) < 2:
         print(__doc__)
@@ -401,14 +437,12 @@ def main(argv):
         font_to_png(font + bytes(max(0, glyphs * 8 - len(font))), argv[3], glyphs)
         print(f"wrote {argv[3]} ({glyphs} glyphs)")
     elif cmd == "font-import":
-        img_glyphs = 256  # honor a 256-glyph sheet; declen tracks actual size
-        font = png_to_font(argv[2], img_glyphs)
-        # trim trailing all-zero glyphs above 128 if the upper half is empty
-        if font[1024:] == bytes(len(font) - 1024):
-            font = font[:1024]
-        data = open(argv[3], "rb").read()
-        open(argv[4], "wb").write(rebuild(data, {FONT_ID: font}))
-        print(f"wrote {argv[4]} (font {len(font)} bytes)")
+        font_import(argv[2], argv[3], argv[4])
+    elif cmd == "font-build":
+        # The build step: both run-dir archives from the pristine originals, no
+        # arguments, so it reads like the rest of the pipeline.
+        for mode in (256, 416):
+            font_import(paths.FONT_PNG, paths.GAME_CC[mode], paths.BUILD_CC[mode])
     else:
         print(__doc__)
         return 1
