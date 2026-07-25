@@ -157,7 +157,8 @@ tools/ghidra.py run DumpDecomp.java build/decomp
 
 - [~] **Translation** — underway in `res/patches.csv`: title screen + credits, protection prompt,
   new-game/difficulty menus, character classes, army screen (25 unit names, stat labels,
-  morale), dwelling screen, character screen, king's castle.
+  morale), dwelling screen, character screen, king's castle, menu bar and its options and
+  controls menus.
 - [ ] **Patcher** — ownership-gated installer producing the translated build.
 
 ## Conventions

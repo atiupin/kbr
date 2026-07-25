@@ -20,7 +20,7 @@ string,0x167BD,"Easy         900    x.5","Легко        900    x.5"
 string,0x167D5,"Normal       600     x1","Нормально    600     x1"
 string,0x167ED,"Hard         400     x2","Трудно       400     x2"
 string,0x16805,"Impossible?  200     x4","Невозможно?  200     x4"
-string,0x15F3F," to select   Ent to Accept",": Выбрать   Enter: Принять"
+string,0x15F3F," to select   Ent to Accept",": Выбрать   ENTER: Принять"
 # title screen - copy-protection prompt, DO NOT RELOC
 string,0x16166,"Please turn to page ","Откройте страницу "
 string,0x1617B,", go to",", там"
