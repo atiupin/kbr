@@ -15,7 +15,8 @@ Manifest (res/patches.csv): a CSV with header `type,offset,expect,write`, one
 patch per row. Blank lines and lines whose first non-space char is `#` are
 ignored, so `#` lines serve as section comments (which is where descriptions
 live -- there is no per-row label column). The file is UTF-8; string `write`/
-`expect` values are transcoded to CP866 at apply time.
+`expect` values are transcoded to CP866 at apply time, with `\\xNN` standing for
+raw byte NN and `\\\\` for a literal backslash (see encode_text).
     type    "bytes" | "string" | "reloc"
     offset  file offset, e.g. 0xC40A (reloc: one or more ref offsets, space-separated)
     expect  what must currently be there  (hex for bytes, the original English text
@@ -133,6 +134,51 @@ def die(msg):
     sys.exit(f"error: {msg}")
 
 
+def encode_text(text, label, column):
+    """Encode one manifest text field to CP866 bytes.
+
+    `\\xNN` writes raw byte NN and `\\\\` a literal backslash; everything else is
+    plain CP866. The escape exists because a few UI strings use glyphs the cp866
+    codec will not round-trip: the movement menu draws its arrows with bytes
+    0x18-0x1b, which the codec maps to the C0 controls of the same value rather
+    than to the arrow characters IBM's page actually shows there. Writing them
+    literally would put invisible control bytes in the CSV.
+    """
+    out = bytearray()
+    lit = []
+    i = 0
+
+    def flush():
+        if lit:
+            try:
+                out.extend("".join(lit).encode(ENCODING))
+            except UnicodeEncodeError as e:
+                die(f"{label}: {column} is not encodable in {ENCODING} ({e})")
+            del lit[:]
+
+    while i < len(text):
+        if text[i] != "\\":
+            lit.append(text[i])
+            i += 1
+            continue
+        esc = text[i + 1:i + 2]
+        if esc == "\\":
+            lit.append("\\")
+            i += 2
+        elif esc == "x":
+            digits = text[i + 2:i + 4]
+            if len(digits) != 2 or any(c not in "0123456789abcdefABCDEF" for c in digits):
+                die(f"{label}: bad \\x escape in {column} ({text[i:i + 4]!r} -- want \\xNN)")
+            flush()
+            out.append(int(digits, 16))
+            i += 4
+        else:
+            die(f"{label}: stray backslash in {column} "
+                f"-- write \\\\ for a literal one, \\xNN for a raw byte")
+    flush()
+    return bytes(out)
+
+
 def resolve(patch, idx):
     """Parse one manifest row into a dict describing the edit. `kind` is one of
     'bytes' | 'string' | 'reloc'; the remaining keys depend on kind (see main)."""
@@ -164,12 +210,10 @@ def resolve(patch, idx):
 
     if typ == "string":
         try:
-            expect = patch["expect"].encode(ENCODING)
-            text = patch["write"].encode(ENCODING)
+            expect = encode_text(patch["expect"], label, "expect")
+            text = encode_text(patch["write"], label, "write")
         except KeyError as e:
             die(f"{label}: missing {e}")
-        except UnicodeEncodeError as e:
-            die(f"{label}: {patch['write']!r} is not encodable in {ENCODING} ({e})")
         if len(text) > len(expect):
             die(f"{label}: translation is {len(text)}B but the slot holds "
                 f"{len(expect)}B -- use a 'reloc' row")
@@ -178,12 +222,10 @@ def resolve(patch, idx):
 
     if typ == "reloc":
         try:
-            expect = patch["expect"].encode(ENCODING)
-            text = patch["write"].encode(ENCODING)
+            expect = encode_text(patch["expect"], label, "expect")
+            text = encode_text(patch["write"], label, "write")
         except KeyError as e:
             die(f"{label}: missing {e}")
-        except UnicodeEncodeError as e:
-            die(f"{label}: not encodable in {ENCODING} ({e})")
         for ref in offs:
             if PROT_LO <= ref <= PROT_HI:
                 die(f"{label}: reloc ref {ref:#x} is inside the copy-protection block "
