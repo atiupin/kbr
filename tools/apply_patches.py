@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Build KBR.EXE from pristine KBU.EXE by applying tools/patches.csv.
+"""Build build/KBR.EXE from pristine build/KBU.EXE by applying tools/patches.csv.
 
-This is not a universal patcher. It reads exactly one file -- KBU.EXE in the
-repo root (with the SHA-256 baked in below) -- and writes exactly one file,
-KBR.EXE next to it. Run it with no arguments:
+This is not a universal patcher. It reads exactly one file -- build/KBU.EXE
+(with the SHA-256 baked in below) -- and writes exactly one file, build/KBR.EXE
+next to it. Run it with no arguments:
 
     python3 tools/apply_patches.py
 
@@ -120,8 +120,9 @@ PROT_LO, PROT_HI = 0xBFE0, 0xCCA7          # file offsets, inclusive
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
-INPUT = os.path.join(ROOT, "KBU.EXE")
-OUTPUT = os.path.join(ROOT, "KBR.EXE")
+BUILD = os.path.join(ROOT, "build")
+INPUT = os.path.join(BUILD, "KBU.EXE")
+OUTPUT = os.path.join(BUILD, "KBR.EXE")
 MANIFEST = os.path.join(HERE, "patches.csv")
 
 
@@ -318,7 +319,7 @@ def main():
 
     open(OUTPUT, "wb").write(bytes(data))
     print(f"applied {len(patches)} patch(es) "
-          f"({len(relocs)} reloc): KBU.EXE -> KBR.EXE")
+          f"({len(relocs)} reloc): build/KBU.EXE -> build/KBR.EXE")
     for p in patches:
         if p["kind"] == "reloc":
             refs = " ".join(f"{r:#08x}" for r in p["offs"])

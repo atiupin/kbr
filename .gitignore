@@ -1,16 +1,16 @@
-# Generated — safe to delete (see CLAUDE.md project layout)
+# Generated — safe to delete (see CLAUDE.md project layout).
+# Also where every game-derived binary lives: KBU/KBR.EXE, the run-dir .CC
+# copies, saves. None of it is ours to distribute.
 build/
 
-# Ghidra runtime lock files (the project itself — KBR.gpr, KBR.rep/ — IS tracked)
-ghidra/*.lock
-ghidra/*.lock~
+# Scratch: DOSBox-X captures (screenshots, MEMDUMP.BIN), the Ghidra project
+# database (game-derived and fully regenerable — see CLAUDE.md), throwaway files
+tmp/
 
-# DOSBox-X debugger memory dumps
-MEMDUMP.BIN
+# The user's own game files. The directory itself stays in git (game/README.md)
+# so there is somewhere to drop them.
+/game/*
+!/game/README.md
 
 # macOS
 .DS_Store
-
-# Save files / game data in the root dir (transient, rewritten on every run)
-/*.dat
-/*.DAT

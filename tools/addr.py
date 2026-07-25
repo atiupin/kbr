@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Translate between KBU.EXE file offsets and Ghidra segment:offset addresses.
+"""Translate between build/KBU.EXE file offsets and Ghidra segment:offset addresses.
 
 Three coordinate systems are in play:
 
@@ -25,7 +25,7 @@ SKEW = BASE - HEADER # 0xE000
 def show(file_off, seg=None):
     image = file_off - HEADER
     linear = file_off + SKEW
-    print(f"file offset    0x{file_off:X}   (xxd -s 0x{file_off:X} KBU.EXE)")
+    print(f"file offset    0x{file_off:X}   (xxd -s 0x{file_off:X} build/KBU.EXE)")
     print(f"image offset   0x{image:X}")
     print(f"Ghidra linear  0x{linear:X}")
     if seg is None:

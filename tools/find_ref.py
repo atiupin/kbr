@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Find the REF of a string in pristine KBU.EXE -- the file offset of the 2-byte
+"""Find the REF of a string in pristine build/KBU.EXE -- the file offset of the 2-byte
 near pointer that points at it -- so it can be pasted into a `reloc` row of
 tools/patches.csv. This is a run-once discovery aid; the build (apply_patches.py)
 never scans, it just applies the offsets you record here.
@@ -21,8 +21,12 @@ can't be repointed this way.
 """
 
 import hashlib
+import os
 import struct
 import sys
+
+KBU = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                   "build", "KBU.EXE")
 
 ENCODING = "cp866"
 TARGET_SHA256 = "a0ad8832b6a9afa7b28c7d0054a13e286d7952a558eaa12a38f6146e77339d49"
@@ -93,9 +97,9 @@ def find_refs(data, str_off):
 def main(argv):
     if len(argv) != 2:
         sys.exit(__doc__)
-    data = open("KBU.EXE", "rb").read()
+    data = open(KBU, "rb").read()
     if hashlib.sha256(data).hexdigest() != TARGET_SHA256:
-        sys.exit("error: KBU.EXE is not pristine -- offsets would be wrong")
+        sys.exit(f"error: {KBU} is not pristine -- offsets would be wrong")
 
     arg = argv[1]
     try:
