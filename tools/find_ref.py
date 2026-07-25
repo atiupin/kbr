@@ -9,13 +9,15 @@ never scans, it just applies the offsets you record here.
 
 Background: game text is reached through 2-byte NEAR offsets (DS-relative). A
 ref sits either in a DGROUP pointer table or inside a code instruction as an
-immediate operand. For each ref found this prints a ready-to-paste line:
+immediate operand. It prints a ready-to-paste line:
 
-    reloc,<ref_offset>,"<pointer_bytes_hex>","<your Russian text>"
+    reloc,<ref_offset>,"<the original English>","<your Russian text>"
 
-Most box/bio lines have exactly one ref. If several are printed, the string is
-referenced from several places and each needs its own reloc row; if none are,
-it is reached by computed/indexed access and can't be repointed this way.
+Most box/bio lines have exactly one ref. If several are found the string is
+referenced from several places and all its pointers must move together, so they
+go in ONE row with the refs space-separated -- which is what the pasted line
+already contains. If none are found it is reached by computed/indexed access and
+can't be repointed this way.
 """
 
 import hashlib
@@ -128,6 +130,7 @@ def main(argv):
     if not refs:
         print("no ref found -- reached by computed/indexed access, not repointable")
         return
+    usable = []
     for ref_off, kind in refs:
         ptr = struct.unpack_from("<H", data, ref_off)[0]
         print(f"ref @ {ref_off:#08x}  [{kind}]  currently -> DS {ptr:#06x}")
@@ -137,11 +140,16 @@ def main(argv):
             print("     (game hangs much later, INT 6 in the graphics loader).")
             print("     Translate in place with a 'string' row instead.")
             continue
-        print(f'  reloc,{ref_off:#08x},"{data[ref_off]:02X}{data[ref_off+1]:02X}",'
-              f'"<Russian>"')
-    if len(refs) > 1:
-        print(f"\n{len(refs)} refs: this string is used from several places -- "
-              f"add one reloc row per ref.")
+        usable.append(ref_off)
+    if not usable:
+        return
+    if len(usable) > 1:
+        print(f"\n{len(usable)} refs: this string is used from several places. All its "
+              f"pointers must move together, so they go in ONE row:")
+    # `expect` is the original English -- apply_patches.py follows the pointer and
+    # checks the string it lands on, so the manifest stays readable and verified.
+    print(f'\n  reloc,{" ".join(f"{r:#08x}" for r in usable)},'
+          f'"{text.replace(chr(34), chr(34) * 2)}","<Russian>"')
 
 
 if __name__ == "__main__":

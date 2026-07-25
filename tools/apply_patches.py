@@ -17,9 +17,10 @@ ignored, so `#` lines serve as section comments (which is where descriptions
 live -- there is no per-row label column). The file is UTF-8; string `write`/
 `expect` values are transcoded to CP866 at apply time.
     type    "bytes" | "string" | "reloc"
-    offset  file offset, e.g. 0xC40A
-    expect  what must currently be at offset  (hex for bytes/reloc, text for string)
-    write   what to write there               (hex for bytes, text for string/reloc)
+    offset  file offset, e.g. 0xC40A (reloc: one or more ref offsets, space-separated)
+    expect  what must currently be there  (hex for bytes, the original English text
+                                           for string and reloc)
+    write   what to write there           (hex for bytes, text for string/reloc)
 
 House rule: quote the expect/write columns ("Gold:  ") so significant leading
 and trailing spaces stay visible -- game UI strings are padded to fixed widths.
@@ -34,11 +35,20 @@ string: expect/write are CP866 text. `write` must be no longer (encoded) than
 
 reloc : for a translation that OVERFLOWS its original slot. `offset` is NOT the
         string -- it is the REF: the file offset of the 2-byte near pointer that
-        points at the string. `expect` is the 2 bytes currently there (the old
-        pointer, hex); `write` is the replacement text. The engine appends the
-        text to the overflow pool at DS POOL_DSOFF and rewrites the pointer at
-        `offset` to aim there; the original slot is untouched. Find a ref once
-        with tools/find_ref.py.
+        points at the string. `expect` is the original English, exactly as in a
+        `string` row: the engine dereferences the pointer found at `offset` and
+        requires the string there to match. (That is a stronger check than pinning
+        the pointer's raw bytes, and it keeps the English readable in the manifest
+        instead of hiding it behind a hex word.) `write` is the replacement text:
+        the engine appends it to the overflow pool at DS POOL_DSOFF and rewrites
+        the pointer at `offset` to aim there; the original slot is untouched.
+        Find a ref once with tools/find_ref.py.
+
+        A string reached from several places needs ALL its pointers moved
+        together, so list every ref in one row, space-separated:
+            reloc,0x0185CB 0x018F02,"lost!","потеряно!"
+        One row per string (not per ref) keeps the translation in a single place
+        and stores one copy in the pool.
 
 Pool safety: measured, not assumed. A full-session memory dump (puzzle map open)
 put the near-heap high-water at DS 0xb6cf and the stack low-water at DS 0xfe2c --
@@ -125,11 +135,16 @@ def resolve(patch, idx):
     label = f"patch {idx}"
     typ = patch.get("type")
     try:
-        off = int(str(patch["offset"]), 0)
+        offs = [int(tok, 0) for tok in str(patch["offset"]).split()]
     except KeyError:
         die(f"{label}: missing offset")
     except ValueError:
         die(f"{label}: bad offset {patch['offset']!r}")
+    if not offs:
+        die(f"{label}: missing offset")
+    if typ != "reloc" and len(offs) != 1:
+        die(f"{label}: only 'reloc' rows may list several offsets")
+    off = offs[0]
 
     if typ == "bytes":
         try:
@@ -159,26 +174,21 @@ def resolve(patch, idx):
 
     if typ == "reloc":
         try:
-            expect = bytes.fromhex(patch["expect"].replace(" ", ""))
-        except (KeyError, ValueError) as e:
-            die(f"{label}: bad reloc expect ({e}) -- want the 2 pointer bytes, hex")
-        if len(expect) != 2:
-            die(f"{label}: reloc expect is {len(expect)}B; it must be the 2-byte "
-                f"pointer currently at the ref offset")
-        try:
+            expect = patch["expect"].encode(ENCODING)
             text = patch["write"].encode(ENCODING)
         except KeyError as e:
             die(f"{label}: missing {e}")
         except UnicodeEncodeError as e:
-            die(f"{label}: {patch['write']!r} is not encodable in {ENCODING} ({e})")
-        if PROT_LO <= off <= PROT_HI:
-            die(f"{label}: reloc ref {off:#x} is inside the copy-protection block "
-                f"({PROT_LO:#x}-{PROT_HI:#x}).\n"
-                f"       That block is integrity-checked and retaliates on a delay -- "
-                f"the game runs, then hangs much later (INT 6 in the graphics loader).\n"
-                f"       Use a 'string' row instead: the protection UI text all fits "
-                f"its original slot.")
-        return {"kind": "reloc", "off": off, "expect": expect,
+            die(f"{label}: not encodable in {ENCODING} ({e})")
+        for ref in offs:
+            if PROT_LO <= ref <= PROT_HI:
+                die(f"{label}: reloc ref {ref:#x} is inside the copy-protection block "
+                    f"({PROT_LO:#x}-{PROT_HI:#x}).\n"
+                    f"       That block is integrity-checked and retaliates on a delay -- "
+                    f"the game runs, then hangs much later (INT 6 in the graphics loader).\n"
+                    f"       Use a 'string' row instead: the protection UI text all fits "
+                    f"its original slot.")
+        return {"kind": "reloc", "off": off, "offs": offs, "expect": expect,
                 "text": text + b"\x00", "label": label}
 
     die(f"{label}: unknown type {typ!r} (want 'bytes', 'string' or 'reloc')")
@@ -204,6 +214,33 @@ def check_overlaps(inplace):
         if b_lo < a_hi:
             die(f"patches overlap: {a!r} [{a_lo:#x},{a_hi:#x}) and "
                 f"{b!r} [{b_lo:#x},{b_hi:#x})")
+
+
+def deref(data, ref, label):
+    """Follow the near pointer at file offset `ref` and return (string_file_offset,
+    string_bytes) for the string it aims at."""
+    if ref + 2 > len(data):
+        die(f"{label}: ref {ref:#x} is past the end of the image")
+    dsoff = struct.unpack_from("<H", data, ref)[0]
+    fo = DS_BASE + dsoff
+    end = data.find(b"\x00", fo) if fo < len(data) else -1
+    if end < 0:
+        die(f"{label}: ref {ref:#x} points at DS {dsoff:#06x} "
+            f"(file {fo:#x}), which is not a NUL-terminated string")
+    return fo, bytes(data[fo:end])
+
+
+def check_reloc_sources(relocs):
+    """One string, one row. Two rows repointing the same string mean its pointers
+    were split across rows -- they must move together, so list every ref in one row."""
+    seen = {}
+    for p in relocs:
+        prev = seen.setdefault(p["src"], p)
+        if prev is not p:
+            die(f"{p['label']} and {prev['label']} both repoint the string at "
+                f"{p['src']:#x} ({p['expect'].decode(ENCODING)!r}).\n"
+                f"       Merge them into one row listing both refs "
+                f"(offset column: \"{prev['off']:#08x} {p['off']:#08x}\").")
 
 
 def fix_mz_header(data):
@@ -235,6 +272,17 @@ def main():
 
     # verify every patch's expect against the pristine image
     for p in patches:
+        if p["kind"] == "reloc":
+            # the ref is a pointer: follow it and check the string it lands on.
+            for ref in p["offs"]:
+                src, got = deref(data, ref, p["label"])
+                if got != p["expect"]:
+                    die(f"{p['label']}: ref {ref:#x} points at "
+                        f"{got.decode(ENCODING)!r}, not {p['expect'].decode(ENCODING)!r}")
+                if p.setdefault("src", src) != src:
+                    die(f"{p['label']}: its refs point at different strings "
+                        f"({p['src']:#x} and {src:#x}) -- one row per string")
+            continue
         end = p["off"] + len(p["expect"])
         got = bytes(data[p["off"]:end])
         if got != p["expect"]:
@@ -252,6 +300,7 @@ def main():
     # reloc: append text to the overflow pool, rewrite each ref pointer
     relocs = [p for p in patches if p["kind"] == "reloc"]
     if relocs:
+        check_reloc_sources(relocs)
         pool_base = DS_BASE + POOL_DSOFF
         if len(data) < pool_base:
             data.extend(b"\x00" * (pool_base - len(data)))
@@ -262,7 +311,8 @@ def main():
                     f"(need DS {new_dsoff:#06x}+{len(p['text'])}B, "
                     f"cap {POOL_END_DSOFF:#06x})")
             data.extend(p["text"])
-            struct.pack_into("<H", data, p["off"], new_dsoff)   # repoint the ref
+            for ref in p["offs"]:                               # all pointers move together
+                struct.pack_into("<H", data, ref, new_dsoff)
             p["new_dsoff"] = new_dsoff
         fix_mz_header(data)
 
@@ -271,7 +321,8 @@ def main():
           f"({len(relocs)} reloc): KBU.EXE -> KBR.EXE")
     for p in patches:
         if p["kind"] == "reloc":
-            print(f"  {p['off']:#08x}  reloc   ref -> DS {p['new_dsoff']:#06x}  {p['label']}")
+            refs = " ".join(f"{r:#08x}" for r in p["offs"])
+            print(f"  {refs}  reloc   ref -> DS {p['new_dsoff']:#06x}  {p['label']}")
         else:
             print(f"  {p['off']:#08x}  {p['kind']:6}  {p['label']}")
     if relocs:

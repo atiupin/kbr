@@ -146,9 +146,13 @@ the MZ page count. Budget math: whole text is 16 KB; realistic RU overflow is ~2
 ~4–10 KB pool has ample headroom and far pointers are never needed.
 
 Mechanised as the **`reloc` patch type** (`tools/apply_patches.py`) + **`tools/find_ref.py`**
-(run-once ref discovery). A `reloc` row's `offset` is the ref, `expect` is the 2 pointer bytes
-there, `write` is the replacement text — the build just repoints, no scanning. A string used from
-several places needs one `reloc` row per ref (all its pointers must move together).
+(run-once ref discovery). A `reloc` row's `offset` is the ref (or several refs, space-separated),
+`expect` is the **original English** — exactly like a `string` row — and `write` is the
+replacement text; the build just repoints, no scanning. The patcher dereferences the pointer it
+finds at each ref and requires the string there to equal `expect`, which both keeps the English
+readable in the manifest and checks something stronger than the raw pointer bytes. A string used
+from several places puts **all** its refs in **one** row (all its pointers must move together, and
+the pool then holds a single copy); two rows repointing the same string are rejected.
 
 #### Pool safety — measured, `0xD6D0` confirmed cold
 
@@ -270,8 +274,8 @@ row. Repointing elsewhere (DGROUP tables, ordinary code) is unaffected and works
   with no arguments; verifies every `expect` before writing (all-or-nothing).
 - **`tools/find_ref.py`** — run-once ref discovery for `reloc` rows: `find_ref.py 0x16e0b` or
   `find_ref.py "as for treason"` prints the ref offset, its current pointer bytes, and a paste-
-  ready `reloc,<off>,"<hex>","<Russian>"` line. Kept out of the build so the patcher stays a dumb,
-  deterministic applier of fixed offsets.
+  ready `reloc,<off…>,"<English>","<Russian>"` line (all usable refs on that one line). Kept out of
+  the build so the patcher stays a dumb, deterministic applier of fixed offsets.
   **Known blind spot: the first and last entry of a pointer table.** A table slot is only accepted
   when _both_ neighbours also validate as string pointers, so the edges of a table report "no ref
   found" even though the table is real (seen on the character-screen label table at `0x18910`:
