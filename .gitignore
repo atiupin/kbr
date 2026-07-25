@@ -1,5 +1,5 @@
 # Generated — safe to delete (see CLAUDE.md project layout).
-# Also where every game-derived binary lives: KBU/KBR.EXE, the run-dir .CC
+# Also where every game-derived binary lives: KBU2/KBR.EXE, the run-dir .CC
 # copies, saves. None of it is ours to distribute.
 build/
 

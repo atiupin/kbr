@@ -13,10 +13,10 @@ build/   *** generated *** — also the RUN DIR (DOSBox mounts it as C:). Everyt
          rebuildable EXCEPT *.DAT, which are the user's in-game saves: DOSBox writes them
          where it finds them, they are gitignored, and nothing regenerates them. So
          `rm -rf build` DESTROYS PLAY PROGRESS — delete the generated files by name instead.
-           KB_NWC.EXE  intermediate (KB.EXE minus the outer packer)
-           KBU.EXE     *** the translation base *** — flat, editable, keep pristine; its
+           KBU1.EXE    intermediate (KB.EXE minus the outer packer)
+           KBU2.EXE    *** the translation base *** — flat, editable, keep pristine; its
                        SHA-256 gates every tool that reads it
-           KBR.EXE     *** our build *** — KBU + res/patches.csv; the runnable/testable copy
+           KBR.EXE     *** our build *** — KBU2 + res/patches.csv; the runnable/testable copy
            256.CC 416.CC  working copies carrying the Cyrillic font, so they differ from game/
            *.DAT       *** the user's saves — NOT regenerable, never delete ***
            decomp/     Ghidra output
@@ -40,9 +40,9 @@ arguments to print it.
 
 ```
 # build chain, in order — no arguments, nothing to configure
-tools/unpack_nwc.py                        KB.EXE -> KB_NWC.EXE   (outer NWC packer)
-tools/unpack_exepack.py                    KB_NWC -> KBU.EXE      (EXEPACK; the edit base)
-tools/apply_patches.py                     KBU + res/patches.csv -> KBR.EXE
+tools/unpack_nwc.py                        KB.EXE -> KBU1.EXE    (outer NWC packer)
+tools/unpack_exepack.py                    KBU1 -> KBU2.EXE      (EXEPACK; the edit base)
+tools/apply_patches.py                     KBU2 + res/patches.csv -> KBR.EXE
 tools/cc.py font-build                     res/font.png -> build/256.CC + 416.CC
 
 # translating
@@ -58,7 +58,7 @@ tools/cc.py font-import <in.png> <archive.CC> <out.CC>
 
 # analysis — diagnostic only, never part of a build (see "Ghidra" below)
 tools/ghidra.py gui                        open the GUI on the project
-tools/ghidra.py run <Script.java> [args]   headless script on KBU.EXE, output de-noised
+tools/ghidra.py run <Script.java> [args]   headless script on KBU2.EXE, output de-noised
 tools/ghidra.py import <file> [opts]       import a binary into the project
 
 # the scripts `run` takes, in tools/ghidra/
@@ -84,7 +84,7 @@ it — read those, and put new findings there rather than here.
 
 | topic                                          | read                                     |
 | ---------------------------------------------- | ---------------------------------------- |
-| where every file lives, the KBU hash gate      | `paths.py`                               |
+| where every file lives, the KBU2 hash gate     | `paths.py`                               |
 | the two packer layers, EXEPACK, LZW            | `unpack_nwc.py` / `unpack_exepack.py`    |
 | CC archive format, the font, PNG I/O           | `cc.py`                                  |
 | patch manifest, `reloc` pool, protection guard | `apply_patches.py` docstring + constants |
@@ -94,7 +94,7 @@ it — read those, and put new findings there rather than here.
 
 ## Translating
 
-The text sits in one contiguous block in `KBU.EXE` at fixed offsets: **~2,650 words of prose**,
+The text sits in one contiguous block in `KBU2.EXE` at fixed offsets: **~2,650 words of prose**,
 ~740 phrase lines, plus menus/items/spells. Extracts are not kept in the repo (they are game
 data) — re-extract with `strings` / `find_ref.py`. **Encoding is CP866**, one byte per Cyrillic
 letter, so the byte budget equals the character count.
@@ -126,7 +126,7 @@ by this tool", not "not a pointer" — check the neighbouring slots before assum
 `KB!.COM` is not a hardware check — it is a loader-patcher that flips one branch byte in the game
 at runtime, so the protection is real but the shipping launcher disables it. We do the same
 statically with one manifest row, `bytes,0xC40A,72,EB` (`JC`→`JMP`), which makes `KBR.EXE` run
-standalone; the hash gate on `KBU.EXE` proves the offset. The prompt routine that asks for a
+standalone; the hash gate on `KBU2.EXE` proves the offset. The prompt routine that asks for a
 manual word never compares the answer, and its strings are now translated into a note saying the
 check is disabled. Full trace and the annotated `KB!.COM` listing:
 `git show a44da0b:dumps/kbcom_annotated.asm`.
@@ -142,11 +142,11 @@ so only 3 of 877 strings link to code. Don't ask it "who prints this string"; us
 `FindStringUsers.java` or a DOSBox-X breakpoint.
 
 The project DB in `tmp/` is scratch: game-derived, no hand-made annotation, kept only as a warm
-cache. Delete it freely, then rebuild (needs `build/KBU.EXE`; the program must end up named
-**`KBU.EXE`**, which is what `-process` selects):
+cache. Delete it freely, then rebuild (needs `build/KBU2.EXE`; the program must end up named
+**`KBU2.EXE`**, which is what `-process` selects):
 
 ```
-tools/ghidra.py import build/KBU.EXE                       # then let auto-analysis run
+tools/ghidra.py import build/KBU2.EXE                       # then let auto-analysis run
 tools/ghidra.py import 'game/KB!.COM' -loader BinaryLoader \
     -loader-baseAddr 1000:0100 -processor 'x86:LE:16:Real Mode' -cspec default
 tools/ghidra.py run AnnotateKbCom.java                     # decline auto-analysis on the .COM
@@ -162,7 +162,7 @@ tools/ghidra.py run DumpDecomp.java build/decomp
 
 ## Conventions
 
-- `build/KBU.EXE` is the single source of truth — regenerate `KBR.EXE` with the script, never
+- `build/KBU2.EXE` is the single source of truth — regenerate `KBR.EXE` with the script, never
   hand-hack headers. Keep `game/` untouched; rebuild the run-dir `.CC` copies from it with `cc.py`.
 - **Nothing game-derived is tracked in git** — no binaries, no disassembly, no extracted text. The
   repo carries only hand-written things.

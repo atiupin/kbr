@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
-"""Build build/KBR.EXE from pristine build/KBU.EXE by applying res/patches.csv.
+"""Build build/KBR.EXE from pristine build/KBU2.EXE by applying res/patches.csv.
 
-This is not a universal patcher. It reads exactly one file -- build/KBU.EXE
+This is not a universal patcher. It reads exactly one file -- build/KBU2.EXE
 (whose SHA-256 gate lives in paths.py) -- and writes exactly one file, build/KBR.EXE
 next to it. Run it with no arguments:
 
     python3 tools/apply_patches.py
 
-The hash gate refuses any KBU.EXE whose bytes differ, so every offset in the
+The hash gate refuses any KBU2.EXE whose bytes differ, so every offset in the
 manifest is provably correct against that exact image -- no per-patch address
 arithmetic is needed.
 
@@ -69,11 +69,11 @@ import struct
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from paths import KBU as INPUT, KBR as OUTPUT, PATCHES_CSV as MANIFEST, KBU_SHA256  # noqa: E402
+from paths import KBU2 as INPUT, KBR as OUTPUT, PATCHES_CSV as MANIFEST, KBU2_SHA256  # noqa: E402
 
 ENCODING = "cp866"
 
-# DGROUP layout of KBU.EXE.
+# DGROUP layout of KBU2.EXE.
 DS_BASE = 0x15690        # file offset of DS:0000 -- near offset 0 lives here
 BSSEND  = 0xB64C         # _end: heap floor / top of BSS (c0 constant, verified)
 
@@ -263,12 +263,12 @@ def main():
     try:
         data = bytearray(open(INPUT, "rb").read())
     except FileNotFoundError:
-        die(f"KBU.EXE not found at {INPUT}")
+        die(f"KBU2.EXE not found at {INPUT}")
 
     digest = hashlib.sha256(data).hexdigest()
-    if digest != KBU_SHA256:
-        die(f"{INPUT} is not pristine KBU.EXE\n"
-            f"       expected sha256 {KBU_SHA256}\n"
+    if digest != KBU2_SHA256:
+        die(f"{INPUT} is not pristine KBU2.EXE\n"
+            f"       expected sha256 {KBU2_SHA256}\n"
             f"       got             {digest}\n"
             f"       regenerate it with unpack_exepack.py.")
 
@@ -322,7 +322,7 @@ def main():
 
     open(OUTPUT, "wb").write(bytes(data))
     print(f"applied {len(patches)} patch(es) "
-          f"({len(relocs)} reloc): build/KBU.EXE -> build/KBR.EXE")
+          f"({len(relocs)} reloc): build/KBU2.EXE -> build/KBR.EXE")
     for p in patches:
         if p["kind"] == "reloc":
             refs = " ".join(f"{r:#08x}" for r in p["offs"])

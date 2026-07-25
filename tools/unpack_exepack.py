@@ -1,21 +1,21 @@
 #!/usr/bin/env python3
 """
-Strip the Microsoft EXEPACK layer from build/KB_NWC.EXE and emit a flat
-build/KBU.EXE with a proper DOS relocation table.
+Strip the Microsoft EXEPACK layer from build/KBU1.EXE and emit a flat
+build/KBU2.EXE with a proper DOS relocation table.
 
 Pipeline for the whole game (everything after the pristine game/ originals
 lands in build/):
-    game/KB.EXE  --(tools/unpack_nwc.py)-->  build/KB_NWC.EXE
-                 --(this script)---------->  build/KBU.EXE
+    game/KB.EXE  --(tools/unpack_nwc.py)-->  build/KBU1.EXE
+                 --(this script)---------->  build/KBU2.EXE
 
 Run with no arguments to use those default paths; pass src/dst to override.
 
 KB.EXE is double-packed: an outer custom New World Computing packer (stripped
 by unpack_nwc.py) wrapping an inner Microsoft EXEPACK layer (removed here).
-KBU.EXE is the flat, uncompressed translation base: every string sits at a
+KBU2.EXE is the flat, uncompressed translation base: every string sits at a
 fixed offset, editable in place.
 
-Validated: KBU's decompressed image matches the live running game (dump1)
+Validated: KBU2's decompressed image matches the live running game (dump1)
 98.9% after relocation; the ~1% delta is runtime-mutated variables.
 
 The EXEPACK format
@@ -31,23 +31,23 @@ with `cmd & 0xFE` selecting the operation -- 0xB0 = fill (one fill byte follows
 below the record), 0xB2 = copy a literal run -- and `cmd & 1` marking the last
 record.
 
-EXEPACK self-relocates at runtime from its own table, which is why KB_NWC.EXE
+EXEPACK self-relocates at runtime from its own table, which is why KBU1.EXE
 runs at any load address despite declaring 0 relocations in its DOS header. That
 table sits right after the "Packed file is corrupt" string as 16 sections, each
 a uint16 count followed by that many uint16 offsets; section i contributes
 segment base i*0x1000. It is decoded here and written out as a real 1960-entry
-DOS relocation table, which is what makes KBU.EXE an ordinary loadable EXE.
+DOS relocation table, which is what makes KBU2.EXE an ordinary loadable EXE.
 """
 import os, struct, sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from paths import KB_NWC, KBU                                # noqa: E402
+from paths import KBU1, KBU2                                 # noqa: E402
 
 
-def unpack(src_path=KB_NWC, dst_path=KBU,
+def unpack(src_path=KBU1, dst_path=KBU2,
            validate=None, validate_base=0x8920, load_seg=0x892):
     d = open(src_path, "rb").read()
-    # Take the load image exactly as the DOS header declares it -- KB_NWC's
+    # Take the load image exactly as the DOS header declares it -- KBU1's
     # header is 32 bytes and its image 107501 bytes, but reading the fields
     # keeps this honest if the file is ever regenerated differently. (CUP386's
     # output carried ~78 KB of dump tail past the declared end; the declared
@@ -55,7 +55,7 @@ def unpack(src_path=KB_NWC, dst_path=KBU,
     cblp, cp, _crlc, cparhdr = struct.unpack_from("<4H", d, 2)
     img = bytearray(d[cparhdr * 16:(cp - 1) * 512 + cblp])
 
-    # EXEPACK header lives at the packer stub's CS:0000. For KB_NWC that's image
+    # EXEPACK header lives at the packer stub's CS:0000. For KBU1 that's image
     # offset 0x19350 (stub entry CS:IP = 1935:0012; IP 0x12 = past the 18-byte hdr).
     cs0 = 0x19350
     (real_ip, real_cs, _mem_start, exepack_size,

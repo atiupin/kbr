@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Find the REF of a string in pristine build/KBU.EXE -- the file offset of the 2-byte
+"""Find the REF of a string in pristine build/KBU2.EXE -- the file offset of the 2-byte
 near pointer that points at it -- so it can be pasted into a `reloc` row of
 res/patches.csv. This is a run-once discovery aid; the build (apply_patches.py)
 never scans, it just applies the offsets you record here.
@@ -26,11 +26,11 @@ import struct
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from paths import KBU, KBU_SHA256                            # noqa: E402
+from paths import KBU2, KBU2_SHA256                          # noqa: E402
 
 ENCODING = "cp866"
 
-# DGROUP layout of KBU.EXE (mirror of apply_patches.py).
+# DGROUP layout of KBU2.EXE (mirror of apply_patches.py).
 DS_BASE = 0x15690        # file offset of DS:0000
 IMAGE_END = 0x1BA20      # end of the original loaded image = DS offset 0x6390
 # Opcodes that load a 16-bit immediate (Turbo C passing a near string pointer):
@@ -96,9 +96,9 @@ def find_refs(data, str_off):
 def main(argv):
     if len(argv) != 2:
         sys.exit(__doc__)
-    data = open(KBU, "rb").read()
-    if hashlib.sha256(data).hexdigest() != KBU_SHA256:
-        sys.exit(f"error: {KBU} is not pristine -- offsets would be wrong")
+    data = open(KBU2, "rb").read()
+    if hashlib.sha256(data).hexdigest() != KBU2_SHA256:
+        sys.exit(f"error: {KBU2} is not pristine -- offsets would be wrong")
 
     arg = argv[1]
     try:

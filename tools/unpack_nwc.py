@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Strip the outer New World Computing packer from game/KB.EXE and emit
-build/KB_NWC.EXE -- the inner (still EXEPACK-packed) EXE.
+build/KBU1.EXE -- the inner (still EXEPACK-packed) EXE.
 
-    python3 tools/unpack_nwc.py            # game/KB.EXE -> build/KB_NWC.EXE
+    python3 tools/unpack_nwc.py            # game/KB.EXE -> build/KBU1.EXE
 
 This replaced CUP386, the DOS code-tracing unpacker originally used for this
 step (since deleted from tools/), so the whole build runs in plain Python.
@@ -33,7 +33,7 @@ the outer header size), all read straight out of the disassembly:
 The inner MZ header is an ordinary DOS header; the stub takes CS:IP, SS:SP and
 the memory sizing from it, and its e_lfarlc/e_crlc describe a relocation table
 of its own. In our copy e_crlc is **0** (the EXEPACK stub self-relocates, which
-is why KB_NWC.EXE also shows 0 relocations), so no fixups are applied. A copy
+is why KBU1.EXE also shows 0 relocations), so no fixups are applied. A copy
 with a nonzero count would need them applied before the image is meaningful --
 that is refused rather than silently mishandled.
 """
@@ -45,11 +45,11 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from cc import lzw_decode                                    # noqa: E402
-from paths import KB_EXE as INPUT, KB_NWC as OUTPUT          # noqa: E402
+from paths import KB_EXE as INPUT, KBU1 as OUTPUT            # noqa: E402
 
 BASE_PTR = 0x4B          # stub offset holding the inner header's file offset
 # The image we expect from the copy this project was reversed against. A
-# mismatch is not fatal here -- apply_patches.py's KBU.EXE hash gate is the real
+# mismatch is not fatal here -- apply_patches.py's KBU2.EXE hash gate is the real
 # check -- but it is worth saying loudly, because every offset in patches.csv
 # assumes this exact build of the game.
 KNOWN_IMAGE_SHA256 = "06ca56b4d1ca737b050178cd394cc9e52e9879c860dcf51c45ff457cc5236c4a"

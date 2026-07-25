@@ -2,7 +2,7 @@
 """Ghidra front-end for this project.
 
     tools/ghidra.py gui                       open the GUI on the project
-    tools/ghidra.py run <Script.java> [args]  run a headless script on KBU.EXE
+    tools/ghidra.py run <Script.java> [args]  run a headless script on KBU2.EXE
     tools/ghidra.py import <file> [opts]      import a binary into the project
 
 Analysis is DONE -- nothing in the build depends on Ghidra. What is left is
@@ -56,12 +56,12 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from paths import TOOLS, TMP, KBU                            # noqa: E402
+from paths import TOOLS, TMP, KBU2                           # noqa: E402
 
 PROJECT_DIR = Path(TMP)                    # scratch: the project is regenerable
 PROJECT_NAME = "KBR"
 SCRIPTS = Path(TOOLS) / "ghidra"           # the .java analysis scripts
-PROGRAM = Path(KBU).name                   # what `run` selects with -process
+PROGRAM = Path(KBU2).name                   # what `run` selects with -process
 
 # Ghidra logs its whole startup at INFO, and prefixes script output with
 # "INFO  Foo.java> ... (GhidraScript)". Strip both so results read clean;
@@ -100,7 +100,7 @@ def check_project():
         die(f"no Ghidra project at {PROJECT_DIR / (PROJECT_NAME + '.gpr')} -- it is "
             f"gitignored scratch.\n"
             f"       Recreate it (CLAUDE.md, \"Rebuilding the Ghidra project\"):\n"
-            f"         tools/ghidra.py import build/KBU.EXE")
+            f"         tools/ghidra.py import build/KBU2.EXE")
 
 
 def check_unlocked():
