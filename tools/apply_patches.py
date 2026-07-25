@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build build/KBR.EXE from pristine build/KBU.EXE by applying tools/patches.csv.
+"""Build build/KBR.EXE from pristine build/KBU.EXE by applying res/patches.csv.
 
 This is not a universal patcher. It reads exactly one file -- build/KBU.EXE
 (whose SHA-256 gate lives in paths.py) -- and writes exactly one file, build/KBR.EXE
@@ -11,7 +11,7 @@ The hash gate refuses any KBU.EXE whose bytes differ, so every offset in the
 manifest is provably correct against that exact image -- no per-patch address
 arithmetic is needed.
 
-Manifest (tools/patches.csv): a CSV with header `type,offset,expect,write`, one
+Manifest (res/patches.csv): a CSV with header `type,offset,expect,write`, one
 patch per row. Blank lines and lines whose first non-space char is `#` are
 ignored, so `#` lines serve as section comments (which is where descriptions
 live -- there is no per-row label column). The file is UTF-8; string `write`/

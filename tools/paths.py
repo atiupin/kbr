@@ -10,8 +10,9 @@ The directories, and the rule each one carries:
 
     GAME    the user's pristine originals -- READ ONLY, never write here
     BUILD   everything generated, and the DOSBox run dir (mounted as C:)
-    TOOLS   this directory: the build scripts and their data (font.png, the
-            patch manifest)
+    RES     hand-written build INPUTS: the patch manifest, the font sheet
+    TOOLS   this directory: scripts only -- the build scripts, plus ghidra.py
+            and its ghidra/*.java scripts
     TMP     scratch -- the Ghidra project DB, DOSBox captures
 
 Paths are absolute and derived from this file's own location, so the scripts
@@ -24,6 +25,7 @@ TOOLS = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(TOOLS)
 GAME = os.path.join(ROOT, "game")
 BUILD = os.path.join(ROOT, "build")
+RES = os.path.join(ROOT, "res")
 TMP = os.path.join(ROOT, "tmp")
 
 # --- inputs: the user's own copy, never modified -----------------------------
@@ -40,8 +42,8 @@ BUILD_CC = {256: os.path.join(BUILD, "256.CC"),  # run-dir copies, carrying the
             416: os.path.join(BUILD, "416.CC")}  # Cyrillic-extended font
 
 # --- hand-written build inputs (tracked) -------------------------------------
-PATCHES_CSV = os.path.join(TOOLS, "patches.csv")
-FONT_PNG = os.path.join(TOOLS, "font.png")
+PATCHES_CSV = os.path.join(RES, "patches.csv")
+FONT_PNG = os.path.join(RES, "font.png")
 
 # KBU.EXE's SHA-256. Every tool that reads KBU gates on this: the file offsets
 # in patches.csv are only meaningful against this exact image, so a mismatch

@@ -1,28 +1,33 @@
 #!/usr/bin/env python3
 """Ghidra front-end for this project.
 
-    ghidra/ghidra.py gui                       open the GUI on the project
-    ghidra/ghidra.py run <Script.java> [args]  run a headless script on KBU.EXE
-    ghidra/ghidra.py import <file> [opts]      import a binary into the project
+    tools/ghidra.py gui                       open the GUI on the project
+    tools/ghidra.py run <Script.java> [args]  run a headless script on KBU.EXE
+    tools/ghidra.py import <file> [opts]      import a binary into the project
 
-This directory holds the hand-written parts -- this script, the analysis scripts
-in scripts/, the annotated listings. The project DATABASE lives in tmp/
-(KBR.gpr / KBR.rep): it is game-derived and fully regenerable, so it is scratch,
-not source. Rebuild it per CLAUDE.md if it is missing.
+Analysis is DONE -- nothing in the build depends on Ghidra. What is left is
+diagnostic: when a patched string breaks something and you need to know what code
+touched it. Reach for a DOSBox-X breakpoint first; it is usually faster.
+
+The hand-written parts are this script and the analysis scripts in tools/ghidra/.
+The project DATABASE lives in tmp/ (KBR.gpr / KBR.rep): it is game-derived and
+fully regenerable, so it is scratch, not source. It is kept only as a warm cache
+-- `-process` needs the program already imported, so without it every query
+would re-run auto-analysis. Delete it freely; rebuild it per CLAUDE.md.
 
 Ghidra allows a single writer, so close the GUI before `run`/`import`; this
 script checks and says so rather than letting Ghidra fail obscurely.
 
-To see what scripts exist: `ls ghidra/scripts` (each one's first comment line
-says what it does).
+To see what scripts exist: `ls tools/ghidra` (each one's first comment line says
+what it does).
 
 GUI orientation
 ---------------
 Listing = disassembly, Decompiler = C-ish pseudocode, Window -> Bytes = hex
 (cursor-linked to the Listing), Window -> Defined Strings = all 877 strings.
 `G` = goto address, `D` = disassemble here. To run our scripts from the GUI,
-Script Manager -> Manage Script Directories -> add ghidra/scripts; hit Refresh
-if a script's version banner looks stale.
+Script Manager -> Manage Script Directories -> add tools/ghidra; hit Refresh if a
+script's version banner looks stale.
 
 EOL comments TRUNCATE in the Listing by default -- the field is narrow and clips
 with "..." rather than wrapping. Fix it once in Edit -> Tool Options -> Listing
@@ -50,11 +55,13 @@ import subprocess
 import sys
 from pathlib import Path
 
-HERE = Path(__file__).resolve().parent
-PROJECT_DIR = HERE.parent / "tmp"          # scratch: the project is regenerable
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from paths import TOOLS, TMP, KBU                            # noqa: E402
+
+PROJECT_DIR = Path(TMP)                    # scratch: the project is regenerable
 PROJECT_NAME = "KBR"
-SCRIPTS = HERE / "scripts"
-PROGRAM = "KBU.EXE"                        # what `run` selects with -process
+SCRIPTS = Path(TOOLS) / "ghidra"           # the .java analysis scripts
+PROGRAM = Path(KBU).name                   # what `run` selects with -process
 
 # Ghidra logs its whole startup at INFO, and prefixes script output with
 # "INFO  Foo.java> ... (GhidraScript)". Strip both so results read clean;
@@ -93,7 +100,7 @@ def check_project():
         die(f"no Ghidra project at {PROJECT_DIR / (PROJECT_NAME + '.gpr')} -- it is "
             f"gitignored scratch.\n"
             f"       Recreate it (CLAUDE.md, \"Rebuilding the Ghidra project\"):\n"
-            f"         ghidra/ghidra.py import build/KBU.EXE")
+            f"         tools/ghidra.py import build/KBU.EXE")
 
 
 def check_unlocked():
@@ -130,7 +137,7 @@ def main(argv):
 
     elif cmd == "run":
         if not rest:
-            die("usage: ghidra/ghidra.py run <Script.java> [args...]")
+            die("usage: tools/ghidra.py run <Script.java> [args...]")
         script, args = rest[0], rest[1:]
         if not (SCRIPTS / script).is_file():
             die(f"no such script: {SCRIPTS / script}")
@@ -142,7 +149,7 @@ def main(argv):
 
     elif cmd == "import":
         if not rest:
-            die("usage: ghidra/ghidra.py import <file> [extra analyzeHeadless opts]")
+            die("usage: tools/ghidra.py import <file> [extra analyzeHeadless opts]")
         PROJECT_DIR.mkdir(parents=True, exist_ok=True)   # may not exist yet
         check_unlocked()
         return headless(["-import", *rest])

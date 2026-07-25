@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Find the REF of a string in pristine build/KBU.EXE -- the file offset of the 2-byte
 near pointer that points at it -- so it can be pasted into a `reloc` row of
-tools/patches.csv. This is a run-once discovery aid; the build (apply_patches.py)
+res/patches.csv. This is a run-once discovery aid; the build (apply_patches.py)
 never scans, it just applies the offsets you record here.
 
     python3 tools/find_ref.py 0x16e0b            # by the string's file offset
