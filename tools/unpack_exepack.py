@@ -1,26 +1,39 @@
 #!/usr/bin/env python3
 """
-Strip the Microsoft EXEPACK layer from KB_NWC.EXE and emit a flat KBU.EXE
-with a proper DOS relocation table.
+Strip the Microsoft EXEPACK layer from build/KB_NWC.EXE and emit a flat
+build/KBU.EXE with a proper DOS relocation table.
 
-Pipeline for the whole game:
-    KB.EXE  --(CUP386 /1 /x, in DOSBox)-->  KB_NWC.EXE  --(this script)-->  KBU.EXE
+Pipeline for the whole game (everything after the pristine game/ originals
+lands in build/):
+    game/KB.EXE  --(tools/unpack_nwc.py)-->  build/KB_NWC.EXE
+                 --(this script)---------->  build/KBU.EXE
 
-KB.EXE is double-packed: an outer custom New World Computing packer (which
-CUP386 removes) wrapping an inner Microsoft EXEPACK layer (removed here).
+Run with no arguments to use those default paths; pass src/dst to override.
+
+KB.EXE is double-packed: an outer custom New World Computing packer (stripped
+by unpack_nwc.py) wrapping an inner Microsoft EXEPACK layer (removed here).
 KBU.EXE is the flat, uncompressed translation base: every string sits at a
 fixed offset, editable in place.
 
 Validated: KBU's decompressed image matches the live running game (dump1)
 98.9% after relocation; the ~1% delta is runtime-mutated variables.
 """
-import struct, sys
+import os, struct, sys
 
-def unpack(src_path="KB_NWC.EXE", dst_path="KBU.EXE",
+BUILD = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                     "build")
+
+def unpack(src_path=os.path.join(BUILD, "KB_NWC.EXE"),
+           dst_path=os.path.join(BUILD, "KBU.EXE"),
            validate=None, validate_base=0x8920, load_seg=0x892):
     d = open(src_path, "rb").read()
-    # KB_NWC header is 32 bytes; declared image is 107501 bytes.
-    img = bytearray(d[32:32 + 107501])
+    # Take the load image exactly as the DOS header declares it -- KB_NWC's
+    # header is 32 bytes and its image 107501 bytes, but reading the fields
+    # keeps this honest if the file is ever regenerated differently. (CUP386's
+    # output carried ~78 KB of dump tail past the declared end; the declared
+    # length is what DOS would load, and what the EXEPACK offsets below assume.)
+    cblp, cp, _crlc, cparhdr = struct.unpack_from("<4H", d, 2)
+    img = bytearray(d[cparhdr * 16:(cp - 1) * 512 + cblp])
 
     # EXEPACK header lives at the packer stub's CS:0000. For KB_NWC that's image
     # offset 0x19350 (stub entry CS:IP = 1935:0012; IP 0x12 = past the 18-byte hdr).
