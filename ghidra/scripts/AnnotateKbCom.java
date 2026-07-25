@@ -4,7 +4,8 @@
 // contains signature DATA that analyzers happily turn into plausible code).
 //
 // Run on the KB!.COM program: Script Manager -> AnnotateKbCom.java
-// Companion listing with the full explanation: dumps/kbcom_annotated.asm
+// Companion listing with the full explanation: tmp/kbcom_annotated.asm (scratch,
+// untracked -- last committed copy: git show a44da0b:dumps/kbcom_annotated.asm)
 
 import ghidra.app.script.GhidraScript;
 import ghidra.program.model.address.Address;
