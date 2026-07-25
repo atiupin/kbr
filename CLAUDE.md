@@ -16,33 +16,64 @@ build/   *** generated *** — also the RUN DIR (DOSBox mounts it as C:). Everyt
            KB_NWC.EXE  intermediate (KB.EXE minus the outer packer)
            KBU.EXE     *** the translation base *** — flat, editable, keep pristine; its
                        SHA-256 gates every tool that reads it
-           KBR.EXE     *** our build *** — KBU + patches.csv; the runnable/testable copy
+           KBR.EXE     *** our build *** — KBU + res/patches.csv; the runnable/testable copy
            256.CC 416.CC  working copies carrying the Cyrillic font, so they differ from game/
            *.DAT       *** the user's saves — NOT regenerable, never delete ***
            decomp/     Ghidra output
-tools/   *** the build *** — hand-written Python, stdlib only: paths.py (the shared layout),
-         unpack_nwc.py, unpack_exepack.py, apply_patches.py + patches.csv, cc.py,
-         find_ref.py, addr.py, font.png
-ghidra/  *** the analysis tooling *** — ghidra.py front-end + scripts/*.java. No game data.
+res/     *** hand-written build INPUTS *** — patches.csv (the patch manifest, i.e. the
+         translation itself) and font.png (the Cyrillic-extended glyph sheet).
+tools/   *** the build *** — SCRIPTS ONLY, hand-written Python, stdlib only: paths.py (the
+         shared layout), unpack_nwc.py, unpack_exepack.py, apply_patches.py, cc.py,
+         find_ref.py, addr.py
+           ghidra.py   the analysis front-end (diagnostic only — the build never calls it)
+           ghidra/     its *.java analysis scripts. No game data.
 tmp/     *** scratch, gitignored *** — the Ghidra project DB (regenerable), DOSBox captures.
 ```
 
-**`tools/` builds, `ghidra/` analyses, `build/` is generated (and is the run dir), `game/` is
-untouchable, `tmp/` is scratch.**
+**`tools/` is code, `res/` is the data it consumes, `build/` is generated (and is the run
+dir), `game/` is untouchable, `tmp/` is scratch.**
+
+## Tools
+
+Every command in the project. Each script's own docstring is the reference — run it with no
+arguments to print it.
+
+```
+# build chain, in order — no arguments, nothing to configure
+tools/unpack_nwc.py                        KB.EXE -> KB_NWC.EXE   (outer NWC packer)
+tools/unpack_exepack.py                    KB_NWC -> KBU.EXE      (EXEPACK; the edit base)
+tools/apply_patches.py                     KBU + res/patches.csv -> KBR.EXE
+tools/cc.py font-build                     res/font.png -> build/256.CC + 416.CC
+
+# translating
+tools/find_ref.py <offset | "substring">   the ref pointing at a string; prints a reloc row
+tools/addr.py <0xoffset | seg:off>         file offset <-> Ghidra address
+
+# CC archives — one-offs; font-build is the only one the build needs
+tools/cc.py list <archive.CC>
+tools/cc.py extract <archive.CC> <id-hex> <out.bin>
+tools/cc.py replace <archive.CC> <id-hex> <in.bin> <out.CC>
+tools/cc.py font-export <archive.CC> <out.png> [--glyphs 128|256]
+tools/cc.py font-import <in.png> <archive.CC> <out.CC>
+
+# analysis — diagnostic only, never part of a build (see "Ghidra" below)
+tools/ghidra.py gui                        open the GUI on the project
+tools/ghidra.py run <Script.java> [args]   headless script on KBU.EXE, output de-noised
+tools/ghidra.py import <file> [opts]       import a binary into the project
+
+# the scripts `run` takes, in tools/ghidra/
+FindStringUsers.java "<text>" [dsbase]     what code references a string (Ghidra can't)
+DumpAsm.java <seg:off>                     one function's assembly, symbols resolved
+DumpDecomp.java [outdir]                   decompiled C for every function + a string map
+AnnotateKbCom.java [eol-max]               disassemble and annotate KB!.COM
+```
 
 ## Build
 
-**Pure Python 3 stdlib** — no dependencies, no DOS utilities, no DOSBox.
-
-```
-python3 tools/unpack_nwc.py           # KB.EXE   -> KB_NWC.EXE
-python3 tools/unpack_exepack.py       # KB_NWC   -> KBU.EXE
-python3 tools/apply_patches.py        # KBU      -> KBR.EXE
-python3 tools/cc.py font-build        # font.png -> 256.CC + 416.CC
-```
-
-Every step takes no arguments and reads its paths from **`tools/paths.py`**, which is the one
-place that knows the layout — put a path there, not in a script.
+Run the four build-chain commands above in order. **Pure Python 3 stdlib** — no dependencies,
+no DOS utilities, no DOSBox. Every step takes no arguments and reads its paths from
+**`tools/paths.py`**, which is the one place that knows the layout — put a path there, not in
+a script.
 
 To test: `dosbox-x -conf dosbox-x.conf` (C: is `build/`), then `KBR`.
 
@@ -102,33 +133,29 @@ check is disabled. Full trace and the annotated `KB!.COM` listing:
 
 ## Ghidra
 
-Analysis is essentially done; the project DB in `tmp/` is scratch and holds no hand-made
-annotation. Drive Ghidra through the front-end, which presets project/program/script paths:
-
-```
-ghidra/ghidra.py gui                          # open the GUI
-ghidra/ghidra.py run DumpAsm.java 1507:0009   # headless, output de-noised
-ghidra/ghidra.py import <file> [opts]
-```
-
-Rebuilding the project (needs `build/KBU.EXE`; the program must end up named **`KBU.EXE`**, which
-is what `-process` selects):
-
-```
-ghidra/ghidra.py import build/KBU.EXE                       # then let auto-analysis run
-ghidra/ghidra.py import 'game/KB!.COM' -loader BinaryLoader \
-    -loader-baseAddr 1000:0100 -processor 'x86:LE:16:Real Mode' -cspec default
-ghidra/ghidra.py run AnnotateKbCom.java                     # decline auto-analysis on the .COM
-ghidra/ghidra.py run DumpDecomp.java build/decomp
-```
+Analysis is done — nothing in the build calls Ghidra. What is left is diagnostic: finding what
+code touches a string a patch broke. Always drive it through `tools/ghidra.py`, which presets
+the paths and explains every flag in its docstring.
 
 **Ghidra cannot resolve string xrefs here** — it can't statically pin DS in segmented real mode,
 so only 3 of 877 strings link to code. Don't ask it "who prints this string"; use
 `FindStringUsers.java` or a DOSBox-X breakpoint.
 
+The project DB in `tmp/` is scratch: game-derived, no hand-made annotation, kept only as a warm
+cache. Delete it freely, then rebuild (needs `build/KBU.EXE`; the program must end up named
+**`KBU.EXE`**, which is what `-process` selects):
+
+```
+tools/ghidra.py import build/KBU.EXE                       # then let auto-analysis run
+tools/ghidra.py import 'game/KB!.COM' -loader BinaryLoader \
+    -loader-baseAddr 1000:0100 -processor 'x86:LE:16:Real Mode' -cspec default
+tools/ghidra.py run AnnotateKbCom.java                     # decline auto-analysis on the .COM
+tools/ghidra.py run DumpDecomp.java build/decomp
+```
+
 ## Status
 
-- [~] **Translation** — underway in `patches.csv`: title screen + credits, protection prompt,
+- [~] **Translation** — underway in `res/patches.csv`: title screen + credits, protection prompt,
   new-game/difficulty menus, character classes, army screen (25 unit names, stat labels,
   morale), dwelling screen, character screen, king's castle.
 - [ ] **Patcher** — ownership-gated installer producing the translated build.
