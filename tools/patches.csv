@@ -42,9 +42,21 @@ string,0x16758,"Do you wish to destroy the","Это имя уже было. Ст
 string,0x16773,"game of ","героя "
 # character classes
 string,0x1A187,"Knight","Рыцарь"
+string,0x01A18E,"General","Генерал"
+string,0x01A196,"Marshal","Маршал"
+string,0x01A19E,"Lord","Лорд"
 string,0x1A1A3,"Paladin","Паладин"
+reloc,0x0185D9,"1B4B","Крестоносец"
+reloc,0x0185DB,"244B","Мститель"
+string,0x01A1BC,"Champion","Чемпион"
 string,0x1A1C5,"Sorceress","Колдунья"
+reloc,0x0185E1,"3F4B","Волшебница"
+reloc,0x0185E3,"484B","Чародейка"
+string,0x01A1DD,"Archmage","Архимаг"
 string,0x1A1E6,"Barbarian","Варвар"
+string,0x01A1F0,"Chieftain","Вождь"
+string,0x01A1FA,"Warlord","Воевода"
+string,0x01A202,"Overlord","Владыка"
 # "(name) the (class)" connector -> ", " (Taiga the Sorceress -> Taiga, Колдунья)
 string,0x1A181," the ",", "
 # army screen - header bar
@@ -101,7 +113,6 @@ string,0x0160E7,"Cost= ","Цена: "
 reloc,0x00AD69,"5E0A"," каждый"
 string,0x0160F5,"You may recruit up to ","Можно нанять до "
 string,0x01610C,"Recruit how many ","Сколько нанять?  "
-string,0x01A2E8,"have joined to your army.","вступили в вашу армию."
 # dwelling screen - refusal
 string,0x01A66B,"You already have the maximum","   У вас уже максимальное"
 string,0x01A688,"number of armies!","  число отрядов!"
@@ -118,3 +129,35 @@ reloc,0x01891C,"E051","Артефактов найдено"
 string,0x01A880,"Castles garrisoned","Замков занято"
 string,0x01A893,"Followers killed","Воинов потеряно"
 string,0x01A8A4,"Current score","Текущий счет"
+# king's castle - main
+string,0x01A6BE,"Recruit Soldiers","Нанять войска"
+string,0x01A3C5,"n/a","нет"
+string,0x01A6CF,"B) Audience with the King","B) Аудиенция у короля"
+string,0x01A6E9,"You don't have enough gold!","Недостаточно золота!"
+string,0x016047,"Castle ","Замок "
+string,0x019A78,"of King Maximus","Максимуса"
+# king's castle - audience intro
+string,0x01A05D,"Trumpets announce your","Трубы возвещают о"
+string,0x01A074,"arrival with regal fanfare.","вашем прибытии с почестями."
+string,0x01A091,"King Maximus rises from his","Король Максимус поднимается"
+string,0x01A0AD,"throne to greet you and","с трона вам навстречу"
+string,0x01A0C5,"proclaims:           (space)","и провозглашает:    (пробел)"
+# king's castle - audience, not enough villains
+# Line 3 is assembled in code as [text][N][" more"][line 4 "villain"][optional "s"]["."],
+# which cannot agree with a Russian numeral. Reworded to put the noun before N
+# ("вы поймаете ещё злодеев: 3."), then " more" is blanked and two code bytes drop the
+# now-redundant 4th line and the plural "s" (loop bound 4->3; JNG->JMP). N reaches 14,
+# so the line 3 prefix must stay <= 25 chars to fit the ~28-char box.
+reloc,0x0185BB,"524A","Приветствую, "
+string,0x01A0EB,"I can aid you better after","Я смогу помочь вам, когда"
+reloc,0x0185BF,"764A","вы поймаете ещё злодеев: "
+string,0x016041," more",""
+bytes,0x00A630,"04","03"
+bytes,0x00A636,"7E","EB"
+# king's castle - audience, promotion
+string,0x01A11F,"Congratulations ","Поздравляю, "
+string,0x01A130,"I now promote you to ","Отныне ваше звание - "
+# king's castle - audience, already at top rank
+string,0x01A146,"Hurry and recover my Scepter","Поспешите вернуть Скипетр"
+string,0x01A163,"of Order or all will be","Порядка, или всё будет"
+reloc,0x0185CB,"EB4A","потеряно!"
