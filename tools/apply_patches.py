@@ -53,7 +53,7 @@ reloc : for a translation that OVERFLOWS its original slot. `offset` is NOT the
 Pool safety: measured, not assumed. A full-session memory dump (puzzle map open)
 put the near-heap high-water at DS 0xb6cf and the stack low-water at DS 0xfe2c --
 a 17.8 KB cold band -- so the pool sits mid-band with KB of slack either side.
-See the POOL_* constants below and CLAUDE.md "String repointing -> Pool safety".
+See the POOL_* constants below for the measurement and how to redo it.
 
 Every `reloc` row's ref MUST come from tools/find_ref.py, which validates that
 the site is a real code immediate or pointer-table slot. A hand-picked offset can
@@ -73,7 +73,7 @@ from paths import KBU as INPUT, KBR as OUTPUT, PATCHES_CSV as MANIFEST, KBU_SHA2
 
 ENCODING = "cp866"
 
-# DGROUP layout of KBU.EXE (see CLAUDE.md "String repointing").
+# DGROUP layout of KBU.EXE.
 DS_BASE = 0x15690        # file offset of DS:0000 -- near offset 0 lives here
 BSSEND  = 0xB64C         # _end: heap floor / top of BSS (c0 constant, verified)
 
@@ -88,13 +88,21 @@ BSSEND  = 0xB64C         # _end: heap floor / top of BSS (c0 constant, verified)
 # DGROUP is left FLOATING (_heaplen stays 0): capping it to force c0's fixed
 # branch was tried and reverted -- it buys nothing here (the heap barely grows)
 # and costs the stack its headroom.
+#
+# To re-measure: run the game to the screen in question, Debug -> Start DOSBox-X
+# Debugger (pauses the CPU), then `MEMDUMPBIN 0000:0000 100000` in the Terminal
+# -- it writes MEMDUMP.BIN into tmp/. Locate DGROUP in the 1 MB image by
+# searching for the "Turbo C++ - Copyright 1990 Borla..." literal, which lives at
+# DS 0x0004, so DS:0000 = hit - 4. Heap high-water is then the highest nonzero
+# byte climbing from _end and stack low-water the lowest descending from 0xffff;
+# DOSBox starts RAM zeroed, so untouched really means untouched and even unwound
+# stack frames still show as residue.
 POOL_DSOFF     = 0xD6D0                    # pool base, mid cold band
 POOL_SIZE      = 0x1000                    # 4 KB budget (whole-text overflow est. ~2.4-4 KB)
 POOL_END_DSOFF = POOL_DSOFF + POOL_SIZE    # hard cap; keeps clear of the stack's descent
 
 # The copy-protection segment (Ghidra 19fe:0000-0cc7). `reloc` rows MUST NOT repoint a
-# ref in here. THE RULE IS SOLID; THE REASON IS UNKNOWN -- see CLAUDE.md "Never reloc a
-# ref inside the copy-protection block" for the full evidence table.
+# ref in here. THE RULE IS SOLID; THE REASON IS UNKNOWN. The evidence:
 #
 # Symptom: a single repointed immediate lets the title screen, the whole town and a
 # contract play through normally, then hangs the game in an INT 6 loop on entering the
@@ -119,6 +127,7 @@ POOL_END_DSOFF = POOL_DSOFF + POOL_SIZE    # hard cap; keeps clear of the stack'
 # Costs nothing: every string reached from here is copy-protection UI text we rewrite
 # freely anyway, and all of it fits its original slot as a `string` row.
 PROT_LO, PROT_HI = 0xBFE0, 0xCCA7          # file offsets, inclusive
+
 
 def die(msg):
     sys.exit(f"error: {msg}")

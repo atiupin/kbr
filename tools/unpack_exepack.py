@@ -17,6 +17,26 @@ fixed offset, editable in place.
 
 Validated: KBU's decompressed image matches the live running game (dump1)
 98.9% after relocation; the ~1% delta is runtime-mutated variables.
+
+The EXEPACK format
+------------------
+The packer stub is identified by the signature "RB" at its CS:0x10, and by its
+error string "Packed file is corrupt". Its 18-byte header at CS:0000 holds the
+real entry CS:IP, SS:SP and the decompressed length.
+
+Decompression reads records BACKWARD from stub CS:0000, expanding the image
+upward in place. Any trailing 0xFF padding is skipped first, then each record is
+    [cmd][len_hi][len_lo]
+with `cmd & 0xFE` selecting the operation -- 0xB0 = fill (one fill byte follows
+below the record), 0xB2 = copy a literal run -- and `cmd & 1` marking the last
+record.
+
+EXEPACK self-relocates at runtime from its own table, which is why KB_NWC.EXE
+runs at any load address despite declaring 0 relocations in its DOS header. That
+table sits right after the "Packed file is corrupt" string as 16 sections, each
+a uint16 count followed by that many uint16 offsets; section i contributes
+segment base i*0x1000. It is decoded here and written out as a real 1960-entry
+DOS relocation table, which is what makes KBU.EXE an ordinary loadable EXE.
 """
 import os, struct, sys
 

@@ -15,6 +15,32 @@ script checks and says so rather than letting Ghidra fail obscurely.
 
 To see what scripts exist: `ls ghidra/scripts` (each one's first comment line
 says what it does).
+
+GUI orientation
+---------------
+Listing = disassembly, Decompiler = C-ish pseudocode, Window -> Bytes = hex
+(cursor-linked to the Listing), Window -> Defined Strings = all 877 strings.
+`G` = goto address, `D` = disassemble here. To run our scripts from the GUI,
+Script Manager -> Manage Script Directories -> add ghidra/scripts; hit Refresh
+if a script's version banner looks stale.
+
+EOL comments TRUNCATE in the Listing by default -- the field is narrow and clips
+with "..." rather than wrapping. Fix it once in Edit -> Tool Options -> Listing
+Fields -> EOL Comments Field: tick Enable Word Wrapping and raise Maximum Lines.
+Our scripts also dodge it, writing anything over 30 chars as a pre-comment (pass
+a different cutoff as the script's first argument).
+
+Importing KB!.COM takes explicit options (see CLAUDE.md "Ghidra") because a .COM
+has no header for anything to auto-detect. The base address 1000:0100 is the
+part that matters: DOS loads a .COM at offset 0x100, and the file's own absolute
+addresses assume it -- import at 0 and every internal reference is off by 0x100.
+Decline auto-analysis on it and run AnnotateKbCom.java instead; on a raw .COM the
+analyzers invent functions out of signature data and still miss the INT 16h
+handler, which is reachable only through a vector written at runtime.
+
+Gotcha: Ghidra refuses a project path containing a dot-directory ("Path element
+starting with '.' is not permitted"), which is why PROJECT_DIR below is the
+repo's tmp/ and not a hidden cache dir.
 """
 
 import os
