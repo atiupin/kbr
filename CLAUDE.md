@@ -99,11 +99,12 @@ The text sits in one contiguous block in `KBU2.EXE` at fixed offsets: **~2,650 w
 data) — re-extract with `strings` / `find_ref.py`. **Encoding is CP866**, one byte per Cyrillic
 letter, so the byte budget equals the character count.
 
-Two length limits. The **memory slot** limit is solved: a translation that fits its original slot
-goes in as a `string` row, and one that overflows goes in as a `reloc` row, which parks the text
-in a spare DGROUP pool and repoints the 2-byte near pointer that reaches it. What still bites is
-the **on-screen box width** — a string can fit in memory and still overflow its UI field. Tight
-menus and labels are the worst; prose looks pre-wrapped to ~28–30 char lines.
+The **memory slot** limit is solved and automatic: write a `string` row when you have the string's
+offset, a `reloc` row when you have its refs from `find_ref.py`, and the build picks in-place or
+pool by measuring. Never hand-convert a fitting `reloc` row — it already inlines, and says so.
+
+What still bites is the **on-screen box width**: a string can fit in memory and still overflow its
+UI field. Tight menus and labels are the worst; prose looks pre-wrapped to ~28–30 char lines.
 
 Two hard rules, both enforced by the tools, both learned the expensive way:
 
@@ -112,14 +113,13 @@ Two hard rules, both enforced by the tools, both learned the expensive way:
   whatever it really was, and the failure surfaces far from the edit.
 - **⛔ Never `reloc` a ref inside the copy-protection block (file `0xBFE0`–`0xCCA7`).** Repointing
   one immediate there hangs the game minutes later on an unrelated screen. **The rule is solid;
-  the mechanism is UNKNOWN** — heap/stack exhaustion, pool placement and sum/XOR integrity checks
-  are all falsified, and no checksum routine was ever found. Do not trust any explanation. It
-  costs nothing: every string reached from that block is protection UI text that fits its own slot
-  as a `string` row.
+  the mechanism is UNKNOWN** — heap/stack exhaustion, pool placement and sum/XOR checks are all
+  falsified. Distrust any explanation. It costs nothing: that block's strings are protection UI
+  text that fits its own slot.
 
-`find_ref.py` has one blind spot: it accepts a table slot only when both neighbours validate, so
-the **first and last entry of a pointer table** report "no ref found". That means "not repointable
-by this tool", not "not a pointer" — check the neighbouring slots before assuming computed access.
+`find_ref.py` has one blind spot: it accepts a table slot only when both neighbours validate, so a
+pointer table's **first and last entry** report "no ref found". That means "not repointable by this
+tool", not "not a pointer" — check the neighbouring slots before assuming computed access.
 
 ## Copy protection (solved)
 
