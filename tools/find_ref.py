@@ -50,7 +50,14 @@ def valid_stroff(data, dsoff):
     offset that lands in the MIDDLE of a string, so arbitrary data validates and
     coincidental byte pairs get promoted to refs -- the bug that let a slot
     inside a descending counter table (file 0x18855, bytes `0c 0b`) pose as a
-    pointer to DS 0x0b0c, corrupting the table when the build rewrote it."""
+    pointer to DS 0x0b0c, corrupting the table when the build rewrote it.
+
+    The price is that a string with no NUL in front of it cannot validate even
+    when it is perfectly real. The villain names are the case in hand: the block
+    starts at file 0x18EDF butted straight against the losing-ending pointer
+    table, whose last entry's high byte occupies 0x18EDE. So the first name is
+    unreachable, and the second falls with it (see find_refs: a slot needs BOTH
+    neighbours). Those two are edited in place instead."""
     fo = DS_BASE + dsoff
     if not (DS_BASE <= fo < IMAGE_END):
         return False

@@ -118,8 +118,9 @@ Two hard rules, both enforced by the tools, both learned the expensive way:
   text that fits its own slot.
 
 `find_ref.py` has one blind spot: it accepts a table slot only when both neighbours validate, so a
-pointer table's **first and last entry** report "no ref found". That means "not repointable by this
-tool", not "not a pointer" — check the neighbouring slots before assuming computed access.
+pointer table's **first and last entry** report "no ref found" — as does any slot beside a string the
+tool cannot validate. That means "not repointable by this tool", not "not a pointer" — check the
+neighbouring slots before assuming computed access.
 
 ## Copy protection (solved)
 
