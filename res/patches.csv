@@ -198,11 +198,8 @@ string,0x01AC03,"  L Land         ","  L Посадка      "
 string,0x01AC15,"  F Fly          ","  F Полет        "
 # contract screen. 17 records, each a 14-entry pointer table (villain 1 at 0x016A2E,
 # stride 28), so every line is reloc-able and the labels repeat once per record.
-# Widths measured off a capture (box interior x38..601, text from x=48, 16px chars):
-# lines 1-5 print at column 10 beside the portrait -> 27 chars, lines 6-14 at column 3
-# -> 34, which lands the same 10px padding on the right as on the left; 35 clips.
-# "Last Seen:"/"Castle:" must stay within slot even so -- the continent and castle name
-# land at a fixed column 21, just past where the English label ends.
+# Width: 27 chars for lines 1-5 (name, alias, reward, last seen, castle), 34 for lines
+# 6-14 (the features header and the description); 35 clips.
 # Descriptions are reloc by default; all 17 (3665 B of English) will need POOL_SIZE
 # raised in apply_patches.py, where the measured cold band is 17.8 KB.
 # ---- villain 1, Murray the Miser ----
