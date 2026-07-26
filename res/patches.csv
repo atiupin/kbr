@@ -82,6 +82,8 @@ string,0x01AB87,"  W Wait End Week","  W Ждать неделю"
 reloc,0x018BBD,"  Q Quit and Save","  Q Запись и выход"
 string,0x01AC03,"  L Land         ","  L Посадка      "
 string,0x01AC15,"  F Fly          ","  F Полет        "
+# menu bar - quit confirmation
+string,0x162D1,"Quit to DOS without saving (y/n) ","Выйти без сохранения? (y/n) "
 # "(name) the (class)" connector -> ", " (Taiga the Sorceress -> Taiga, Колдунья)
 string,0x1A181," the ",", "
 # army screen - header bar
