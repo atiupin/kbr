@@ -40,6 +40,13 @@ reloc,0x016732,"game playable.","наполняю его жизнью.        "
 # title screen - destroy-saved-game confirmation
 string,0x16758,"Do you wish to destroy the","Это имя уже было. Стереть"
 string,0x16773,"game of ","героя "
+# title screen - load saved game
+string,0x15F6B,"Select game:"," Сохранения "
+string,0x15F78,"'ESC' to exit \x18\x19 Return to Select","ESC:Выйти  \x18\x19:Выбор  ENTER:Играть"
+# title screen - loading message
+reloc,0x01673c,"Please wait while I prepare","Подождите, я готовлю мир,"
+reloc,0x01673e,"a suitable environment for","достойный вашей охоты за"
+reloc,0x016740,"your bountying enjoyment!","головами злодеев!"
 # character classes
 string,0x1A187,"Knight","Рыцарь"
 string,0x01A18E,"General","Генерал"
