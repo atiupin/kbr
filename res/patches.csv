@@ -225,6 +225,13 @@ string,0x015C9C,"Vampires","Вампиры"
 reloc,0x015944,"Giants","Великаны"
 string,0x015CAC,"Demons","Демоны"
 string,0x015CB3,"Dragons","Драконы"
+# army-size prefixes - match HotA more or less
+reloc,0x005f1b,"A few ","Мало: "
+reloc,0x005f16,"Some ","Группа: "
+reloc,0x005f0c,"Many ","Толпа: "
+reloc,0x005f02,"A lot of ","Орда: "
+reloc,0x005ef8,"A horde of ","Туча: "
+reloc,0x005eee,"A multitude of ","Тьма: "
 # spell names - 13 chars max on the cast screen, but see the town screen's spell line:
 # one sold at a 4-digit price gets only 12
 reloc,0x0184f5,"Clone","Клонирование"
