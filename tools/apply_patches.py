@@ -22,6 +22,22 @@ visible -- UI strings are padded to fixed widths.
 
 bytes : hex, equal length, overwritten in place.
 
+        NO CODE MOTION. Rewriting an instruction is fine (a flipped branch, a changed
+        immediate); MOVING one is not, even inside an equal-length block. The EXE
+        relocation table pins the segment word of every far call BY FILE OFFSET -- 1960
+        entries, listed at 0x1c -- and DOS adds the load segment to each of those words
+        at load time. Slide a `9a` call and two things break at once: its segment word
+        is never fixed up, so it calls into hyperspace, and the loader instead adds the
+        base to whatever instruction bytes now sit at the old offset.
+
+        Learned by reordering the dwelling recruit line's five call sequences at 0xACCD
+        (equal length, self-contained, no jumps into them -- all true, all irrelevant):
+        5 relocation entries pointed into the block, and the screen drew its header and
+        then nothing. To reorder OUTPUT, move the cursor, not the code -- the drawing
+        calls take absolute columns, so their order on screen is independent of the
+        order they run in. If code really must move, its relocation entries have to move
+        with it, which this manifest has no way to express.
+
 string: CP866 text written in place, NUL-terminated. `expect` must be the complete
         original (its NUL is verified), so its length is the slot budget; a longer
         `write` is rejected and belongs in a `reloc` row.
@@ -274,6 +290,46 @@ def check_reloc_sources(relocs):
                 f"(offset column: \"{prev['off']:#08x} {p['off']:#08x}\").")
 
 
+def check_relocations(orig, data):
+    """Gate the "no code motion" rule (see the `bytes` docs above) instead of trusting it.
+
+    DOS adds the load segment to the word at every file offset the MZ relocation table
+    lists, so those words are pinned: a patch that shifts one out from under its entry
+    both leaves a far call unrelocated and lets the loader corrupt whatever moved in.
+    The invariant that catches it is blunt -- a relocation target's word may not change:
+
+      entry untouched -> the word must still be what pristine KBU2 had there
+      entry repointed -> its new target must be a far call's segment word (`9a` +3)
+
+    Repointing is how deliberate code motion declares itself, and requiring a `9a` in
+    front proves the entry landed on a call rather than on an arbitrary word.
+    """
+    nrel, = struct.unpack_from("<H", data, 0x06)
+    hdr = struct.unpack_from("<H", data, 0x08)[0] * 16
+    tbl, = struct.unpack_from("<H", data, 0x18)
+    if (nrel, hdr, tbl) != tuple(x[0] for x in (struct.unpack_from("<H", orig, 0x06),
+                                                (struct.unpack_from("<H", orig, 0x08)[0] * 16,),
+                                                struct.unpack_from("<H", orig, 0x18))):
+        die("the MZ relocation table itself moved or changed size -- unsupported")
+
+    for i in range(nrel):
+        ent = tbl + 4 * i
+        off, seg = struct.unpack_from("<HH", data, ent)
+        target = hdr + seg * 16 + off
+        if data[ent:ent + 4] != orig[ent:ent + 4]:          # repointed on purpose
+            if data[target - 3] != 0x9A:
+                die(f"relocation entry {i} at {ent:#x} was repointed to {target:#x}, "
+                    f"which is not a far call's segment word (no 9a at {target - 3:#x})")
+        elif data[target:target + 2] != orig[target:target + 2]:
+            die(f"a patch changed the word at {target:#x}, which relocation entry {i} "
+                f"({ent:#x}) pins.\n"
+                f"       DOS fixes up that word at load time: moving code out from under "
+                f"an entry\n"
+                f"       breaks the call that moved AND corrupts what took its place. "
+                f"See 'NO CODE MOTION'\n"
+                f"       in this script's docstring.")
+
+
 def fix_mz_header(data):
     """Rewrite the MZ page-count fields so DOS loads the grown image. minalloc is left
     as-is: the runtime's BSS/heap/stack now sit in the file-backed region as harmless
@@ -356,6 +412,8 @@ def main():
                 struct.pack_into("<H", data, ref, new_dsoff)
             p["new_dsoff"] = new_dsoff
         fix_mz_header(data)
+
+    check_relocations(open(INPUT, "rb").read(), data)
 
     open(OUTPUT, "wb").write(bytes(data))
     inlined = [p for p in relocs if p["inlined"]]
