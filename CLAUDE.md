@@ -159,9 +159,9 @@ tools/ghidra.py run DumpDecomp.java build/decomp
 - [~] **Translation** — underway in `res/patches.csv`: title screen + credits, protection prompt,
   new-game/difficulty menus, load-game picker, character classes, army screen (25 unit names,
   army-size prefixes, stat labels, morale), dwelling screen, character screen, king's castle,
-  menu bar and its options and controls menus, town screen and the 14 spell names. Place names
-  (towns, castles, continents) and the villain name table are still English on purpose — one
-  later pass.
+  menu bar and its options and controls menus, town screen, the 14 spell names, the villain
+  names and all 17 contract screens. Place names (towns, castles, continents) are still English
+  on purpose — one later pass, which also picks up the "Saharia" left in three contract lines.
 - [ ] **Patcher** — ownership-gated installer producing the translated build.
 
 ## Conventions
