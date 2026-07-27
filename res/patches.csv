@@ -103,6 +103,11 @@ string,0x01AC15,"  F Fly          ","  F Полет        "
 # ---- quit confirmation
 string,0x162D1,"Quit to DOS without saving (y/n) ","Выйти без сохранения? (y/n) "
 
+# ---- game saved
+reloc,0x01894c,"Your game has been saved.","Игра сохранена."
+reloc,0x018950,"Press Control-Q to Quit or","Нажмите Ctrl+Q чтобы выйти,"
+reloc,0x018952,"any other key to continue.","или пробел чтобы продолжить."
+
 # ==== ARMY SCREEN =========================================================================
 
 # ---- header bar
