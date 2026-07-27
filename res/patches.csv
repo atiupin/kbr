@@ -48,9 +48,9 @@ reloc,0x01673c,"Please wait while I prepare","Подождите, я готов�
 reloc,0x01673e,"a suitable environment for","достойный вашей охоты за"
 reloc,0x016740,"your bountying enjoyment!","головами злодеев!"
 # menu bar - header
-string,0x0157A5,"Options / Controls / ","О: Меню / Система  / "
-string,0x01579B," Options "," О: Меню "
-string,0x015790," Controls "," Система  "
+string,0x0157A5,"Options / Controls / ","О:Помощь  C:Опции    "
+reloc,0x004a88," Options "," О:Помощь "
+string,0x015790," Controls "," C:Опции "
 string,0x0157C5,"Days Left","Ост. дней"
 string,0x0157BB,"Time Stop","   Стазис"
 # menu bar - controls. "Да"/"Нет" are overprinted at hardcoded columns 12 and 15
