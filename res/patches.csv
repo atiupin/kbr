@@ -127,6 +127,7 @@ reloc,0x01594C,"Low","Низк"
 string,0x015CC4,"High","Выс"
 
 # ==== SEARCH PROMPT =======================================================================
+# NOT VERIFIED
 # Four draws at col 1 plus the y/n line at col 16 (13 chars). The day count is 1 or 10
 # (0xE0FB..0xE12C), so " дн." is the only form that agrees with both. "Копать" matches the
 # menu-bar entry; line 3 is blanked, the phrase fits two lines.
@@ -137,6 +138,44 @@ reloc,0x018e85,"search of this area.",""
 reloc,0x018e87,"Search (y/n)?","Копать? (y/n)"
 reloc,0x018e89,"Your search of this area has","Раскопки ничего не дали."
 reloc,0x018e8b,"revealed nothing.",""
+
+# ==== ADVENTURE MAP =======================================================================
+# ---- enemy castle, siege prompt
+reloc,0x0092f6,"Various groups of monsters","Разные шайки чудовищ"
+reloc,0x009379," and"," со"
+reloc,0x009392,"army ","своим войском "
+string,0x019a88,"occupy this castle.","заняли замок."
+string,0x019a9c,"Lay Siege (y/n)?","  Осадить? (y/n)"
+
+# ---- scouts sight an enemy army
+reloc,0x00b333,"Your scouts have sighted:","Ваши разведчики видят:"
+reloc,0x00b451,"Attack (y/n)?","Атаковать? (y/n)"
+bytes,0x00B446,"10","0d"
+
+# ---- wandering army: flees, or offers to join
+reloc,0x0186ef,"flee in terror at the sight","в ужасе бегут, завидев"
+reloc,0x0186f1,"your vast army.","ваше несметное войско."
+reloc,0x0186f5,"with desires of greater","в жажде подвигов и славы"
+reloc,0x0186f7,"glory, wish to join you","просятся к вам на службу."
+# Foot line col 16 -> 15; shared with both branches, hence its extra leading space.
+bytes,0x00B545,"10","0f"
+reloc,0x0186f3,"      (space)","      (пробел)"
+reloc,0x0186f9,"Accept (y/n)?","Принять? (y/n)"
+
+# ==== SPELL CASTING =======================================================================
+
+# ---- Castle Gate / Town Gate
+# NOT VERIFIED
+reloc,0x018641,"Castles you have been to:","Замки, где вы побывали:"
+reloc,0x018643,"Revisit which castle? ","В какой замок? "
+reloc,0x018645,"Towns you have been to:","Города, где вы побывали:"
+reloc,0x018647,"Revisit which town? ","В какой город? "
+
+# ---- Instant Army
+# NOT VERIFIED
+reloc,0x0186c1,"have joined to your army.","вступили в ваше войско."
+reloc,0x0186c3,"   There are no open slots  ","   Нет ни свободных мест,"
+reloc,0x0186c5,"  or any of this army type! ","   ни отряда такого типа!"
 
 # ==== DWELLING SCREEN =====================================================================
 
@@ -748,7 +787,7 @@ reloc,0x009e4c," spell.",""
 # ---- treasure: maps to another continent
 reloc,0x0185a1,"Hidden within an ancient","В старинном сундуке вы"
 reloc,0x0185a3,"chest, you find maps and","находите карты, описывающие"
-reloc,0x0185a5,"charts describing passage to","путь на новый континент:"
+reloc,0x0185a5,"charts describing passage to","морской путь на континент:"
 
 # ---- treasure: magic orb, map completed, NOT VERIFIED
 reloc,0x0185a7,"Peering through a magical","Заглянув в волшебный шар,"
