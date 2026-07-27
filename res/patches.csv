@@ -284,6 +284,32 @@ string,0x01A9AE,"3. Archipelia","3. Архипелия"
 string,0x01A9BC,"4. Saharia","4. Сахария"
 string,0x01A9C7,"Go to which continent? ","Куда отправляемся? "
 
+# ==== WEEK CHANGE =========================================================================
+
+# ---- astrologers / repopulation
+reloc,0x00d5fa,"Astrologers proclaim:","Астрологи возвещают, чья"
+reloc,0x00d613,"Week of the ","нынче неделя: "
+reloc,0x00d6f4,"All ",""
+reloc,0x00d711," dwellings are",": все жилища"
+reloc,0x00d72a,"repopulated.","пополнены."
+# Foot prompt, via a pointer: endings-table slot 40, which its own loops never reach.
+# "(пробел)" is a char wider than "(space)", so the goto moves one column left.
+bytes,0xD738,"16","15"
+reloc,0x018edd,"(space)","(пробел)"
+reloc,0x00dbd8,"Week #","Неделя "
+
+# ---- budget box
+reloc,0x00d783,"Budget","Бюджет"
+reloc,0x018954,"On Hand","Казна"
+reloc,0x018956,"Payment","Доход"
+reloc,0x018958,"Boat","Корабль"
+reloc,0x01895a,"Army","Армия"
+reloc,0x01895c,"Balance","Итого"
+# Slot 6 of the same table; the ledger loop only reads slots 1-5, so this one is not drawn
+# anywhere we could find -- translated just in case.
+reloc,0x01895e,"Leave","Ушли"
+reloc,0x00d870,"Leave","Ушли"
+
 # ==== NAME TABLES =========================================================================
 
 # ---- unit names
