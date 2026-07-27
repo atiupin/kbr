@@ -668,17 +668,7 @@ string,0x018241,"  stealing the Sceptre of Order.","  и похитил Скип
 
 # ==== TREASURE CHESTS =====================================================================
 # Seven events, each a pointer table walked by one loop at file 0x9955; every line is drawn
-# at col 1, so the box is 28 chars wide. Line counts and the slots that take a number are
-# FIXED BY CODE and cannot move:
-#   gold cache  7 lines, count+" gold." after line 4, count+'.' after line 7
-#   mineral     6 lines, blank row after line 3, count after line 6
-#   genie       7 lines
-#   nomads      7 lines, count after line 7
-#   imp         5 lines, then count@col4 + spell name@col6 + " spell." lower down
-#   maps        3 lines, then the continent name + '.' on line 4
-#   orb         4 lines
-# The '.' after the leadership gain and after the continent name are putchar immediates, not
-# strings. Every table entry, first one included, comes from find_ref.py.
+# at col 1, so the box is 28 chars wide.
 
 # ---- treasure: hidden gold cache
 reloc,0x018561,"After scouring the area,","Обыскав округу, вы находите"
@@ -687,7 +677,7 @@ reloc,0x018565,"treasure cache. You may:","Вы можете:"
 reloc,0x018567,"A) Take the ","A) Забрать "
 reloc,0x009b78," gold."," золота."
 reloc,0x018569,"B) Distribute the gold to","B) Раздать всё золото"
-reloc,0x01856b,"the peasants, increasing","крестьянам тогда ваше"
+reloc,0x01856b,"the peasants, increasing","крестьянам, тогда ваше"
 reloc,0x01856d,"your leadership by ","лидерство вырастет на "
 
 # ---- treasure: mineral deposits
@@ -695,10 +685,10 @@ reloc,0x01856f,"After surveying the area,","Осмотрев эти земли, 
 reloc,0x018571,"you discover that it is","обнаруживаете богатые"
 reloc,0x018573,"rich in mineral deposits.","залежи руды."
 reloc,0x018575,"The King rewards you for","Король награждает вас за"
-reloc,0x018577,"your find by increasing","находку, и ваше недельное"
-reloc,0x018579,"your weekly income by ","жалованье растёт на "
+reloc,0x018577,"your find by increasing","находку и повышает ваше"
+reloc,0x018579,"your weekly income by ","недельное жалованье на "
 
-# ---- treasure: genie in a bottle
+# ---- treasure: genie in a bottle, NOT VERIFIED
 reloc,0x01857b,"Traversing the area, you","Бродя по округе, вы"
 reloc,0x01857d,"stumble upon a time worn","натыкаетесь на древний"
 reloc,0x01857f,"cannister. Curious, you un-","сосуд. Из любопытства вы"
@@ -712,79 +702,78 @@ reloc,0x018589,"A tribe of nomads greet you","Племя кочевников т
 reloc,0x01858b,"and your army warmly. Their","встречает вас и вашу армию."
 reloc,0x01858d,"shaman, in awe of your","Их шаман, поражённый вашей"
 reloc,0x01858f,"prowess, teaches you the","доблестью, открывает вам"
-reloc,0x018591,"secret of his tribe's magic.","тайное искусство своего"
-reloc,0x018593,"Your maximum spell capacity","племени. Максимум"
-reloc,0x018595,"is increased by ","заклинаний вырос на "
+reloc,0x018591,"secret of his tribe's magic.","загадочные риуталы своего"
+reloc,0x018593,"Your maximum spell capacity","племени. Ваш максимум"
+reloc,0x018595,"is increased by ","заклинаний вырастает на "
 
 # ---- treasure: captured imp
-# The reward row is [count]@col4 [spell name]@col6 [" spell."], so the noun has to sit in
-# line 5 and the suffix shrinks to the full stop: "...заклинаниями:" / "1 Воскрешение."
 reloc,0x018597,"You have captured a","Вы поймали проказливого"
-reloc,0x018599,"mischevious imp which has","беса, что наводил ужас на"
-reloc,0x01859b,"been terrorizing the","всю округу. В обмен на"
+reloc,0x018599,"mischevious imp which has","беса, что донимал пакостями"
+reloc,0x01859b,"been terrorizing the","всю округу. В обмен на свою"
 reloc,0x01859d,"region. In exchange for","свободу он делится с вами"
 reloc,0x01859f,"its release, you receive:","заклинаниями:"
-reloc,0x009e4c," spell.","."
+reloc,0x009e4c," spell.",""
 
 # ---- treasure: maps to another continent
-reloc,0x0185a1,"Hidden within an ancient","В древнем сундуке вы"
-reloc,0x0185a3,"chest, you find maps and","находите карты и лоции."
-reloc,0x0185a5,"charts describing passage to","Теперь вам открыт путь:"
+reloc,0x0185a1,"Hidden within an ancient","В старинном сундуке вы"
+reloc,0x0185a3,"chest, you find maps and","находите карты, описывающие"
+reloc,0x0185a5,"charts describing passage to","путь на новый континент:"
 
-# ---- treasure: magic orb, map completed
+# ---- treasure: magic orb, map completed, NOT VERIFIED
 reloc,0x0185a7,"Peering through a magical","Заглянув в волшебный шар,"
-reloc,0x0185a9,"orb you are able to view the","вы обозреваете весь"
-reloc,0x0185ab,"entire continent. Your map","континент. Карта этих"
-reloc,0x0185ad,"of this area is complete.","земель теперь полна."
+reloc,0x0185a9,"orb you are able to view the","вы видите весь континент"
+reloc,0x0185ab,"entire continent. Your map","как на ладони. Карта этих"
+reloc,0x0185ad,"of this area is complete.","земель полностью открыта."
 
 # ==== ARTIFACT CHESTS =====================================================================
-# One table at 0x183a8, five slots per artifact; unused slots point at the NUL of the
-# previous string. Lines that fit their own slot are written in place as 'string'; every
-# slot here has a ref if a rewording needs the pool.
 
-# ---- artifact: Ring of Heroism
+# ---- the map fragment, appended to every artifact find
+string,0x0160A3,"...and a piece of the map to","...и часть карты, ведущей"
+string,0x0160C0,"the stolen scepter.","к Скипетру Порядка."
+
+# ---- artifact: Ring of Heroism, NOT VERIFIED
 string,0x019650,"Ridding the countryside of","Избавив округу от"
 reloc,0x0183aa,"a ferocious beast, the","свирепого зверя, вы"
 reloc,0x0183ac,"Magistrate presents you","получаете от магистрата:"
 string,0x01969A,"with: The Ring of Heroism...","Кольцо Героизма..."
 
-# ---- artifact: Shield of Protection
+# ---- artifact: Shield of Protection, NOT VERIFIED
 string,0x0196B8,"Challenged to a joust by the","Вызванный на поединок"
 reloc,0x0183b4,"dread Dark Knight, you","грозным Чёрным Рыцарем, вы"
 reloc,0x0183b6,"quickly dispose of him and","быстро расправляетесь с ним"
 reloc,0x0183b8,"receive: The Shield of","и получаете:"
 reloc,0x0183ba,"Protection...","Щит Защиты..."
 
-# ---- artifact: Crown of Command
+# ---- artifact: Crown of Command, NOT VERIFIED
 reloc,0x0183bc,"Resting on a throne in a","На троне призрачного замка"
 reloc,0x0183be,"phantom castle, you have","вы находите:"
 string,0x01975E,"found: The Crown of Command.","Корона Власти."
 
-# ---- artifact: Amulet of Augmentation
+# ---- artifact: Amulet of Augmentation, NOT VERIFIED
 string,0x01977D,"Hidden within an enchanted","В зачарованной роще вы"
 reloc,0x0183c8,"grove, you find: The Amulet","находите:"
 string,0x0197B4,"of Augmentation...","Амулет Усиления..."
 
 # ---- artifact: Articles of Nobility
-string,0x0197C9,"Freeing a virtuous maiden","Освободив добродетельную"
-reloc,0x0183d2,"from the clutches of a","деву из лап гнусного"
-reloc,0x0183d4,"despicable criminal, you","злодея, вы удостаиваетесь"
-reloc,0x0183d6,"have been granted: The","награды:"
-reloc,0x0183d8,"Articles of Nobility...","Дворянская Грамота..."
+string,0x0197C9,"Freeing a virtuous maiden","Вы освобождаете юную"
+reloc,0x0183d2,"from the clutches of a","добродетельную деву из лап"
+reloc,0x0183d4,"despicable criminal, you","гнусного злодея, и местный"
+reloc,0x0183d6,"have been granted: The","лорд жалует вам:"
+reloc,0x0183d8,"Articles of Nobility...","Дворянскую Грамоту..."
 
-# ---- artifact: Anchor of Admirality
+# ---- artifact: Anchor of Admirality, NOT VERIFIED
 reloc,0x0183da,"You discover ancient scrolls","Вы находите древние свитки"
 reloc,0x0183dc,"that describe the patterns","с описанием течений всех"
 reloc,0x0183de,"of the oceans. Mariners, in","океанов. Мореходы в"
 reloc,0x0183e0,"gratitude, bestow upon you:","благодарность даруют вам:"
 reloc,0x0183e2,"The Anchor of Admirality...","Адмиральский Якорь..."
 
-# ---- artifact: Book of Necros
+# ---- artifact: Book of Necros, NOT VERIFIED
 reloc,0x0183e4,"In the study of a deserted","В кабинете заброшенной"
 reloc,0x0183e6,"wizard's tower, you have","башни мага вы находите:"
 string,0x019902,"found: The Book of Necros...","Книга Некроса..."
 
-# ---- artifact: Sword of Prowess
+# ---- artifact: Sword of Prowess, NOT VERIFIED
 string,0x019921,"Following rumors of a great","Идя по слухам о великом"
 reloc,0x0183f0,"and powerful sword, you","и могучем мече, вы"
 reloc,0x0183f2,"defeat its fearsome guardian","побеждаете его грозного"
