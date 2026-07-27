@@ -117,10 +117,10 @@ Two hard rules, both enforced by the tools, both learned the expensive way:
   falsified. Distrust any explanation. It costs nothing: that block's strings are protection UI
   text that fits its own slot.
 
-`find_ref.py` has one blind spot: it accepts a table slot only when both neighbours validate, so a
-pointer table's **first and last entry** report "no ref found" — as does any slot beside a string the
-tool cannot validate. That means "not repointable by this tool", not "not a pointer" — check the
-neighbouring slots before assuming computed access.
+`find_ref.py` validates a table slot by *chaining* — the next slot must point exactly one past this
+one's NUL — and accepts a run of three, so a table's **first and last entry are reachable** too. A
+two-entry table still isn't: "no ref found" means "not repointable by this tool", not "not a
+pointer" — check the neighbouring slots before assuming computed access.
 
 ## Copy protection (solved)
 

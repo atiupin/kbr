@@ -16,8 +16,9 @@ immediate operand. It prints a ready-to-paste line:
 Most box/bio lines have exactly one ref. If several are found the string is
 referenced from several places and all its pointers must move together, so they
 go in ONE row with the refs space-separated -- which is what the pasted line
-already contains. If none are found it is reached by computed/indexed access and
-can't be repointed this way.
+already contains. If none are found it is reached by computed/indexed access, or
+sits in a table too short to prove itself (see find_refs), and can't be repointed
+this way -- "not repointable by this tool", never "not a pointer".
 """
 
 import hashlib
@@ -42,31 +43,43 @@ LOAD_OPS = frozenset({0xB8, 0xB9, 0xBA, 0xBB, 0xBE, 0xBF, 0x68})
 PROT_LO, PROT_HI = 0xBFE0, 0xCCA7
 
 
-def valid_stroff(data, dsoff):
-    """True if DS offset `dsoff` points at a real string START.
+def string_len(data, dsoff):
+    """Length of the NUL-terminated printable string at DS offset `dsoff`, else None.
 
-    Requiring the START (a NUL immediately before it) is what makes this
-    discriminating. Merely checking "printable bytes up to a NUL" accepts any
-    offset that lands in the MIDDLE of a string, so arbitrary data validates and
-    coincidental byte pairs get promoted to refs -- the bug that let a slot
-    inside a descending counter table (file 0x18855, bytes `0c 0b`) pose as a
-    pointer to DS 0x0b0c, corrupting the table when the build rewrote it.
-
-    The price is that a string with no NUL in front of it cannot validate even
-    when it is perfectly real. The villain names are the case in hand: the block
-    starts at file 0x18EDF butted straight against the losing-ending pointer
-    table, whose last entry's high byte occupies 0x18EDE. So the first name is
-    unreachable, and the second falls with it (see find_refs: a slot needs BOTH
-    neighbours). Those two are edited in place instead."""
+    The EMPTY string counts (length 0). Tables here pad an unused slot with a
+    pointer to the NUL that ends the previous string, and `chains` below has to
+    step through such a slot to reach the entries on the far side of it -- the
+    artifact table at 0x183a8 is three quarters padding of exactly that kind."""
     fo = DS_BASE + dsoff
     if not (DS_BASE <= fo < IMAGE_END):
-        return False
-    if fo != DS_BASE and data[fo - 1] != 0:                  # must be a string START
-        return False
+        return None
     end = data.find(b"\x00", fo)
-    if end < 0 or not (1 <= end - fo <= 64):
+    if end < 0 or end - fo > 64:
+        return None
+    if not all(32 <= c < 127 for c in data[fo:end]):
+        return None
+    return end - fo
+
+
+def chains(data, i):
+    """True if slots `i` and `i+2` are CONSECUTIVE entries of a pointer table.
+
+    Not "both look like strings" -- that test is far too weak, it promotes any
+    coincidental byte pair to a ref (the bug that let a slot inside a descending
+    counter table, file 0x18855, pose as a pointer to DS 0x0b0c and corrupted the
+    table when the build rewrote it). This asks the arithmetic question instead:
+
+        table[k+1] == table[k] + len(string k) + 1
+
+    i.e. the next slot points exactly one past the NUL of this slot's string.
+    Compilers emit string literals in the order the table lists them, so every
+    real table walks its block that way, and forging a link needs two adjacent
+    words that happen to be the offsets of two adjacent strings."""
+    if not (DS_BASE <= i and i + 4 <= IMAGE_END):
         return False
-    return all(32 <= c < 127 for c in data[fo:end])
+    a, b = struct.unpack_from("<HH", data, i)
+    n = string_len(data, a)
+    return n is not None and b == a + n + 1
 
 
 def find_refs(data, str_off):
@@ -75,7 +88,26 @@ def find_refs(data, str_off):
     Conservative by design: a false ref corrupts whatever it lands on, so a site
     is only reported when it is structurally a pointer -- an immediate operand of
     a known load instruction, or a slot whose neighbours are themselves string
-    pointers and which is ordered like a real table."""
+    pointers and which is ordered like a real table.
+
+    Conservative is not the same as sound, and `code-immediate` is the weaker of
+    the two tests: it only asks whether the PRECEDING BYTE is a load opcode, and
+    nothing here tracks instruction boundaries. A jump whose displacement happens
+    to equal a load opcode is enough to fake one. Real case: DS 0x47eb ('A tribe
+    of nomads greet you') is reported at file 0x5240, which is `eb 47`, the
+    `jmp short` two bytes into `74 bf eb 47` -- the 0xbf that vouched for it is
+    the displacement of the preceding `jz`, not a `mov di`. Repointing it would
+    have rewritten a branch target. So when a string reports BOTH a table entry
+    and a lone code-immediate, disassemble the code site before trusting it;
+    a table entry needs no such check, the chain already validated it.
+
+    A slot is accepted when it sits in a run of THREE chained slots, in any of
+    the three positions -- which is what reaches a table's first and last entry,
+    the case an earlier both-neighbours-must-validate test could not see. TWO
+    chained slots are not enough: an arithmetic ramp fakes one link whenever its
+    step equals a string length there, and the menu table at 0x18cc8 (step 9)
+    does exactly that, offering `DS 0x102` -- two bytes into ' Controls ' -- as a
+    pointer. Its second link fails, so the run test rejects it."""
     dsoff = str_off - DS_BASE
     needle = struct.pack("<H", dsoff)
     refs = []
@@ -84,18 +116,10 @@ def find_refs(data, str_off):
         if i < DS_BASE:                                      # code immediate
             if data[i - 1] in LOAD_OPS:
                 refs.append((i, "code-immediate"))
-        elif i + 3 < IMAGE_END:                              # candidate table entry
-            prev = struct.unpack_from("<H", data, i - 2)[0]
-            nxt = struct.unpack_from("<H", data, i + 2)[0]
-            # Both neighbours must be string starts too: an isolated hit inside
-            # non-pointer data fails, a genuine table's slots all pass.
-            if valid_stroff(data, prev) and valid_stroff(data, nxt):
-                # ...and the triple must be ordered like a table. Real pointer
-                # tables run monotonically; a data run that merely resembles one
-                # (e.g. the 0x14,0x13,0x12... ramp) is rejected by the strictness
-                # of the string-start test above, and this catches the rest.
-                if prev < dsoff < nxt or nxt < dsoff < prev:
-                    refs.append((i, "table-entry"))
+        elif (chains(data, i) and chains(data, i + 2)          # run starts here
+                or chains(data, i - 2) and chains(data, i)     # ...or i is inside
+                or chains(data, i - 4) and chains(data, i - 2)):   # ...or ends here
+            refs.append((i, "table-entry"))
         i = data.find(needle, i + 1)
     return refs
 
