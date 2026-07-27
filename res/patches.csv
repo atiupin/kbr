@@ -1,9 +1,12 @@
 type,offset,expect,write
-# copy protection
+
+# ==== COPY PROTECTION =====================================================================
 bytes,0xC40A,"72","EB"
-# title screen
+
+# ==== TITLE SCREEN ========================================================================
 string,0x15E48,"Select Char A-D or L-Load saved game","Выберите героя A-D или L-загрузитесь"
-# title screen - credits
+
+# ---- credits
 string,0x15E6D,"King's Bounty Designed By:","Дизайн King's Bounty:"
 string,0x15E88,"Jon Van Caneghem","Джон Ван Канегем"
 string,0x15E99,"Programmed By:","Программисты:"
@@ -13,7 +16,8 @@ string,0x15EC4,"Graphics By:","Графика:"
 string,0x15ED1,"Kenneth L. Mayfield","Кеннет Л. Мейфилд"
 string,0x15EE5,"Vincent DeQuattro, Jr.","Винсент ДеКуаттро, мл."
 string,0x15F24,"All Rights Reserved","Все права защищены"
-# title screen - new game
+
+# ---- new game
 string,0x15F38,"Name: ","Имя: "
 string,0x167A2,"Difficulty   Days  Score","Сложность    Дни   Очки"
 string,0x167BD,"Easy         900    x.5","Легко        900    x.5"
@@ -21,7 +25,9 @@ string,0x167D5,"Normal       600     x1","Нормально    600     x1"
 string,0x167ED,"Hard         400     x2","Трудно       400     x2"
 string,0x16805,"Impossible?  200     x4","Невозможно?  200     x4"
 string,0x15F3F," to select   Ent to Accept",": Выбрать   ENTER: Принять"
-# title screen - copy-protection prompt, DO NOT RELOC
+
+# ---- copy-protection prompt
+# DO NOT RELOC: every ref here is inside the copy-protection block.
 string,0x16166,"Please turn to page ","Откройте страницу "
 string,0x1617B,", go to",", там"
 string,0x16183,"line ","ряд "
@@ -32,28 +38,37 @@ string,0x161B9,"as words or lines.  Hyphenated","открывать, конеч�
 string,0x161D8,"words are treated as one word.","снята. Просто нажмите Enter и"
 string,0x161F7,"Any line that has any kind of","вперед, к приключениям. Удачи"
 string,0x16215,"text is considered a line.","в походе, герой!"
-# title screen - new-game creation message
+
+# ---- new-game creation message
 reloc,0x01672c,"A new game is being created.","Создается новый мир. Немного"
 reloc,0x01672e,"Please wait while I perform","подождите, пока я творю     "
 reloc,0x016730,"godlike actions to make this","божественные чудеса, и      "
 reloc,0x016732,"game playable.","наполняю его жизнью.        "
-# title screen - destroy-saved-game confirmation
+
+# ---- destroy-saved-game confirmation
 string,0x16758,"Do you wish to destroy the","Это имя уже было. Стереть"
 string,0x16773,"game of ","героя "
-# title screen - load saved game
+
+# ---- load saved game
 string,0x15F6B,"Select game:"," Сохранения "
 string,0x15F78,"'ESC' to exit \x18\x19 Return to Select","ESC:Выйти  \x18\x19:Выбор  ENTER:Играть"
-# title screen - loading message
+
+# ---- loading message
 reloc,0x01673c,"Please wait while I prepare","Подождите, я готовлю мир,"
 reloc,0x01673e,"a suitable environment for","достойный вашей охоты за"
 reloc,0x016740,"your bountying enjoyment!","головами злодеев!"
-# menu bar - header
+
+# ==== MENU BAR ============================================================================
+
+# ---- header
 string,0x0157A5,"Options / Controls / ","О:Помощь  C:Опции    "
 reloc,0x004a88," Options "," О:Помощь "
 string,0x015790," Controls "," C:Опции "
 string,0x0157C5,"Days Left","Ост. дней"
 string,0x0157BB,"Time Stop","   Стазис"
-# menu bar - controls. "Да"/"Нет" are overprinted at hardcoded columns 12 and 15
+
+# ---- controls
+# "Да"/"Нет" are overprinted at hardcoded columns 12 and 15.
 string,0x01A9DF,"1 Delay 0123456789","1 Пауза 0123456789"
 string,0x01A9F2,"2 Sounds    On/Off","2 Звуки     Да/Нет"
 string,0x01AA05,"3 Walk Beep On/Off","3 Шаги      Да/Нет"
@@ -61,7 +76,8 @@ string,0x01AA18,"4 Animation On/Off","4 Анимация  Да/Нет"
 string,0x01AA2B,"5 Army Size On/Off","5 Стеки     Да/Нет"
 string,0x01AA51,"Off","Нет"
 string,0x01AA55,"On","Да"
-# menu bar - options
+
+# ---- options
 string,0x01AA58,"  \x19  or 2 Move Down","  \x19  2  Вниз"
 string,0x01AA6C,"  \x1A  or 4 Move Left","  \x1A  4  Влево"
 string,0x01AA80,"  \x1B  or 6 Move Right","  \x1B  6  Вправо"
@@ -83,18 +99,24 @@ reloc,0x018BBD,"  Q Quit and Save","  Q Запись и выход"
 string,0x01ABF1,"  N New Continent","  N Новая земля"
 string,0x01AC03,"  L Land         ","  L Посадка      "
 string,0x01AC15,"  F Fly          ","  F Полет        "
-# menu bar - quit confirmation
+
+# ---- quit confirmation
 string,0x162D1,"Quit to DOS without saving (y/n) ","Выйти без сохранения? (y/n) "
-# army screen - header bar
+
+# ==== ARMY SCREEN =========================================================================
+
+# ---- header bar
 string,0x1AC27,"Press 'ESC' to exit","ESC: Выйти"
-# army screen - row labels
+
+# ---- row labels
 string,0x016237,"HitPts:"," Жизни:"
 string,0x01623F,"SL:   MV:      Damage:","Ур:   Хд:        Урон:"
 string,0x016256,"Fly","Лет"
 string,0x01625A,"Out of Control","Неуправляемы"
 string,0x016269,"Morale:","Мораль:"
 string,0x016271,"G-Cost:","  Цена:"
-# army screen - morale
+
+# ---- morale
 string,0x015CBB,"Norm","Норм"
 reloc,0x01594C,"Low","Низк"
 string,0x015CC4,"High","Выс"
@@ -107,14 +129,15 @@ string,0x01A348,"Forest"," Лес"
 string,0x01A363,"------"," ---"
 reloc,0x0186D1,"Dungeon","Темница"
 reloc,0x0186D9,"-------","-------"
-# dwelling screen - recruit dialogue
+
+# ---- recruit dialogue
 # The count line was printnum(count)@col1 + name@col5 + " are available" -- "150 Скелеты
 # ждут найма", a numeral in front of a nominative plural. Reordered to name + the string +
-# the count at the cursor: split KBU2's block at 0xACCD into 15/42/15/19/10 = A/B/C/D/E,
-# and the write column is A+D+E+B + "eb 0d" + filler. The dropped goto(5,0x98) pays for the
-# jmp, and its filler keeps a 68 11 at 0xAD2F so no relocation target changes value.
+# the count at the cursor: split KBU2's block at 0xACCD into 15/42/15/19/10 = A/B/C/D/E, and
+# the write column is A+D+E+B + "eb 0d" + filler. The dropped goto(5,0x98) pays for the jmp,
+# and its filler keeps a 68 11 at 0xAD2F so no relocation target changes value.
 # The second row moves the 3 entries whose far calls moved (NO CODE MOTION in
-# apply_patches.py) -- without it the screen drew this box's header and nothing else.
+# apply_patches.py); without it the screen drew this box's header and nothing else.
 bytes,0xACCD,"b8 98 00 50 b8 01 00 50 9a b7 0f 68 11 59 59 b8 20 00 50 b8 01 00 50 8a 46 f8 b4 00 ba 0b 00 f7 ea 8a 56 06 b6 00 03 c2 8b d8 8a 87 ae 72 b4 00 50 9a 55 12 68 11 83 c4 06 b8 98 00 50 b8 05 00 50 9a b7 0f 68 11 59 59 8a 46 ff b4 00 d1 e0 8b d8 ff b7 88 02 9a 63 10 68 11 59 b8 48 0a 50 9a 63 10 68 11 59","b8 98 00 50 b8 01 00 50 9a b7 0f 68 11 59 59 8a 46 ff b4 00 d1 e0 8b d8 ff b7 88 02 9a 63 10 68 11 59 b8 48 0a 50 9a 63 10 68 11 59 b8 20 00 50 b8 01 00 50 8a 46 f8 b4 00 ba 0b 00 f7 ea 8a 56 06 b6 00 03 c2 8b d8 8a 87 ae 72 b4 00 50 9a 55 12 68 11 83 c4 06 eb 0d 90 90 90 90 90 90 90 90 90 90 68 11 90"
 bytes,0xDD4,"25 8d 00 00 11 8d 00 00 01 8d 00 00","1e 8d 00 00 f6 8c 00 00 ec 8c 00 00"
 string,0x0160D8," are available"," ждут найма: "
@@ -122,10 +145,12 @@ string,0x0160E7,"Cost= ","Цена: "
 reloc,0x00AD69," each."," каждый"
 string,0x0160F5,"You may recruit up to ","Можно нанять до "
 string,0x01610C,"Recruit how many ","Сколько нанять?  "
-# dwelling screen - refusal
+
+# ---- refusal
 string,0x01A66B,"You already have the maximum","   У вас уже максимальное"
 string,0x01A688,"number of armies!","  число отрядов!"
-# character screen
+
+# ==== CHARACTER SCREEN ====================================================================
 string,0x01A824,"Leadership","Лидерство"
 reloc,0x018912,"Commission/Week","Жалованье в неделю"
 reloc,0x018914,"Gold","Золото"
@@ -136,92 +161,117 @@ reloc,0x01891C,"Artifacts found","Артефактов найдено"
 string,0x01A880,"Castles garrisoned","Замков занято"
 string,0x01A893,"Followers killed","Воинов потеряно"
 string,0x01A8A4,"Current score","Текущий счет"
-# king's castle - main
+
+# ==== KING'S CASTLE =======================================================================
+
+# ---- main
 string,0x016047,"Castle ","Замок "
 string,0x019A78,"of King Maximus","Максимуса"
 string,0x01A6CF,"B) Audience with the King","B) Аудиенция у короля"
-# king's castle - recruit soldiers
+
+# ---- recruit soldiers
 string,0x01A6BE,"Recruit Soldiers","Нанять войска"
 string,0x01A3C5,"n/a","нет"
 string,0x01614D,"Max=","До:"
 reloc,0x00BE3E,"How Many","Сколько?"
 string,0x01A6E9,"You don't have enough gold!","Недостаточно золота!"
-# king's castle - audience intro
+
+# ---- audience intro
 reloc,0x0185AF,"Trumpets announce your","Трубы возвещают о вашем"
 string,0x01A074,"arrival with regal fanfare.","прибытии с почестями."
 string,0x01A091,"King Maximus rises from his","Король Максимус поднимается"
 string,0x01A0AD,"throne to greet you and","с трона вам навстречу"
 string,0x01A0C5,"proclaims:           (space)","и провозглашает:    (пробел)"
-# king's castle - audience, not enough villains
+
+# ---- audience, not enough villains
 # Line 3 is assembled in code as [text][N][" more"][line 4 "villain"][optional "s"]["."],
-# which cannot agree with a Russian numeral. Reworded to put the noun before N
-# ("вы поймаете ещё злодеев: 3."), then " more" is blanked and two code bytes drop the
-# now-redundant 4th line and the plural "s" (loop bound 4->3; JNG->JMP). N reaches 14,
-# so the line 3 prefix must stay <= 25 chars to fit the ~28-char box.
+# which cannot agree with a Russian numeral. Reworded to put the noun before N ("вы поймаете
+# ещё злодеев: 3."), then " more" is blanked and two code bytes drop the now-redundant 4th
+# line and the plural "s" (loop bound 4->3; JNG->JMP). N reaches 14, so the line 3 prefix
+# must stay <= 25 chars to fit the ~28-char box.
 reloc,0x0185BB,"My dear ","Приветствую, "
 string,0x01A0EB,"I can aid you better after","Я смогу помочь вам, когда"
 reloc,0x0185BF,"you've captured ","вы поймаете ещё злодеев: "
 string,0x016041," more",""
 bytes,0x00A630,"04","03"
 bytes,0x00A636,"7E","EB"
-# king's castle - audience, promotion
+
+# ---- audience, promotion
 string,0x01A11F,"Congratulations ","Поздравляю, "
 string,0x01A130,"I now promote you to ","Отныне ваше звание - "
-# king's castle - audience, already at top rank
+
+# ---- audience, already at top rank
 string,0x01A146,"Hurry and recover my Scepter","Поспешите вернуть Скипетр"
 string,0x01A163,"of Order or all will be","Порядка, или всё будет"
 reloc,0x0185CB,"lost!","потеряно!"
-# town screen - 28 chars max. The rent price is one hardcoded digit ('1' or '5', chosen at
-# 0x009605) followed by the "00 week)" row, so the rent line is a fixed 27 chars and cannot
-# grow with the price.
+
+# ==== TOWN SCREEN =========================================================================
+# 28 chars max. The rent price is one hardcoded digit ('1' or '5', chosen at 0x009605)
+# followed by the "00 week)" row, so the rent line is a fixed 27 chars and cannot grow with
+# the price.
+
+# ---- main menu
 reloc,0x00a6c1,"Town of ","Город "
 reloc,0x0184e9,"A) Get New Contract","A) Новый контракт"
 reloc,0x0184eb,"B) Rent boat (","B) Нанять корабль ("
 reloc,0x00961c,"00 week)","00/нед)"
 reloc,0x0184f3,"B) Cancel boat rental","B) Вернуть корабль"
 reloc,0x0184ed,"C) Gather information","C) Собрать сведения"
-# the spell line is "D) " + spell name + " spell " + '(' + price + ')'. Russian cannot
-# decline the name after the noun, so the noun moves in front of it as an abbreviated
-# label on the "D) " prefix, and " spell " shrinks to the space before the price.
-# Budget: the 9-char prefix leaves 16 for name + price digits, so a 4-digit spell may
-# not exceed 12 chars ("Призыв войск"); the longest lines land on exactly 28.
+# The spell line is "D) " + spell name + " spell " + '(' + price + ')'. Russian cannot
+# decline the name after the noun, so the noun moves in front of it as an abbreviated label
+# on the "D) " prefix, and " spell " shrinks to the space before the price.
+# Budget: the 9-char prefix leaves 16 for name + price digits, so a 4-digit spell may not
+# exceed 12 chars ("Призыв войск"); the longest lines land on exactly 28.
 reloc,0x0184ef,"D) ","D) Закл. "
 reloc,0x009660," spell "," "
 reloc,0x0184f1,"E) Buy seige weapons (3000)","E) Купить катапульту (3000)"
-# town screen - refusals
+
+# ---- refusals
 reloc,0x0188dc,"Please vacate the boat first","Сначала сойдите с корабля"
 reloc,0x0098dc,"You have seige weapons!","Катапульта уже куплена!"
-# town screen - gather information. Line 1 is "Castle " + name + this row; line 2 is
-# ["your" | "no one's" | villain name + "'s"] + " rule" + '.'. No Russian genitive can
-# agree with an undeclinable name, so it is recast as a label and its answer, with
-# " rule" and "'s" blanked. Castle names are still English, so line 1 has 10 chars
-# left after the longest of them ("Замок Quinderwitch" is already 18).
+
+# ---- gather information
+# Line 1 is "Castle " + name + this row; line 2 is ["your" | "no one's" | villain name +
+# "'s"] + " rule" + '.'. No Russian genitive can agree with an undeclinable name, so it is
+# recast as a label and its answer, with " rule" and "'s" blanked. Castle names are still
+# English, so line 1 has 10 chars left after the longest of them ("Замок Quinderwitch" is
+# already 18).
 reloc,0x0097d4," is under",", хозяин:"
 reloc,0x0097ff,"your","вы"
 reloc,0x00980f,"no one's","никто"
 reloc,0x009843,"'s",""
 reloc,0x009865," rule",""
-# town screen - spell purchase. Refusal is two centred lines at columns 4 and 3.
+
+# ---- spell purchase
+# Refusal is two centred lines at columns 4 and 3.
 # The tally is "You can learn " + N + " more spell" + 's' + '.', where the 's' is an
-# unconditional English plural, so the branch that appends it becomes a jump that
-# always skips it (JZ -> JMP) -- the same fix as the king's audience above.
+# unconditional English plural, so the branch that appends it becomes a jump that always
+# skips it (JZ -> JMP), the same fix as the king's audience above.
 reloc,0x00a7bd,"You have learned your","Вы выучили предельное"
 reloc,0x00a7d6,"maximum number of spells.","   число заклинаний."
 reloc,0x00a841,"You can learn ","Можно выучить ещё: "
 reloc,0x00a85c," more spell",""
 bytes,0x00A868,"74","EB"
-# miscellaneous
-# "(name) the (class)" connector -> ", " (Taiga the Sorceress -> Taiga, Колдунья)
+
+# ==== MISCELLANEOUS =======================================================================
+
+# ---- name/class connector
+# "(name) the (class)" -> ", " (Taiga the Sorceress -> Taiga, Колдунья)
 string,0x1A181," the ",", "
-# gold (town, dwellings, etc.)
+
+# ---- gold amounts (town, dwellings, etc.)
 reloc,0x005E82,"GP=","Зол:"
-# boat travel menu
+
+# ==== BOAT TRAVEL MENU ====================================================================
 string,0x01A992,"1. Continentia","1. Континентия"
 string,0x01A9A1,"2. Forestria","2. Форестрия"
 string,0x01A9AE,"3. Archipelia","3. Архипелия"
 string,0x01A9BC,"4. Saharia","4. Сахария"
 string,0x01A9C7,"Go to which continent? ","На какой континент? "
-# unit names
+
+# ==== NAME TABLES =========================================================================
+
+# ---- unit names
 reloc,0x015918,"Peasants","Крестьяне"
 string,0x015C02,"Sprites","Феи"
 reloc,0x01591C,"Militia","Ополченцы"
@@ -247,15 +297,19 @@ string,0x015C9C,"Vampires","Вампиры"
 reloc,0x015944,"Giants","Великаны"
 string,0x015CAC,"Demons","Демоны"
 string,0x015CB3,"Dragons","Драконы"
-# army-size prefixes - match HotA more or less
+
+# ---- army-size prefixes
+# Match HotA's wording more or less.
 reloc,0x005f1b,"A few ","Мало: "
 reloc,0x005f16,"Some ","Группа: "
 reloc,0x005f0c,"Many ","Толпа: "
 reloc,0x005f02,"A lot of ","Орда: "
 reloc,0x005ef8,"A horde of ","Туча: "
 reloc,0x005eee,"A multitude of ","Тьма: "
-# spell names - 13 chars max on the cast screen, but see the town screen's spell line:
-# one sold at a 4-digit price gets only 12
+
+# ---- spell names
+# 13 chars max on the cast screen, but see the town screen's spell line: one sold at a
+# 4-digit price gets only 12.
 reloc,0x0184f5,"Clone","Клонирование"
 reloc,0x0184f7,"Teleport","Телепорт"
 reloc,0x0184f9,"Fireball","Огненный шар"
@@ -270,7 +324,8 @@ reloc,0x018509,"Castle Gate","Врата замка"
 reloc,0x01850b,"Town Gate","Врата города"
 reloc,0x01850d,"Instant Army","Призыв войск"
 string,0x019C93,"Raise Control","Дар лидерства"
-# character classes
+
+# ---- character classes
 string,0x1A187,"Knight","Рыцарь"
 string,0x01A18E,"General","Генерал"
 string,0x01A196,"Marshal","Маршал"
@@ -287,15 +342,18 @@ string,0x1A1E6,"Barbarian","Варвар"
 string,0x01A1F0,"Chieftain","Вождь"
 string,0x01A1FA,"Warlord","Воевода"
 string,0x01A202,"Overlord","Владыка"
-# continent names
+
+# ---- continent names
 string,0x016C0A,"Continentia","Континентия"
 string,0x016C16,"Forestria","Форестрия"
 string,0x016C20,"Archipelia","Архипелия"
 string,0x016C2B,"Saharia","Сахария"
-# villain names. Their own table, separate from the contract screen's "Name: " lines:
-# it feeds the town's gather-information line 2 (<= 26 chars, the '.' follows) and the
-# victory screen. The first two have no usable ref, so they are edited in place and
-# capped at their own slots, 16 and 14 chars; the rest are free to overflow.
+
+# ---- villain names
+# Their own table, separate from the contract screen's "Name: " lines: it feeds the town's
+# gather-information line 2 (<= 26 chars, the '.' follows) and the victory screen. The first
+# two fit their own slots (16 and 14 chars) and are left in place; both have a ref now if a
+# rewording needs the pool.
 string,0x018EDF,"Murray the Miser","Мюррей Скряга"
 string,0x018EF0,"Hack the Rogue","Хак Прохвост"
 reloc,0x01826a,"Princess Aimola","Принцесса Аймола"
@@ -313,15 +371,18 @@ reloc,0x018280,"Czar Nickolai the Mad","Царь Николай Безумный
 reloc,0x018282,"Magus Deathspell","Магус Чернокнижник"
 reloc,0x018284,"Urthrax Killspite","Уртракс Душегуб"
 reloc,0x018286,"Arech Dragonbreath","Арех Огнедышащий"
-# contract screen. 17 records, each a 14-entry pointer table (villain 1 at 0x016A2E,
-# stride 28), so every line is reloc-able and the labels repeat once per record.
-# Width: 27 chars for lines 1-5 (name, alias, reward, last seen, castle), 34 for lines
-# 6-14 (the features header and the description); 35 clips.
-# Descriptions are reloc by default, but Russian usually fits its own slot: all 17
-# records land at ~2.1 KB of pool, well inside POOL_SIZE, so no budget change was needed.
-# The three lines find_ref.py cannot reach (the table's last slot, and the two beside an
-# empty string) are edited in place; they happen to fit.
-# ---- villain 1, Murray the Miser ----
+
+# ==== CONTRACT SCREENS ====================================================================
+# 17 records, each a 14-entry pointer table (villain 1 at 0x016A2E, stride 28), so every
+# line is reloc-able and the labels repeat once per record.
+# Width: 27 chars for lines 1-5 (name, alias, reward, last seen, castle), 34 for lines 6-14
+# (the features header and the description); 35 clips.
+# Descriptions are reloc by default, but Russian usually fits its own slot: all 17 records
+# land at ~2.1 KB of pool, well inside POOL_SIZE, so no budget change was needed.
+# Rows that fit their own slot are written in place as 'string'; that is a byte budget, not
+# a limit -- find_ref.py reaches every slot of these tables.
+
+# ---- villain 1, Murray the Miser
 string,0x016D19,"Name: Murray the Miser","Имя: Мюррей Скряга"
 string,0x016D30,"Alias: None","Кличка: нет"
 string,0x016D3C,"Reward: 5,000 gold","Награда: 5000 зол."
@@ -336,7 +397,8 @@ reloc,0x016A42,"  various petty crimes as well","  и измена. Мюррей
 reloc,0x016A44,"  as for treason. He allowed a","  в замок шайку пиратов,"
 reloc,0x016A46,"  group of pirates to enter the","  и те выпустили на волю"
 reloc,0x016A48,"  castle and free criminals.","  всех преступников."
-# ---- villain 2, Hack the Rogue ----
+
+# ---- villain 2, Hack the Rogue
 string,0x016E67,"Name: Hack the Rogue","Имя: Хак Прохвост"
 string,0x016E7C,"Alias: The Spitter","Кличка: Плевок"
 string,0x016E8F,"Reward: 6,000 gold","Награда: 6000 зол."
@@ -351,7 +413,8 @@ reloc,0x016A5E,"Crimes: Along with many minor","Преступления: пом
 reloc,0x016A60,"  infractions, Hack is wanted","  нарушений, Хак разыскивается"
 reloc,0x016A62,"  for conspiracy against the","  за заговор против Короны"
 reloc,0x016A64,"  Crown and grave-robbing.","  и за разграбление могил."
-# ---- villain 3, Princess Aimola ----
+
+# ---- villain 3, Princess Aimola
 string,0x016FA8,"Name: Princess Aimola","Имя: Принцесса Аймола"
 string,0x016FBE,"Alias: Lady Deceit","Кличка: Леди Обман"
 string,0x016FD1,"Reward: 7,000 gold","Награда: 7000 зол."
@@ -366,7 +429,8 @@ reloc,0x016A7A,"  her status as a visiting","  статус почётной г�
 reloc,0x016A7C,"  dignitary by encouraging a","  подстрекательства к убийству"
 reloc,0x016A7E,"  murder and joining the","  и участия в заговоре против"
 reloc,0x016A80,"  conspiracy against the Crown.","  Короны."
-# ---- villain 4, Baron Johnno Makahl ----
+
+# ---- villain 4, Baron Johnno Makahl
 string,0x0170F7,"Name: Baron Johnno Makahl","Имя: Барон Джонно Макал"
 reloc,0x016A84,"Alias: Johnno","Кличка: Джонно"
 string,0x01711F,"Reward: 8,000 gold","Награда: 8000 зол."
@@ -381,7 +445,8 @@ reloc,0x016A96,"  various crimes against the","  во многих злодея�
 reloc,0x016A98,"  Kingdom, including leading a","  Королевства. Он возглавил"
 reloc,0x016A9A,"  direct assualt against the","  открытое нападение на Корону"
 reloc,0x016A9C,"  Crown and conspiracy.","  и участвовал в заговоре."
-# ---- villain 5, Dread Pirate Rob ----
+
+# ---- villain 5, Dread Pirate Rob
 string,0x017230,"Name: Dread Pirate Rob","Имя: Ужасный Пират Роб"
 string,0x017247,"Alias: Terror of the Sea","Кличка: Гроза морей"
 string,0x017260,"Reward: 9,000 gold","Награда: 9000 зол."
@@ -396,7 +461,8 @@ reloc,0x016AB2,"  as well a conspiracy and for","  заговор и освоб�
 reloc,0x016AB4,"  breaking out five traitors","  изменников, что были"
 reloc,0x016AB6,"  sentenced to death in the","  приговорены к смерти"
 reloc,0x016AB8,"  Royal Dungeons.","  в королевских подземельях."
-# ---- villain 6, Canegor the Mystic ----
+
+# ---- villain 6, Canegor the Mystic
 string,0x01737B,"Name: Canegor the Mystic","Имя: Канегор Мистик"
 reloc,0x016abc,"Alias: The Majestic Sage","Кличка: Пресветлый Мудрец"
 string,0x0173AD,"Reward: 10,000 gold","Награда: 10000 зол."
@@ -410,7 +476,8 @@ reloc,0x016acc,"Crimes: Canegor is wanted for","Преступления: Кан
 reloc,0x016ace,"  grave robbing, conspiracy","  в осквернении могил, заговоре"
 reloc,0x016ad0,"  against the Crown, and","  против Короны и разграблении"
 string,0x017497,"  plundering the Royal Library.","  Королевской библиотеки."
-# ---- villain 7, Sir Moradon the Cruel ----
+
+# ---- villain 7, Sir Moradon the Cruel
 string,0x0174B8,"Name:Sir Moradon the Cruel","Имя: Сэр Морадон Жестокий"
 string,0x0174D3,"Alias: None","Кличка: нет"
 string,0x0174DF,"Reward: 12,000 gold","Награда: 12000 зол."
@@ -425,7 +492,8 @@ reloc,0x016aea,"Crimes: Sir Moradon, an emissary","Преступления: с�
 reloc,0x016aec,"  from another land, is wanted","  чужой земли, вступил в заговор"
 reloc,0x016aee,"  for joining a conspiracy to","  ради свержения Королевства"
 reloc,0x016af0,"  topple the kingdom.","  и его законного короля."
-# ---- villain 8, Prince Barrowpine ----
+
+# ---- villain 8, Prince Barrowpine
 string,0x0175FA,"Name: Prince Barrowpine","Имя: Принц Барроупайн"
 string,0x017612,"Alias: The Elf Lord","Кличка: Лорд Эльфов"
 string,0x017626,"Reward: 14,000 gold","Награда: 14000 зол."
@@ -440,7 +508,8 @@ reloc,0x016b06,"Crimes: The prince is one of the","Преступления: п�
 reloc,0x016b08,"  leaders of the conspiracy","  из главарей заговора"
 reloc,0x016b0a,"  against the Crown, he also","  против Короны. Он ещё торгует"
 reloc,0x016b0c,"  traffics stolen artifacts.","  крадеными артефактами."
-# ---- villain 9, Bargash Eyesore ----
+
+# ---- villain 9, Bargash Eyesore
 string,0x017743,"Name: Bargash Eyesore","Имя: Баргаш Образина"
 string,0x017759,"Alias: Old One Eye","Кличка: Одноглазый"
 string,0x01776C,"Reward: 16,000 gold","Награда: 16000 зол."
@@ -455,7 +524,8 @@ reloc,0x016b22,"Crimes: Bargash is wanted for","Преступления: Бар
 reloc,0x016b24,"  conspiracy against the Crown","  в заговоре против Короны."
 reloc,0x016b26,"  and for leading an outright","  Он возглавил дерзкое"
 reloc,0x016b28,"  attack against the King.","  нападение на самого Короля."
-# ---- villain 10, Rinaldus Drybone ----
+
+# ---- villain 10, Rinaldus Drybone
 reloc,0x016b2a,"Name: Rinaldus Drybone","Имя: Ринальдус Костлявый"
 string,0x01789F,"Alias: The Death Lord","Кличка: Лорд Смерти"
 string,0x0178B5,"Reward: 18,000 gold","Награда: 18000 зол."
@@ -470,7 +540,8 @@ reloc,0x016b3e,"Crimes: Rinaldus is wanted for","Преступления: Ри�
 reloc,0x016b40,"  conspiracy against the Crown","  в заговоре против Короны."
 reloc,0x016b42,"  and leading a rebellion on the","  Он поднял восстание"
 reloc,0x016b44,"  continent of Saharia.","  на континенте Сахария."
-# ---- villain 11, Ragface ----
+
+# ---- villain 11, Ragface
 reloc,0x016b46,"Name: Ragface","Имя: Лохмотник"
 string,0x0179F1,"Alias: None","Кличка: нет"
 string,0x0179FD,"Reward: 20,000 gold","Награда: 20000 зол."
@@ -485,7 +556,8 @@ reloc,0x016b5a,"  him.","  разложения."
 reloc,0x016b5c,"Crimes: Conspiracy against the","Преступления: заговор против"
 reloc,0x016b5e,"  Crown and leading an","  Короны и руководство мятежом"
 reloc,0x016b60,"  insurrection in Saharia.","  в Сахарии."
-# ---- villain 12, Mahk Bellowspeak ----
+
+# ---- villain 12, Mahk Bellowspeak
 string,0x017B0F,"Name: Mahk Bellowspeak","Имя: Мак Горлопан"
 reloc,0x016b64,"Alias: Bruiser","Кличка: Громила"
 string,0x017B35,"Reward: 25,000 gold","Награда: 25000 зол."
@@ -500,7 +572,8 @@ reloc,0x016b76,"Crimes: Mahk is wanted for the","Преступления: Ма�
 reloc,0x016b78,"  conspiracy against the Crown,","  в заговоре против Короны,"
 reloc,0x016b7a,"  leading a jail break, and for","  в организации побега из тюрьмы"
 reloc,0x016b7c,"  piracy on the open seas.","  и в морском разбое."
-# ---- villain 13, Auric Whiteskin ----
+
+# ---- villain 13, Auric Whiteskin
 string,0x017C58,"Name: Auric Whiteskin","Имя: Аурик Белошкурый"
 string,0x017C6E,"Alias: The Barbarian","Кличка: Варвар"
 string,0x017C83,"Reward: 30,000 gold","Награда: 30000 зол."
@@ -515,7 +588,8 @@ reloc,0x016b92,"Crimes: Auric is wanted for","Преступления: Аури
 reloc,0x016b94,"  conspiracy and for leading the","  в заговоре. Он возглавил"
 reloc,0x016b96,"  rebellion of the continent","  мятеж на континенте"
 reloc,0x016b98,"  Saharia.","  Сахария."
-# ---- villain 14, Czar Nickolai the Mad ----
+
+# ---- villain 14, Czar Nickolai the Mad
 string,0x017D88,"Name:Czar Nickolai the Mad","Имя: Царь Николай Безумный"
 reloc,0x016b9c,"Alias: The Mad Czar","Кличка: Безумный Царь"
 string,0x017DB7,"Reward: 35,000 gold","Награда: 35000 зол."
@@ -530,7 +604,8 @@ reloc,0x016bae,"Crimes: The Czar is wanted for","Преступления: Ца�
 reloc,0x016bb0,"  conspiracy against the Crown,","  в заговоре против Короны,"
 reloc,0x016bb2,"  violating diplomatic status,","  в злоупотреблении статусом"
 reloc,0x016bb4,"  and murder.","  дипломата и в убийстве."
-# ---- villain 15, Magus Deathspell ----
+
+# ---- villain 15, Magus Deathspell
 reloc,0x016bb6,"Name: Magus Deathspell","Имя: Магус Чернокнижник"
 string,0x017EE2,"Alias: None","Кличка: нет"
 string,0x017EEE,"Reward: 40,000 gold","Награда: 40000 зол."
@@ -545,7 +620,8 @@ reloc,0x016bca,"Crimes: Magus is wanted for","Преступления: Магу
 reloc,0x016bcc,"  conspiracy against the Crown","  в заговоре против Короны"
 reloc,0x016bce,"  and for practicing forbidden","  и в занятии запретной"
 reloc,0x016bd0,"  magics.","  магией."
-# ---- villain 16, Urthrax Killspite ----
+
+# ---- villain 16, Urthrax Killspite
 string,0x017FF5,"Name: Urthrax Killspite","Имя: Уртракс Душегуб"
 reloc,0x016bd4,"Alias: The Demon King","Кличка: Король Демонов"
 string,0x018023,"Reward: 45,000 gold","Награда: 45000 зол."
@@ -558,7 +634,8 @@ reloc,0x016be2,"  protruding from sides of head,","  по бокам голов�
 reloc,0x016be4,"  over 7 feet tall.","  двух метров."
 reloc,0x016be6,"Crimes: Urthrax is wanted for","Преступления: Уртракс повинен"
 string,0x0180E5,"  conspiracy against the Crown.","  в заговоре против Короны."
-# ---- villain 17, Arech Dragonbreath ----
+
+# ---- villain 17, Arech Dragonbreath
 string,0x018107,"Name: Arech Dragonbreath","Имя: Арех Огнедышащий"
 reloc,0x016bf0,"Alias: Mastermind","Кличка: Тёмный Гений"
 string,0x018132,"Reward: 50,000 gold","Награда: 50000 зол."
