@@ -134,6 +134,8 @@ string,0x01A6CF,"B) Audience with the King","B) Аудиенция у корол
 # king's castle - recruit soldiers
 string,0x01A6BE,"Recruit Soldiers","Нанять войска"
 string,0x01A3C5,"n/a","нет"
+string,0x01614D,"Max=","До:"
+reloc,0x00BE3E,"How Many","Сколько?"
 string,0x01A6E9,"You don't have enough gold!","Недостаточно золота!"
 # king's castle - audience intro
 string,0x01A05D,"Trumpets announce your","Трубы возвещают о"
