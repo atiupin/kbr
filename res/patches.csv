@@ -85,8 +85,6 @@ string,0x01AC03,"  L Land         ","  L Посадка      "
 string,0x01AC15,"  F Fly          ","  F Полет        "
 # menu bar - quit confirmation
 string,0x162D1,"Quit to DOS without saving (y/n) ","Выйти без сохранения? (y/n) "
-# "(name) the (class)" connector -> ", " (Taiga the Sorceress -> Taiga, Колдунья)
-string,0x1A181," the ",", "
 # army screen - header bar
 string,0x1AC27,"Press 'ESC' to exit","ESC: Выйти"
 # army screen - row labels
@@ -118,8 +116,6 @@ string,0x01610C,"Recruit how many ","Сколько нанять?  "
 # dwelling screen - refusal
 string,0x01A66B,"You already have the maximum","   У вас уже максимальное"
 string,0x01A688,"number of armies!","  число отрядов!"
-# gold readout
-reloc,0x005E82,"GP=","Зол:"
 # character screen
 string,0x01A824,"Leadership","Лидерство"
 reloc,0x018912,"Commission/Week","Жалованье в неделю"
@@ -132,12 +128,13 @@ string,0x01A880,"Castles garrisoned","Замков занято"
 string,0x01A893,"Followers killed","Воинов потеряно"
 string,0x01A8A4,"Current score","Текущий счет"
 # king's castle - main
-string,0x01A6BE,"Recruit Soldiers","Нанять войска"
-string,0x01A3C5,"n/a","нет"
-string,0x01A6CF,"B) Audience with the King","B) Аудиенция у короля"
-string,0x01A6E9,"You don't have enough gold!","Недостаточно золота!"
 string,0x016047,"Castle ","Замок "
 string,0x019A78,"of King Maximus","Максимуса"
+string,0x01A6CF,"B) Audience with the King","B) Аудиенция у короля"
+# king's castle - recruit soldiers
+string,0x01A6BE,"Recruit Soldiers","Нанять войска"
+string,0x01A3C5,"n/a","нет"
+string,0x01A6E9,"You don't have enough gold!","Недостаточно золота!"
 # king's castle - audience intro
 string,0x01A05D,"Trumpets announce your","Трубы возвещают о"
 string,0x01A074,"arrival with regal fanfare.","вашем прибытии с почестями."
@@ -202,6 +199,11 @@ reloc,0x00a7d6,"maximum number of spells.","   число заклинаний."
 reloc,0x00a841,"You can learn ","Можно выучить ещё: "
 reloc,0x00a85c," more spell",""
 bytes,0x00A868,"74","EB"
+# miscellaneous
+# "(name) the (class)" connector -> ", " (Taiga the Sorceress -> Taiga, Колдунья)
+string,0x1A181," the ",", "
+# gold (town, dwellings, etc.)
+reloc,0x005E82,"GP=","Зол:"
 # boat travel menu
 string,0x01A992,"1. Continentia","1. Континентия"
 string,0x01A9A1,"2. Forestria","2. Форестрия"
