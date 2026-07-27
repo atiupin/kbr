@@ -96,7 +96,7 @@ string,0x01AB66,"  U Use Magic","  U Магия"
 string,0x01AB74,"  V View Character","  V Герой"
 string,0x01AB87,"  W Wait End Week","  W Ждать неделю"
 reloc,0x018BBD,"  Q Quit and Save","  Q Запись и выход"
-string,0x01ABF1,"  N New Continent","  N Новая земля"
+string,0x01ABF1,"  N New Continent","  N Континент"
 string,0x01AC03,"  L Land         ","  L Посадка      "
 string,0x01AC15,"  F Fly          ","  F Полет        "
 
@@ -282,7 +282,7 @@ string,0x01A992,"1. Continentia","1. Континентия"
 string,0x01A9A1,"2. Forestria","2. Форестрия"
 string,0x01A9AE,"3. Archipelia","3. Архипелия"
 string,0x01A9BC,"4. Saharia","4. Сахария"
-string,0x01A9C7,"Go to which continent? ","На какой континент? "
+string,0x01A9C7,"Go to which continent? ","Куда отправляемся? "
 
 # ==== NAME TABLES =========================================================================
 
