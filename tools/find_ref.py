@@ -19,6 +19,12 @@ go in ONE row with the refs space-separated -- which is what the pasted line
 already contains. If none are found it is reached by computed/indexed access, or
 sits in a table too short to prove itself (see find_refs), and can't be repointed
 this way -- "not repointable by this tool", never "not a pointer".
+
+A `table-entry` verdict says nothing about liveness. Tables are read base+index,
+often from SEVERAL bases into one array (DS 0x3252 is indexed from both 0x324e and
+0x3252), so no immediate ever equals a slot's own DS offset -- grepping for one
+proves nothing. Two slots were called dead that way and turned out to be the combat
+targeting prompt. Only a screenshot settles it.
 """
 
 import hashlib
