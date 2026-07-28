@@ -36,7 +36,7 @@ string,0x16230,"Word: ","Слово:"
 string,0x1619C,"Note: Spaces are not counted","Ладно, шучу! Не нужно ничего"
 string,0x161B9,"as words or lines.  Hyphenated","открывать, конечно. Защита уже"
 string,0x161D8,"words are treated as one word.","снята. Просто нажмите Enter и"
-string,0x161F7,"Any line that has any kind of","вперед, к приключениям. Удачи"
+string,0x161F7,"Any line that has any kind of","вперёд, к приключениям. Удачи"
 string,0x16215,"text is considered a line.","в походе, герой!"
 
 # ---- new-game creation message
@@ -92,7 +92,7 @@ string,0x01AB22,"  I Contract Info","  I Контракт"
 string,0x01AB34,"  M Auto-mapping","  M Карта"
 string,0x01AB45,"  P Puzzle Solve","  P Головоломка"
 string,0x01AB56,"  S Search Area","  S Копать"
-string,0x01AB66,"  U Use Magic","  U Магия"
+string,0x01AB66,"  U Use Magic","  U Колдовать"
 string,0x01AB74,"  V View Character","  V Герой"
 string,0x01AB87,"  W Wait End Week","  W Ждать неделю"
 reloc,0x018BBD,"  Q Quit and Save","  Q Запись и выход"
@@ -141,7 +141,7 @@ reloc,0x018e8b,"revealed nothing.",""
 
 # ==== ADVENTURE MAP =======================================================================
 # ---- enemy castle, siege prompt
-reloc,0x0092f6,"Various groups of monsters","Разные шайки чудовищ"
+reloc,0x0092f6,"Various groups of monsters","Разношерстные шайки чудовищ"
 reloc,0x009379," and"," со"
 reloc,0x009392,"army ","своим войском "
 string,0x019a88,"occupy this castle.","заняли замок."
@@ -457,7 +457,7 @@ string,0x015C63,"Knights","Рыцари"
 string,0x015C6B,"Ogres","Огры"
 string,0x015C71,"Barbarians","Варвары"
 string,0x015C7C,"Trolls","Тролли"
-reloc,0x01593C,"Cavalry","Кавалерия"
+reloc,0x01593C,"Cavalry","Конники"
 string,0x015C8B,"Druids","Друиды"
 string,0x015C92,"Archmages","Архимаги"
 string,0x015C9C,"Vampires","Вампиры"
@@ -498,11 +498,11 @@ string,0x01A18E,"General","Генерал"
 string,0x01A196,"Marshal","Маршал"
 string,0x01A19E,"Lord","Лорд"
 string,0x1A1A3,"Paladin","Паладин"
-reloc,0x0185D9,"Crusader","Крестоносец"
+reloc,0x0185D9,"Crusader","Храмовник"
 reloc,0x0185DB,"Avenger","Мститель"
 string,0x01A1BC,"Champion","Чемпион"
 string,0x1A1C5,"Sorceress","Колдунья"
-reloc,0x0185E1,"Magician","Волшебница"
+reloc,0x0185E1,"Magician","Кудесница"
 reloc,0x0185E3,"Mage","Чародейка"
 string,0x01A1DD,"Archmage","Архимаг"
 string,0x1A1E6,"Barbarian","Варвар"
@@ -883,78 +883,71 @@ reloc,0x0185ad,"of this area is complete.","земель полностью от
 string,0x0160A3,"...and a piece of the map to","...и часть карты, ведущей"
 string,0x0160C0,"the stolen scepter.","к Скипетру порядка."
 
-# ---- artifact: Ring of Heroism, NOT VERIFIED
-string,0x019650,"Ridding the countryside of","Избавив округу от"
-reloc,0x0183aa,"a ferocious beast, the","свирепого зверя, вы"
-reloc,0x0183ac,"Magistrate presents you","получаете от магистрата:"
+# ---- artifact: Ring of Heroism
+string,0x019650,"Ridding the countryside of","Вы избавляете здешние края"
+reloc,0x0183aa,"a ferocious beast, the","от свирепого зверя. За это"
+reloc,0x0183ac,"Magistrate presents you","магистрат вручает вам"
 string,0x01969A,"with: The Ring of Heroism...","Кольцо героизма..."
 
 # ---- artifact: Shield of Protection, NOT VERIFIED
 string,0x0196B8,"Challenged to a joust by the","Вызванный на поединок"
 reloc,0x0183b4,"dread Dark Knight, you","грозным Чёрным Рыцарем, вы"
 reloc,0x0183b6,"quickly dispose of him and","быстро расправляетесь с ним"
-reloc,0x0183b8,"receive: The Shield of","и получаете:"
-reloc,0x0183ba,"Protection...","Щит стойкости..."
+reloc,0x0183b8,"receive: The Shield of","и получаете Щит стойкости..."
+reloc,0x0183ba,"Protection...",""
 
 # ---- artifact: Crown of Command, NOT VERIFIED
 reloc,0x0183bc,"Resting on a throne in a","На троне призрачного замка"
-reloc,0x0183be,"phantom castle, you have","вы находите:"
-string,0x01975E,"found: The Crown of Command.","Корону власти..."
+reloc,0x0183be,"phantom castle, you have","вы находите Корону власти..."
+string,0x01975E,"found: The Crown of Command.",""
 
 # ---- artifact: Amulet of Augmentation, NOT VERIFIED
-string,0x01977D,"Hidden within an enchanted","В зачарованной роще вы"
-reloc,0x0183c8,"grove, you find: The Amulet","находите:"
-reloc,0x0183ca,"of Augmentation...","Амулет чародейства..."
+string,0x01977D,"Hidden within an enchanted","В зачарованной роще"
+reloc,0x0183c8,"grove, you find: The Amulet","вы находите Амулет"
+reloc,0x0183ca,"of Augmentation...","чародейства..."
 
 # ---- artifact: Articles of Nobility
 string,0x0197C9,"Freeing a virtuous maiden","Вы освобождаете юную"
 reloc,0x0183d2,"from the clutches of a","добродетельную деву из лап"
-reloc,0x0183d4,"despicable criminal, you","гнусного злодея, и местный"
-reloc,0x0183d6,"have been granted: The","лорд жалует вам:"
+reloc,0x0183d4,"despicable criminal, you","гнусного злодея. В награду"
+reloc,0x0183d6,"have been granted: The","местный лорд жалует вам"
 reloc,0x0183d8,"Articles of Nobility...","Дворянскую грамоту..."
 
-# ---- artifact: Anchor of Admirality, NOT VERIFIED
+# ---- artifact: Anchor of Admirality
 reloc,0x0183da,"You discover ancient scrolls","Вы находите древние свитки"
 reloc,0x0183dc,"that describe the patterns","с описанием течений всех"
-reloc,0x0183de,"of the oceans. Mariners, in","океанов. Мореходы в"
-reloc,0x0183e0,"gratitude, bestow upon you:","благодарность даруют вам:"
+reloc,0x0183de,"of the oceans. Mariners, in","океанов. В благодарность"
+reloc,0x0183e0,"gratitude, bestow upon you:","мореходы даруют вам"
 reloc,0x0183e2,"The Anchor of Admirality...","Адмиральский якорь..."
 
 # ---- artifact: Book of Necros, NOT VERIFIED
 reloc,0x0183e4,"In the study of a deserted","В кабинете заброшенной"
-reloc,0x0183e6,"wizard's tower, you have","башни мага вы находите:"
+reloc,0x0183e6,"wizard's tower, you have","башни мага вы находите"
 string,0x019902,"found: The Book of Necros...","Книгу Некроса..."
 
 # ---- artifact: Sword of Prowess, NOT VERIFIED
 string,0x019921,"Following rumors of a great","Идя по слухам о великом"
 reloc,0x0183f0,"and powerful sword, you","и могучем мече, вы"
 reloc,0x0183f2,"defeat its fearsome guardian","побеждаете его грозного"
-reloc,0x0183f4,"and gain possession of: The","стража и получаете:"
+reloc,0x0183f4,"and gain possession of: The","стража и получаете"
 string,0x01998E,"Sword of Prowess...","Меч доблести..."
 
 # ==== SIGNPOSTS ==========================================================================
-# NOT VERIFIED
 reloc,0x00a04f,"A sign reads:","Знак гласит:"
 
-# NOT VERIFIED
 reloc,0x018288,"Treasure Island","Остров сокровищ"
 
-# NOT VERIFIED
-reloc,0x01828c,"Rent a boat and sail the","Наймите лодку и плывите"
+reloc,0x01828c,"Rent a boat and sail the","Наймите корабль и плывите"
 reloc,0x01828e,"seas. Explore the easy way!","по морям - так легче всего!"
 
-# NOT VERIFIED
 reloc,0x018290,"Six villains rule","Континентией правят"
 reloc,0x018292,"Continentia.","шесть злодеев."
 
-# NOT VERIFIED
 reloc,0x018294,"Aurange is north","Ауранж живёт к северу"
 
-# NOT VERIFIED
-reloc,0x018298,"The Sceptre will never be","Вам никогда не найти"
+reloc,0x018298,"The Sceptre will never be","Тебе никогда не найти"
 reloc,0x01829a,"found!","Скипетр!"
 
-# NOT VERIFIED
 reloc,0x01829c,"King's Treasure Garden","Сад королевских сокровищ"
 
 # NOT VERIFIED
@@ -977,19 +970,14 @@ reloc,0x0182b2,"desert.","небыстрое."
 # NOT VERIFIED
 reloc,0x0182b4,"Dead End","Тупик"
 
-# NOT VERIFIED
 reloc,0x0182b8,"Irok guards the north.","Irok стережёт север."
 
-# NOT VERIFIED
 reloc,0x0182bc,"A-maze-ing Forest","Лес-лабиринт"
 
-# NOT VERIFIED
 reloc,0x0182c0,"All maps are found in chests","Все карты лежат в сундуках"
 
-# NOT VERIFIED
-reloc,0x0182c4,"Bridge Port","Мостовой порт"
+reloc,0x0182c4,"Bridge Port","Замостье"
 
-# NOT VERIFIED
 reloc,0x0182c8,"Hidden Grove","Тайная роща"
 
 # NOT VERIFIED
@@ -997,19 +985,14 @@ reloc,0x0182cc,"Secret Pass","Тайный перевал"
 
 reloc,0x0182d0,"Isle of Death","Остров смерти"
 
-# NOT VERIFIED
 reloc,0x0182d4,"Pirate's Cove","Пиратская бухта"
 
-# NOT VERIFIED
-reloc,0x0182d8,"Boon Docks","Дальние доки"
+reloc,0x0182d8,"Boon Docks","Глухая гавань"
 
-# NOT VERIFIED
 reloc,0x0182dc,"Welcome to Kookamunga!","Вас приветствует Kookamunga!"
 
-# NOT VERIFIED
 reloc,0x0182e0,"Time is on our side.","Время работает на нас."
 
-# NOT VERIFIED
 reloc,0x0182e4,"Passage to Basefit.","Дорога на Basefit."
 
 # NOT VERIFIED
@@ -1028,7 +1011,6 @@ reloc,0x0182f4,"Wood's End is south.","Woods End - к югу."
 # NOT VERIFIED
 reloc,0x0182f8,"Undead are everywhere!","Повсюду нежить!"
 
-# NOT VERIFIED
 reloc,0x0182fc,"Peasants are fodder!","Крестьяне - пушечное мясо!"
 
 # NOT VERIFIED
@@ -1038,7 +1020,6 @@ reloc,0x018300,"Monster Way","Путь чудовищ"
 reloc,0x018304,"There is one town for each","На каждый замок здесь"
 reloc,0x018306,"castle.","по одному городу."
 
-# NOT VERIFIED
 reloc,0x018308,"Remember, wherever you go","Помни: куда бы ты ни шёл,"
 reloc,0x01830a,"there you are.","ты уже там."
 
@@ -1058,10 +1039,8 @@ reloc,0x018318,"Beware the moors!","Берегись болот!"
 reloc,0x01831c,"You'll never find the","Здесь вам Скипетра"
 reloc,0x01831e,"Sceptre here!","не найти!"
 
-# NOT VERIFIED
-reloc,0x018320,"Your quest is doomed!","Ваш поход обречён!"
+reloc,0x018320,"Your quest is doomed!","Твой поход обречён!"
 
-# NOT VERIFIED
 reloc,0x018324,"Stay on the road!","Держитесь дороги!"
 
 # NOT VERIFIED
@@ -1070,7 +1049,6 @@ reloc,0x018328,"Don't go any farther!","Дальше не ходите!"
 # NOT VERIFIED
 reloc,0x01832c,"Wrong Way!","Не туда!"
 
-# NOT VERIFIED
 reloc,0x018330,"Four villains rule Forestria","Форестрией правят четверо"
 
 # NOT VERIFIED
