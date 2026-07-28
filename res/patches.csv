@@ -24,7 +24,7 @@ string,0x167BD,"Easy         900    x.5","Легко        900    x.5"
 string,0x167D5,"Normal       600     x1","Нормально    600     x1"
 string,0x167ED,"Hard         400     x2","Трудно       400     x2"
 string,0x16805,"Impossible?  200     x4","Невозможно?  200     x4"
-string,0x15F3F," to select   Ent to Accept",": Выбрать   ENTER: Принять"
+string,0x15F3F,"\x18\x19 to select   Ent to Accept","\x18\x19: Выбрать   ENTER: Принять"
 
 # ---- copy-protection prompt
 # DO NOT RELOC: every ref here is inside the copy-protection block.
