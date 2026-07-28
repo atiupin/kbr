@@ -126,6 +126,34 @@ string,0x015CBB,"Norm","Норм"
 reloc,0x01594C,"Low","Низк"
 string,0x015CC4,"High","Выс"
 
+# ==== GARRISON SCREEN =====================================================================
+
+# ---- army list
+# FUN_18ac_0be5's right column, 8 chars measured: <verb1> / "(A-E) " on rows 0-1, "Space to" /
+# <verb2> on rows 3-4, and the caller swaps the verbs, so each has to read in both slots.
+reloc,0x0186e5,"Remove","Забрать"
+reloc,0x0186e7,"Garrison","Оставить"
+reloc,0x0186e9,"Space to","Пробел:"
+reloc,0x0186eb,"Empty","Пусто"
+
+# ---- refusal
+# FUN_18ac_05e3 indents each line by a hardcoded column from the byte table at DS 0x31f2;
+# line 2's 9 centred a 10-char word, ours is 21.
+bytes,0x018885,"09","02"
+reloc,0x01888a,"You cannot garrison your","Последний отряд нельзя"
+reloc,0x01888c,"last army!","оставить в гарнизоне!"
+
+# ==== DISMISS ARMY ========================================================================
+
+# ---- picker
+reloc,0x00dce6,"Dismiss which army","Распустить отряд:"
+
+# ---- confirmation
+reloc,0x01897d,"If you Dismiss your last","Распустив последний отряд,"
+reloc,0x01897f,"army, you will be sent back","вы с позором вернётесь"
+reloc,0x018981,"to the King in disgrace.","к королю."
+reloc,0x018983,"Dismiss last army (y/n)?","Распустить? (y/n)"
+
 # ==== SEARCH PROMPT =======================================================================
 # NOT VERIFIED
 # Four draws at col 1 plus the y/n line at col 16 (13 chars). The day count is 1 or 10
