@@ -265,7 +265,7 @@ string,0x01A130,"I now promote you to ","Отныне ваше звание - "
 
 # ---- audience, already at top rank
 string,0x01A146,"Hurry and recover my Scepter","Поспешите вернуть Скипетр"
-string,0x01A163,"of Order or all will be","Порядка, или всё будет"
+string,0x01A163,"of Order or all will be","порядка, или всё будет"
 reloc,0x0185CB,"lost!","потеряно!"
 
 # ==== TOWN SCREEN =========================================================================
@@ -738,7 +738,7 @@ reloc,0x016c00,"Crimes: Arech is wanted for","Преступления: Арех
 reloc,0x016c02,"  leading the conspiracy against","  в том, что возглавил заговор"
 reloc,0x016c04,"  the Crown, arranging jail-","  против Короны, устроил побеги"
 reloc,0x016c06,"  breaks. formenting rebellion,","  из тюрем, разжёг восстание"
-string,0x018241,"  stealing the Sceptre of Order.","  и похитил Скипетр Порядка."
+string,0x018241,"  stealing the Sceptre of Order.","  и похитил Скипетр порядка."
 
 # ==== TREASURE CHESTS =====================================================================
 # Seven events, each a pointer table walked by one loop at file 0x9955; every line is drawn
@@ -803,56 +803,56 @@ reloc,0x0185ad,"of this area is complete.","земель полностью от
 
 # ---- the map fragment, appended to every artifact find
 string,0x0160A3,"...and a piece of the map to","...и часть карты, ведущей"
-string,0x0160C0,"the stolen scepter.","к Скипетру Порядка."
+string,0x0160C0,"the stolen scepter.","к Скипетру порядка."
 
 # ---- artifact: Ring of Heroism, NOT VERIFIED
 string,0x019650,"Ridding the countryside of","Избавив округу от"
 reloc,0x0183aa,"a ferocious beast, the","свирепого зверя, вы"
 reloc,0x0183ac,"Magistrate presents you","получаете от магистрата:"
-string,0x01969A,"with: The Ring of Heroism...","Кольцо Героизма..."
+string,0x01969A,"with: The Ring of Heroism...","Кольцо героизма..."
 
 # ---- artifact: Shield of Protection, NOT VERIFIED
 string,0x0196B8,"Challenged to a joust by the","Вызванный на поединок"
 reloc,0x0183b4,"dread Dark Knight, you","грозным Чёрным Рыцарем, вы"
 reloc,0x0183b6,"quickly dispose of him and","быстро расправляетесь с ним"
 reloc,0x0183b8,"receive: The Shield of","и получаете:"
-reloc,0x0183ba,"Protection...","Щит Защиты..."
+reloc,0x0183ba,"Protection...","Щит стойкости..."
 
 # ---- artifact: Crown of Command, NOT VERIFIED
 reloc,0x0183bc,"Resting on a throne in a","На троне призрачного замка"
 reloc,0x0183be,"phantom castle, you have","вы находите:"
-string,0x01975E,"found: The Crown of Command.","Корона Власти."
+string,0x01975E,"found: The Crown of Command.","Корону власти..."
 
 # ---- artifact: Amulet of Augmentation, NOT VERIFIED
 string,0x01977D,"Hidden within an enchanted","В зачарованной роще вы"
 reloc,0x0183c8,"grove, you find: The Amulet","находите:"
-string,0x0197B4,"of Augmentation...","Амулет Усиления..."
+reloc,0x0183ca,"of Augmentation...","Амулет чародейства..."
 
 # ---- artifact: Articles of Nobility
 string,0x0197C9,"Freeing a virtuous maiden","Вы освобождаете юную"
 reloc,0x0183d2,"from the clutches of a","добродетельную деву из лап"
 reloc,0x0183d4,"despicable criminal, you","гнусного злодея, и местный"
 reloc,0x0183d6,"have been granted: The","лорд жалует вам:"
-reloc,0x0183d8,"Articles of Nobility...","Дворянскую Грамоту..."
+reloc,0x0183d8,"Articles of Nobility...","Дворянскую грамоту..."
 
 # ---- artifact: Anchor of Admirality, NOT VERIFIED
 reloc,0x0183da,"You discover ancient scrolls","Вы находите древние свитки"
 reloc,0x0183dc,"that describe the patterns","с описанием течений всех"
 reloc,0x0183de,"of the oceans. Mariners, in","океанов. Мореходы в"
 reloc,0x0183e0,"gratitude, bestow upon you:","благодарность даруют вам:"
-reloc,0x0183e2,"The Anchor of Admirality...","Адмиральский Якорь..."
+reloc,0x0183e2,"The Anchor of Admirality...","Адмиральский якорь..."
 
 # ---- artifact: Book of Necros, NOT VERIFIED
 reloc,0x0183e4,"In the study of a deserted","В кабинете заброшенной"
 reloc,0x0183e6,"wizard's tower, you have","башни мага вы находите:"
-string,0x019902,"found: The Book of Necros...","Книга Некроса..."
+string,0x019902,"found: The Book of Necros...","Книгу Некроса..."
 
 # ---- artifact: Sword of Prowess, NOT VERIFIED
 string,0x019921,"Following rumors of a great","Идя по слухам о великом"
 reloc,0x0183f0,"and powerful sword, you","и могучем мече, вы"
 reloc,0x0183f2,"defeat its fearsome guardian","побеждаете его грозного"
 reloc,0x0183f4,"and gain possession of: The","стража и получаете:"
-string,0x01998E,"Sword of Prowess...","Меч Доблести..."
+string,0x01998E,"Sword of Prowess...","Меч доблести..."
 
 # ==== SIGNPOSTS ==========================================================================
 # NOT VERIFIED
