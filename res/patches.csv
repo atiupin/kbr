@@ -577,6 +577,10 @@ reloc,0x018286,"Arech Dragonbreath","Арех Огнедышащий"
 # Rows that fit their own slot are written in place as 'string'; that is a byte budget, not
 # a limit -- find_ref.py reaches every slot of these tables.
 
+# ---- shared with every record
+reloc,0x0051d3,"Unknown","Неизвестен"
+reloc,0x005277,"You have no Contract!","У вас нет контракта!"
+
 # ---- villain 1, Murray the Miser
 string,0x016D19,"Name: Murray the Miser","Имя: Мюррей Скряга"
 string,0x016D30,"Alias: None","Кличка: нет"
