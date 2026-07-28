@@ -77,6 +77,7 @@ Pool placement is measured, not assumed -- see the POOL_* constants.
 import csv
 import hashlib
 import os
+import re
 import struct
 import sys
 
@@ -84,6 +85,11 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from paths import KBU2 as INPUT, KBR as OUTPUT, PATCHES_CSV as MANIFEST, KBU2_SHA256  # noqa: E402
 
 ENCODING = "cp866"
+
+COLUMNS = ("type", "offset", "expect", "write")
+KINDS = ("bytes", "string", "reloc")
+OFFSET_RE = re.compile(r"0x[0-9a-fA-F]+\Z")
+HEX_RE = re.compile(r"[0-9a-fA-F]+\Z")
 
 # DGROUP layout of KBU2.EXE.
 DS_BASE = 0x15690        # file offset of DS:0000 -- near offset 0 lives here
@@ -180,82 +186,119 @@ def encode_text(text, label, column):
 
 
 def resolve(patch, idx):
-    """Parse one manifest row into a dict describing the edit. `kind` is one of
-    'bytes' | 'string' | 'reloc'; the remaining keys depend on kind (see main)."""
+    """Turn one shape-checked manifest row into a dict describing the edit. `kind` is
+    one of 'bytes' | 'string' | 'reloc'; the remaining keys depend on kind (see main)."""
     label = f"patch {idx}"
-    typ = patch.get("type")
-    try:
-        offs = [int(tok, 0) for tok in str(patch["offset"]).split()]
-    except KeyError:
-        die(f"{label}: missing offset")
-    except ValueError:
-        die(f"{label}: bad offset {patch['offset']!r}")
-    if not offs:
-        die(f"{label}: missing offset")
-    if typ != "reloc" and len(offs) != 1:
-        die(f"{label}: only 'reloc' rows may list several offsets")
+    typ = patch["type"]
+    offs = [int(tok, 0) for tok in patch["offset"].split()]
     off = offs[0]
 
     if typ == "bytes":
-        try:
-            expect = bytes.fromhex(patch["expect"].replace(" ", ""))
-            payload = bytes.fromhex(patch["write"].replace(" ", ""))
-        except (KeyError, ValueError) as e:
-            die(f"{label}: bad bytes expect/write ({e})")
+        expect = bytes.fromhex(patch["expect"].replace(" ", ""))
+        payload = bytes.fromhex(patch["write"].replace(" ", ""))
         if len(expect) != len(payload):
             die(f"{label}: bytes expect/write differ in length "
                 f"({len(expect)} vs {len(payload)})")
         return {"kind": "bytes", "off": off, "expect": expect,
                 "payload": payload, "label": label}
 
+    expect = encode_text(patch["expect"], label, "expect")
+    text = encode_text(patch["write"], label, "write")
+
     if typ == "string":
-        try:
-            expect = encode_text(patch["expect"], label, "expect")
-            text = encode_text(patch["write"], label, "write")
-        except KeyError as e:
-            die(f"{label}: missing {e}")
         if len(text) > len(expect):
             die(f"{label}: translation is {len(text)}B but the slot holds "
                 f"{len(expect)}B -- use a 'reloc' row")
         return {"kind": "string", "off": off, "expect": expect,
                 "payload": text + b"\x00", "label": label}
 
-    if typ == "reloc":
-        try:
-            expect = encode_text(patch["expect"], label, "expect")
-            text = encode_text(patch["write"], label, "write")
-        except KeyError as e:
-            die(f"{label}: missing {e}")
-        for ref in offs:
-            if PROT_LO <= ref <= PROT_HI:
-                die(f"{label}: reloc ref {ref:#x} is inside the copy-protection block "
-                    f"({PROT_LO:#x}-{PROT_HI:#x}).\n"
-                    f"       That block is integrity-checked and retaliates on a delay -- "
-                    f"the game runs, then hangs much later (INT 6 in the graphics loader).\n"
-                    f"       Use a 'string' row instead: the protection UI text all fits "
-                    f"its original slot.")
-        return {"kind": "reloc", "off": off, "offs": offs, "expect": expect,
-                "text": text + b"\x00", "label": label}
+    for ref in offs:
+        if PROT_LO <= ref <= PROT_HI:
+            die(f"{label}: reloc ref {ref:#x} is inside the copy-protection block "
+                f"({PROT_LO:#x}-{PROT_HI:#x}).\n"
+                f"       That block is integrity-checked and retaliates on a delay -- "
+                f"the game runs, then hangs much later (INT 6 in the graphics loader).\n"
+                f"       Use a 'string' row instead: the protection UI text all fits "
+                f"its original slot.")
+    return {"kind": "reloc", "off": off, "offs": offs, "expect": expect,
+            "text": text + b"\x00", "label": label}
 
-    die(f"{label}: unknown type {typ!r} (want 'bytes', 'string' or 'reloc')")
+
+def check_row(where, row):
+    """Reject any row whose columns are not what its `type` says they are. The text
+    columns go through encode_text only to validate here; resolve() encodes for real."""
+    typ, offsets, expect, write = (row[c] for c in COLUMNS)
+
+    if typ not in KINDS:
+        die(f"{where}: type {typ!r} -- want one of {', '.join(KINDS)}")
+
+    toks = offsets.split()
+    if not toks:
+        die(f"{where}: offset is empty")
+    if typ != "reloc" and len(toks) > 1:
+        die(f"{where}: {len(toks)} offsets, but only 'reloc' rows may list several")
+    for tok in toks:
+        if not OFFSET_RE.match(tok):
+            die(f"{where}: offset {tok!r} -- want 0x-prefixed hex, e.g. 0x0185e3")
+
+    if not expect:
+        die(f"{where}: expect is empty -- it is what pins the row to the right bytes")
+
+    if typ == "bytes":
+        for col, val in (("expect", expect), ("write", write)):
+            packed = val.replace(" ", "")
+            if not packed or not HEX_RE.match(packed) or len(packed) % 2:
+                die(f"{where}: bytes {col} {val!r} -- want whole hex bytes, "
+                    f'e.g. "72" or "eb 0d 90"')
+    else:
+        encode_text(expect, where, "expect")
+        encode_text(write, where, "write")      # empty is legal -- it blanks the string
 
 
 def load_manifest():
+    """Read res/patches.csv into one shape-checked dict per patch row.
+
+    A line at a time, in strict mode: strict rejects text after a closing quote, which
+    default csv folds into the field instead, and per-line keeps an unbalanced quote
+    from swallowing the rows below it. Safe because no field spans a newline."""
     try:
         with open(MANIFEST, newline="", encoding="utf-8") as f:
-            rows = [ln for ln in f if ln.strip() and not ln.lstrip().startswith("#")]
+            lines = [(n, ln) for n, ln in enumerate(f, 1)
+                     if ln.strip() and not ln.lstrip().startswith("#")]
     except FileNotFoundError:
         die(f"manifest not found: {MANIFEST}")
-    patches = list(csv.DictReader(rows))
-    if not patches:
+
+    rows = []
+    for lineno, raw in lines:
+        where = f"{MANIFEST} line {lineno}"
+        try:
+            fields = next(csv.reader([raw], strict=True))
+        except csv.Error as e:
+            die(f"{where}: not parsable as CSV -- {e}\n       {raw.strip()}")
+        if len(fields) != len(COLUMNS):
+            die(f"{where}: {len(fields)} field(s), want {len(COLUMNS)} "
+                f"({','.join(COLUMNS)})\n       {raw.strip()}")
+        rows.append((where, fields))
+
+    if not rows:
         die(f"manifest {MANIFEST}: no patches found")
+    where, header = rows.pop(0)
+    if tuple(header) != COLUMNS:
+        die(f"{where}: header is {','.join(header)}, want {','.join(COLUMNS)}")
+    if not rows:
+        die(f"manifest {MANIFEST}: no patches found")
+
+    patches = []
+    for where, fields in rows:
+        row = dict(zip(COLUMNS, fields))
+        check_row(where, row)
+        patches.append(row)
     return patches
 
 
 def check_overlaps(inplace):
-    """Overlap check over (offset, payload, label) triples. Pool appends are bump-
-    allocated at the end and cannot overlap, so only in-place writes need it -- which
-    includes inlined `reloc` rows, whose slot can collide with a `string` row."""
+    """Only in-place writes can collide (pool appends are bump-allocated) -- including
+    inlined `reloc` rows, whose slot can land on a `string` row."""
     spans = sorted((off, off + len(payload), label) for off, payload, label in inplace)
     for (a_lo, a_hi, a), (b_lo, b_hi, b) in zip(spans, spans[1:]):
         if b_lo < a_hi:
@@ -368,6 +411,10 @@ def main():
                         f"({p['src']:#x} and {src:#x}) -- one row per string")
             continue
         end = p["off"] + len(p["expect"])
+        need = end + 1 if p["kind"] == "string" else end     # a string needs its NUL too
+        if need > len(data):
+            die(f"{p['label']}: {p['off']:#x}+{len(p['expect'])}B runs past the end of "
+                f"the image ({len(data)} bytes)")
         got = bytes(data[p["off"]:end])
         if got != p["expect"]:
             die(f"{p['label']}: expected {p['expect'].hex()} at {p['off']:#x}, "
