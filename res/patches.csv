@@ -166,6 +166,84 @@ bytes,0x00B545,"10","0f"
 reloc,0x0186f3,"      (space)","      (пробел)"
 reloc,0x0186f9,"Accept (y/n)?","Принять? (y/n)"
 
+# ==== COMBAT SCREEN =======================================================================
+# ---- menu bar
+reloc,0x01086f,"Options / ","О:Помощь  "
+reloc,0x018bbf,"  G Give Up","  G Сдаться"
+reloc,0x018bc1,"  S Shoot","  S Стрелять"
+reloc,0x018bc3,"  U Use Magic","  U Колдовать"
+reloc,0x018bc5,"  V View Char","  V Герой"
+reloc,0x018bc7,"  W Wait","  W Ждать"
+reloc,0x018bc9,"  SPC Pass","SPC Пропустить ход"
+
+# ---- action log
+# One line in the lower bar: the acting army's name (FUN_1d9b_1663), then fragments at the
+# cursor (FUN_1f51_1024). Every shape, all sized to a 35-column budget:
+#   <army> vs <army> killing <n>     melee -- the widest English line is exactly 35
+#   <army> shoot <army> killing <n>  " vs " skipped, " shoot " already named the target
+#   <army> retaliate killing <n>     the retaliator's name replaces "<vs> <army>"
+#   <army> vs <army>, <n> die        same melee, shorter: NWC's guard for the 16 pairings
+#                                    (0x128CC) whose long form would have run to 36
+# The count always costs 3: FUN_1207_0321 divides by 1000 and appends 'K' past 999.
+reloc,0x010d59," wait"," ждут"
+reloc,0x010d5e," pass"," пропускают ход"
+reloc,0x011099," are out of control!"," неуправляемы!"
+reloc,0x012183," move"," идут"
+reloc,0x01230a," fly"," летят"
+reloc,0x01263c," shoot "," бьют: "
+reloc,0x0128a1," retaliate"," отвечают"
+reloc,0x01887a," vs "," бьют: "
+reloc,0x01887c," killing ",", пало "
+# That shorter tally reads "1 dies" / "7 die" in English: the 's' is verb agreement, appended
+# when the count is 1. "пало" needs none, so the branch that adds it always jumps instead.
+# NOT VERIFIED
+reloc,0x018880,", ",", "
+reloc,0x01887e," die"," пало"
+bytes,0x0129F8,"75","EB"
+
+# ---- refusals
+reloc,0x0134c3,"Can't ",""
+reloc,0x0187ce,"Fly","Не умеют летать"
+reloc,0x0187d0,"Cast","Вы не умеете колдовать"
+reloc,0x0187d2,"Shoot","Не могут стрелять"
+
+# ---- demon's half ability
+# NOT VERIFIED
+reloc,0x01356c,"HALF","1/2"
+
+# ---- victory
+# The box is 36 columns wide, so "(пробел)" -- a char wider -- needs its gotoxy 28 -> 27.
+reloc,0x0115ff,"Victory!","Победа!"
+bytes,0x118D4,"1C","1B"
+reloc,0x0118df,"(space)","(пробел)"
+
+# ---- victory, the spoils
+# Table DS 0x308e, read only by FUN_1f51_0000 -- the combat screen, not the king's castle.
+# Text starts at column 1 of the same 36-column box, so 35 chars clip. Line 1 also carries
+# the name (10 max) + " the " + rank (9 max) and a comma the code drops on column 35, so
+# NWC sized it to the byte: the prefix has 13.
+reloc,0x01871e,"Well done ","Отлично, "
+reloc,0x018720,"you have successfully vanquished","вы блестяще одолели очередного"
+reloc,0x018722,"yet another foe.","противника."
+# Blanking the " and the" that trails the purse gives "capture of " a line of its own --
+# the only way to name an undeclinable villain ("Царь Николай Безумный", 21 + 9 = 30).
+reloc,0x018724,"Spoils of War: ","Трофеи: "
+reloc,0x018738," gold"," зол."
+reloc,0x018726," and the",""
+reloc,0x018728,"capture of ","В плену: "
+reloc,0x01872a,"For fulfilling your contract you","По контракту вам полагается"
+reloc,0x01872c,"receive an additional ","награда: "
+reloc,0x01872e,"as bounty... and a piece of the","А в сокровищнице замка нашлась"
+reloc,0x018730,"map to the stolen scepter.","часть карты к Скипетру порядка."
+reloc,0x018732,"Since you did not have the proper","Увы, контракта на этого"
+reloc,0x018734,"contract, the Lord has been set","злодея у вас не было, и его"
+reloc,0x018736,"free.","пришлось отпустить."
+
+# ---- give up
+reloc,0x018e79,"Giving up will forfeit your","Сдавшись, вы потеряете"
+reloc,0x018e7b,"armies and send you back to","свое войско и вернётесь"
+reloc,0x018e7d,"the King. Give up (y/n)?","к королю. Сдаться? (y/n)"
+
 # ==== SPELL CASTING =======================================================================
 
 # ---- Castle Gate / Town Gate
