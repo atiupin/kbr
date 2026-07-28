@@ -853,3 +853,230 @@ reloc,0x0183f0,"and powerful sword, you","и могучем мече, вы"
 reloc,0x0183f2,"defeat its fearsome guardian","побеждаете его грозного"
 reloc,0x0183f4,"and gain possession of: The","стража и получаете:"
 string,0x01998E,"Sword of Prowess...","Меч Доблести..."
+
+# ==== SIGNPOSTS ==========================================================================
+# NOT VERIFIED
+reloc,0x00a04f,"A sign reads:","Знак гласит:"
+
+# NOT VERIFIED
+reloc,0x018288,"Treasure Island","Остров сокровищ"
+
+# NOT VERIFIED
+reloc,0x01828c,"Rent a boat and sail the","Наймите лодку и плывите"
+reloc,0x01828e,"seas. Explore the easy way!","по морям - так легче всего!"
+
+# NOT VERIFIED
+reloc,0x018290,"Six villains rule","Континентией правят"
+reloc,0x018292,"Continentia.","шесть злодеев."
+
+# NOT VERIFIED
+reloc,0x018294,"Aurange is north","Ауранж живёт к северу"
+
+# NOT VERIFIED
+reloc,0x018298,"The Sceptre will never be","Вам никогда не найти"
+reloc,0x01829a,"found!","Скипетр!"
+
+# NOT VERIFIED
+reloc,0x01829c,"King's Treasure Garden","Сад королевских сокровищ"
+
+# NOT VERIFIED
+reloc,0x0182a0,"There are two artifacts per","На каждом континенте"
+reloc,0x0182a2,"continent.","по два артефакта."
+
+# NOT VERIFIED
+reloc,0x0182a4,"Peasant Way","Крестьянский путь"
+
+# NOT VERIFIED
+reloc,0x0182a8,"Wonder Woods","Дивный лес"
+
+# NOT VERIFIED
+reloc,0x0182ac,"Pond of Peril","Гиблый пруд"
+
+# NOT VERIFIED
+reloc,0x0182b0,"It takes time to cross the","Пересечь пустыню - дело"
+reloc,0x0182b2,"desert.","небыстрое."
+
+# NOT VERIFIED
+reloc,0x0182b4,"Dead End","Тупик"
+
+# NOT VERIFIED
+reloc,0x0182b8,"Irok guards the north.","Irok стережёт север."
+
+# NOT VERIFIED
+reloc,0x0182bc,"A-maze-ing Forest","Лес-лабиринт"
+
+# NOT VERIFIED
+reloc,0x0182c0,"All maps are found in chests","Все карты лежат в сундуках"
+
+# NOT VERIFIED
+reloc,0x0182c4,"Bridge Port","Мостовой порт"
+
+# NOT VERIFIED
+reloc,0x0182c8,"Hidden Grove","Тайная роща"
+
+# NOT VERIFIED
+reloc,0x0182cc,"Secret Pass","Тайный перевал"
+
+reloc,0x0182d0,"Isle of Death","Остров смерти"
+
+# NOT VERIFIED
+reloc,0x0182d4,"Pirate's Cove","Пиратская бухта"
+
+# NOT VERIFIED
+reloc,0x0182d8,"Boon Docks","Дальние доки"
+
+# NOT VERIFIED
+reloc,0x0182dc,"Welcome to Kookamunga!","Вас приветствует Kookamunga!"
+
+# NOT VERIFIED
+reloc,0x0182e0,"Time is on our side.","Время работает на нас."
+
+# NOT VERIFIED
+reloc,0x0182e4,"Passage to Basefit.","Дорога на Basefit."
+
+# NOT VERIFIED
+reloc,0x0182e8,"The end is near.","Конец близок."
+
+# NOT VERIFIED
+reloc,0x0182ec,"Treasure at the river's end.","Клад в устье реки."
+
+# NOT VERIFIED
+reloc,0x0182f0,"The ogres are back... and","Огры вернулись... и они"
+reloc,0x0182f2,"they're hungry!","голодны!"
+
+# NOT VERIFIED
+reloc,0x0182f4,"Wood's End is south.","Woods End - к югу."
+
+# NOT VERIFIED
+reloc,0x0182f8,"Undead are everywhere!","Повсюду нежить!"
+
+# NOT VERIFIED
+reloc,0x0182fc,"Peasants are fodder!","Крестьяне - пушечное мясо!"
+
+# NOT VERIFIED
+reloc,0x018300,"Monster Way","Путь чудовищ"
+
+# NOT VERIFIED
+reloc,0x018304,"There is one town for each","На каждый замок здесь"
+reloc,0x018306,"castle.","по одному городу."
+
+# NOT VERIFIED
+reloc,0x018308,"Remember, wherever you go","Помни: куда бы ты ни шёл,"
+reloc,0x01830a,"there you are.","ты уже там."
+
+# NOT VERIFIED
+reloc,0x01830c,"Forestria maze entrance!","Вход в лабиринт Форестрии!"
+
+# NOT VERIFIED
+reloc,0x018310,"Crossroads","Перекрёсток"
+
+# NOT VERIFIED
+reloc,0x018314,"No Trespassing!","Прохода нет!"
+
+# NOT VERIFIED
+reloc,0x018318,"Beware the moors!","Берегись болот!"
+
+# NOT VERIFIED
+reloc,0x01831c,"You'll never find the","Здесь вам Скипетра"
+reloc,0x01831e,"Sceptre here!","не найти!"
+
+# NOT VERIFIED
+reloc,0x018320,"Your quest is doomed!","Ваш поход обречён!"
+
+# NOT VERIFIED
+reloc,0x018324,"Stay on the road!","Держитесь дороги!"
+
+# NOT VERIFIED
+reloc,0x018328,"Don't go any farther!","Дальше не ходите!"
+
+# NOT VERIFIED
+reloc,0x01832c,"Wrong Way!","Не туда!"
+
+# NOT VERIFIED
+reloc,0x018330,"Four villains rule Forestria","Форестрией правят четверо"
+
+# NOT VERIFIED
+reloc,0x018334,"There's no turning back!","Назад дороги нет!"
+
+# NOT VERIFIED
+reloc,0x018338,"Swamplands","Болотный край"
+
+# NOT VERIFIED
+reloc,0x01833c,"Pirate's Treasure Trove","Пиратская сокровищница"
+
+# NOT VERIFIED
+reloc,0x018340,"Corak was here!","Здесь был Корак!"
+
+# NOT VERIFIED
+reloc,0x018344,"Thieves will be eaten!","Воров тут едят!"
+
+# NOT VERIFIED
+reloc,0x018348,"Pirates have no mercy!","Пираты не знают пощады!"
+
+# NOT VERIFIED
+reloc,0x01834c,"The dead live!","Мёртвые живы!"
+
+# NOT VERIFIED
+reloc,0x018350,"There are five islands here.","Здесь пять островов."
+
+# NOT VERIFIED
+reloc,0x018354,"Maximus will DIE!","Максимус СДОХНЕТ!"
+
+# NOT VERIFIED
+reloc,0x018358,"Pool of Prosperity","Пруд изобилия"
+
+# NOT VERIFIED
+reloc,0x01835c,"Four villains rule here.","Здесь правят четыре злодея."
+
+# NOT VERIFIED
+reloc,0x018360,"Down with the King!","Долой короля!"
+
+# NOT VERIFIED
+reloc,0x018364,"The islands hide treasures.","На островах спрятаны клады."
+
+# NOT VERIFIED
+reloc,0x018368,"Time, is on our side!","Время на нашей стороне!"
+
+# NOT VERIFIED
+reloc,0x01836c,"Welcome to Archipelia!","Вас приветствует Архипелия!"
+
+# NOT VERIFIED
+reloc,0x018370,"Saharia is a volcano","Сахария - это вулкан,"
+reloc,0x018372,"surrounded by a desert.","окружённый пустыней."
+
+# NOT VERIFIED
+reloc,0x018374,"Three villains rule Saharia.","Сахарией правят трое."
+
+# NOT VERIFIED
+reloc,0x018378,"Your army will perish here!","Здесь ваше войско сгинет!"
+
+# NOT VERIFIED
+reloc,0x01837c,"Oasis","Оазис"
+
+# NOT VERIFIED
+reloc,0x018380,"Wading Pool","Лягушатник"
+
+# NOT VERIFIED
+reloc,0x018384,"Oasis of Plenty","Оазис изобилия"
+
+# NOT VERIFIED
+reloc,0x018388,"There is no escaping the","От пророчества"
+reloc,0x01838a,"prophecy!","не уйти!"
+
+# NOT VERIFIED
+reloc,0x01838c,"Volcano Guardian","Страж вулкана"
+
+# NOT VERIFIED
+reloc,0x018390,"Time is running out!","Время на исходе!"
+
+# NOT VERIFIED
+reloc,0x018394,"Treasure Trough","Кладезь сокровищ"
+
+# NOT VERIFIED
+reloc,0x018398,"Rest Stop","Привал"
+
+# NOT VERIFIED
+reloc,0x01839c,"Treasure Zone","Земля сокровищ"
+
+# NOT VERIFIED
+reloc,0x0183a0,"This place is a nightmare!","Это место - сущий кошмар!"
