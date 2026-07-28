@@ -37,6 +37,11 @@ patched for this: the CC loader mallocs each member by its declen, so the larger
 font auto-allocates, and the glyph blitter indexes the font unsigned (confirmed
 in DOSBox-X).
 
+The upper half is not all Cyrillic: CP866 spends 0xB0-0xDF and 0xF2-0xFF on box
+drawing and blocks, which no Russian text reaches and the game -- shipped with a
+128-glyph font -- could never print. Those 62 cells are free to draw new glyphs
+in, reachable from the manifest as \\xNN.
+
 res/font.png is the editable sheet -- a raw 1:1 128x128 RGBA rip, transparent
 background, white ink, 16 glyphs per row, no scaling or grid; top 8 rows are the
 original 128 glyphs, bottom 8 rows are the Cyrillic. font-export/font-import
