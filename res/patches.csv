@@ -147,6 +147,10 @@ reloc,0x009392,"army ","своим войском "
 string,0x019a88,"occupy this castle.","заняли замок."
 string,0x019a9c,"Lay Siege (y/n)?","  Осадить? (y/n)"
 
+# ---- without siege weapons
+reloc,0x018e75,"You need siege weapons to","Для штурма замка нужна"
+reloc,0x018e77,"attack a castle.  (space)","катапульта.   (пробел)"
+
 # ---- scouts sight an enemy army
 reloc,0x00b333,"Your scouts have sighted:","Ваши разведчики видят:"
 reloc,0x00b451,"Attack (y/n)?","Атаковать? (y/n)"
