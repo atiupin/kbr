@@ -117,7 +117,7 @@ Two hard rules, both enforced by the tools, both learned the expensive way:
   falsified. Distrust any explanation. It costs nothing: that block's strings are protection UI
   text that fits its own slot.
 
-`find_ref.py` validates a table slot by *chaining* — the next slot must point exactly one past this
+`find_ref.py` validates a table slot by _chaining_ — the next slot must point exactly one past this
 one's NUL — and accepts a run of three, so a table's **first and last entry are reachable** too. A
 two-entry table still isn't: "no ref found" means "not repointable by this tool", not "not a
 pointer" — check the neighbouring slots before assuming computed access.
@@ -178,6 +178,10 @@ tools/ghidra.py run DumpDecomp.java build/decomp
   instead of CUP386, PNG I/O instead of Pillow).
 - **Document a finding in the script that owns it**, not in this file. This file says what the
   project is, where things live, and which rules must not be broken.
+- **Comment only the non-obvious, and briefly.** A comment earns its place by recording a
+  finding, a constraint, or the reason behind a choice — never by restating the code, narrating
+  how something ordinary works, or walking through examples. One dense sentence beats a
+  paragraph; if it would only tell a competent reader what they can see, drop it.
 
 ## Commit Guidelines
 

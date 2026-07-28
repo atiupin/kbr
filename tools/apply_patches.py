@@ -3,75 +3,52 @@
 
     python3 tools/apply_patches.py          # no arguments
 
-Not a universal patcher: it reads one file and writes one. The SHA-256 gate in
-paths.py refuses any other KBU2.EXE, so every manifest offset is provably correct
-against that exact image -- no per-patch address arithmetic.
+Not a universal patcher: one input, one output. The SHA-256 gate in paths.py refuses
+any other KBU2.EXE, so every manifest offset is provably correct against that image.
 
-Manifest (res/patches.csv): CSV, header `type,offset,expect,write`, one patch per
-row. Blank and `#` lines are skipped, so `#` carries the section comments (there is
-no label column). UTF-8 in, CP866 out, with `\\xNN` for raw byte NN and `\\\\` for a
-literal backslash (see encode_text).
+Manifest (res/patches.csv): CSV, header `type,offset,expect,write`, one patch per row.
+Blank and `#` lines are skipped, so `#` carries the section comments. UTF-8 in, CP866
+out, with `\\xNN` for raw byte NN and `\\\\` for a literal backslash (see encode_text).
+Quote expect/write ("Gold:  ") to keep significant leading and trailing spaces visible.
+Rows are shape-checked before anything is applied; errors name the manifest line.
 
     type    "bytes" | "string" | "reloc"
     offset  file offset (reloc: one or more ref offsets, space-separated)
     expect  what must be there now  (hex for bytes, the original English otherwise)
     write   what to write           (hex for bytes, the translation otherwise)
 
-Quote expect/write ("Gold:  ") so significant leading and trailing spaces stay
-visible -- UI strings are padded to fixed widths.
-
 bytes : hex, equal length, overwritten in place.
 
         NO CODE MOTION. Rewriting an instruction is fine (a flipped branch, a changed
-        immediate); MOVING one is not, even inside an equal-length block. The EXE
-        relocation table pins the segment word of every far call BY FILE OFFSET -- 1960
-        entries, listed at 0x1c -- and DOS adds the load segment to each of those words
-        at load time. Slide a `9a` call and two things break at once: its segment word
-        is never fixed up, so it calls into hyperspace, and the loader instead adds the
-        base to whatever instruction bytes now sit at the old offset.
+        immediate); MOVING one is not, even inside an equal-length block. The MZ
+        relocation table pins every far call's segment word BY FILE OFFSET and DOS adds
+        the load segment to it, so a slid `9a` is never fixed up while the loader
+        corrupts whatever took its place. Reordering the recruit line's calls at 0xACCD
+        drew a header and nothing else. To reorder OUTPUT move the cursor instead --
+        the drawing calls take absolute columns. check_relocations enforces this.
 
-        Learned by reordering the dwelling recruit line's five call sequences at 0xACCD
-        (equal length, self-contained, no jumps into them -- all true, all irrelevant):
-        5 relocation entries pointed into the block, and the screen drew its header and
-        then nothing. To reorder OUTPUT, move the cursor, not the code -- the drawing
-        calls take absolute columns, so their order on screen is independent of the
-        order they run in. If code really must move, its relocation entries have to move
-        with it, which this manifest has no way to express.
+string: CP866 written in place, NUL-terminated. `expect` is the complete original (its
+        NUL is verified), so its length is the slot budget. A longer `write` is an
+        error, never an automatic reloc: upgrading needs refs the row does not carry,
+        and could silently repoint inside the copy-protection block (see PROT_LO).
 
-string: CP866 text written in place, NUL-terminated. `expect` must be the complete
-        original (its NUL is verified), so its length is the slot budget; a longer
-        `write` is rejected and belongs in a `reloc` row.
+reloc : `offset` is NOT the string -- it is the REF, the file offset of the 2-byte near
+        pointer reaching it, from tools/find_ref.py. `expect` is still the English: the
+        pointer is dereferenced and what it lands on must match.
 
-reloc : `offset` is NOT the string -- it is the REF, the file offset of the 2-byte
-        near pointer reaching it, found once with tools/find_ref.py. `expect` is
-        still the original English: the pointer is dereferenced and the string it
-        lands on must match. Stronger than pinning the pointer's raw bytes, and it
-        keeps the English readable instead of hidden behind a hex word.
+        The row says where the string is REACHED FROM, not that the pool must be used.
+        A `write` that fits the original slot is inlined there with the refs untouched;
+        only overflows go to the pool at DS POOL_DSOFF, every ref repointed. Inlining
+        also covers what find_ref.py cannot see (computed or indexed access, a pointer
+        table's first/last slot), which would otherwise keep showing English.
 
-        A reloc row declares where the string is REACHED FROM, not that the pool
-        must be used. If `write` fits the original slot the build inlines it (in
-        place, refs untouched); only genuine overflows are appended to the pool at
-        DS POOL_DSOFF with every ref repointed. The row therefore survives rewording
-        in either direction, and each build prints which way each row went.
-
-        Inlining also fixes paths a reloc misses: find_ref.py cannot see computed or
-        indexed access (nor a pointer table's first/last slot), so a string reached
-        both ways would keep showing English on the computed path.
-
-        One row per string, not per ref -- a string reached from several places needs
-        all its pointers moved together:
+        One row per string, not per ref -- all its pointers must move together:
             reloc,0x0185CB 0x018F02,"lost!","потеряно!"
 
-The automation is one-directional: a `string` row that overflows is an error, never
-an automatic reloc. Upgrading needs refs the row does not carry, and could silently
-repoint inside the copy-protection block -- the edit that hangs the game (see PROT_LO).
-
-Every reloc ref MUST come from find_ref.py, which validates that the site is a real
-code immediate or pointer-table slot. A hand-picked offset can land on a 2-byte value
-that merely happens to equal the string's DS offset; that mistake (a ref inside a
-counter table) silently corrupted game data and crashed the puzzle map.
-
-Pool placement is measured, not assumed -- see the POOL_* constants.
+Every reloc ref MUST come from find_ref.py, which proves the site is a real code
+immediate or table slot. A hand-picked 2-byte value that merely happens to equal the
+string's DS offset repoints something else: that mistake (a ref inside a counter table)
+corrupted game data and crashed the puzzle map.
 """
 
 import csv
@@ -92,49 +69,34 @@ OFFSET_RE = re.compile(r"0x[0-9a-fA-F]+\Z")
 HEX_RE = re.compile(r"[0-9a-fA-F]+\Z")
 
 # DGROUP layout of KBU2.EXE.
-DS_BASE = 0x15690        # file offset of DS:0000 -- near offset 0 lives here
+DS_BASE = 0x15690        # file offset of DS:0000
 BSSEND  = 0xB64C         # _end: heap floor / top of BSS (c0 constant, verified)
 
-# Pool placement, from the MEMDUMP.BIN measurement (heavy session, puzzle map open):
-# near-heap high-water DS 0xb6cf (~131 B above _end), stack low-water DS 0xfe2c (~467 B
-# below the top) -- a 17.8 KB cold band at DS 0xb6d0..0xfe2c. The pool sits mid-band, so
-# the climbing heap and descending stack each have KB of slack. c0's BSS wipe stops at
-# _end, so the pool's file-loaded bytes survive startup untouched.
+# Pool placement, measured from MEMDUMP.BIN (heavy session, puzzle map open): heap
+# high-water DS 0xb6cf, stack low-water DS 0xfe2c -- a 17.8 KB cold band. The pool sits
+# mid-band, so heap and stack each keep KB of slack, and c0's BSS wipe stops at _end, so
+# its file-loaded bytes survive startup. DGROUP is left FLOATING (_heaplen 0): capping it
+# was tried and reverted, it buys nothing and costs stack headroom.
 #
-# DGROUP is left FLOATING (_heaplen stays 0): capping it to force c0's fixed branch was
-# tried and reverted -- it buys nothing (the heap barely grows) and costs stack headroom.
-#
-# To re-measure: reach the screen, Debug -> Start DOSBox-X Debugger (pauses the CPU),
-# then `MEMDUMPBIN 0000:0000 100000` writes tmp/MEMDUMP.BIN. Find DGROUP by searching for
-# the "Turbo C++ - Copyright 1990 Borla..." literal at DS 0x0004 (so DS:0000 = hit - 4).
-# Heap high-water is the highest nonzero byte above _end, stack low-water the lowest
-# below 0xffff; DOSBox boots RAM zeroed, so untouched really means untouched.
+# To re-measure: DOSBox-X debugger, `MEMDUMPBIN 0000:0000 100000`. DS:0000 sits 4 bytes
+# below the "Turbo C++ - Copyright 1990 Borla..." literal; RAM boots zeroed, so the
+# highest nonzero byte above _end and the lowest below 0xffff are the real water marks.
 POOL_DSOFF     = 0xD6D0                    # pool base, mid cold band
-POOL_SIZE      = 0x1000                    # 4 KB budget (whole-text overflow est. ~2.4-4 KB)
-POOL_END_DSOFF = POOL_DSOFF + POOL_SIZE    # hard cap; keeps clear of the stack's descent
+POOL_SIZE      = 0x1000                    # 4 KB (whole-text overflow est. ~2.4-4 KB)
+POOL_END_DSOFF = POOL_DSOFF + POOL_SIZE    # hard cap; clear of the stack's descent
 
 # Copy-protection segment (Ghidra 19fe:0000-0cc7). `reloc` rows MUST NOT repoint a ref
 # in here. THE RULE IS SOLID; THE MECHANISM IS UNKNOWN -- distrust any explanation.
 #
-# Symptom: one repointed immediate plays the title screen, the whole town and a contract
-# through normally, then hangs in an INT 6 loop on entering the king's castle -- a wild
-# far jump to 0070:000E with DS=A000, dying mid-graphics thousands of instructions later.
+# One repointed immediate plays for minutes, then hangs in an INT 6 loop on entering the
+# king's castle. Bisected: repointing to another string INSIDE the original image still
+# hangs, and swapping two immediates -- byte-sum AND XOR unchanged -- still hangs, so it
+# is no simple checksum. Falsified: heap exhaustion, stack exhaustion, pool placement.
 #
-# Bisected (builds differing only in the named bytes): repointing to another string
-# INSIDE the original image still hangs, and swapping two immediates -- byte-sum AND XOR
-# unchanged -- still hangs. So it reacts to being modified at all, and it is no simple
-# sum/XOR checksum. Falsified: heap exhaustion, stack exhaustion, pool placement (the
-# pool was intact at the crash). No checksum routine, flag or sabotage code was found.
-#
-# NOT "any byte here is fatal": our own protection flip (`bytes` at 0xC40A, JC->JMP)
-# lives here and is fine -- it is exactly what NWC's KB!.COM patches at runtime, so
-# nothing can guard it without breaking the shipping loader. The guard is for `reloc`
-# only, and the range is a conservative fence around the segment, not a measured bound.
-#
-# Costs nothing: every string reached from here is protection UI text that fits its own
-# slot as a `string` row. Rejection happens at PARSE time, before the inline/pool
-# decision -- an inlined row would be harmless today, but it sits one rewording away
-# from fatal, so the trap stays out of the manifest entirely.
+# Not "any byte here is fatal": our own flip at 0xC40A is exactly what KB!.COM patches at
+# runtime, so nothing can guard it. The fence is conservative and costs nothing -- every
+# string reached from here is protection UI that fits its own slot as a `string` row.
+# Rejected at parse time: an inlined reloc is harmless today, one rewording from fatal.
 PROT_LO, PROT_HI = 0xBFE0, 0xCCA7          # file offsets, inclusive
 
 
@@ -144,12 +106,8 @@ def die(msg):
 
 def encode_text(text, label, column):
     """Encode one manifest text field to CP866. `\\xNN` writes raw byte NN, `\\\\` a
-    literal backslash, everything else is plain CP866.
-
-    The escape exists for glyphs cp866 will not round-trip: the movement menu draws its
-    arrows with bytes 0x18-0x1b, which the codec maps to the C0 controls of the same
-    value. Writing them literally would put invisible control bytes in the CSV.
-    """
+    literal backslash. The escape is for glyphs cp866 will not round-trip: the movement
+    menu's arrows are bytes 0x18-0x1b, which the codec maps to the C0 controls."""
     out = bytearray()
     lit = []
     i = 0
@@ -334,19 +292,14 @@ def check_reloc_sources(relocs):
 
 
 def check_relocations(orig, data):
-    """Gate the "no code motion" rule (see the `bytes` docs above) instead of trusting it.
-
-    DOS adds the load segment to the word at every file offset the MZ relocation table
-    lists, so those words are pinned: a patch that shifts one out from under its entry
-    both leaves a far call unrelocated and lets the loader corrupt whatever moved in.
-    The invariant that catches it is blunt -- a relocation target's word may not change:
+    """Gate the "no code motion" rule instead of trusting it: a relocation target's word
+    may not change.
 
       entry untouched -> the word must still be what pristine KBU2 had there
       entry repointed -> its new target must be a far call's segment word (`9a` +3)
 
-    Repointing is how deliberate code motion declares itself, and requiring a `9a` in
-    front proves the entry landed on a call rather than on an arbitrary word.
-    """
+    Repointing is how deliberate code motion declares itself; the `9a` proves the entry
+    landed on a call and not on an arbitrary word."""
     nrel, = struct.unpack_from("<H", data, 0x06)
     hdr = struct.unpack_from("<H", data, 0x08)[0] * 16
     tbl, = struct.unpack_from("<H", data, 0x18)
@@ -397,10 +350,9 @@ def main():
             f"       got             {digest}\n"
             f"       regenerate it with unpack_exepack.py.")
 
-    # verify every patch's expect against the pristine image
+    # every patch's expect, against the pristine image
     for p in patches:
         if p["kind"] == "reloc":
-            # the ref is a pointer: follow it and check the string it lands on.
             for ref in p["offs"]:
                 src, got = deref(data, ref, p["label"])
                 if got != p["expect"]:
@@ -426,16 +378,13 @@ def main():
     relocs = [p for p in patches if p["kind"] == "reloc"]
     check_reloc_sources(relocs)
 
-    # A reloc row needs the pool only if its translation OVERFLOWS the slot. When it
-    # fits, inline it: write the slot and leave the refs alone. `expect` was verified
-    # against the slot above, so len(expect) is the budget. The freed tail keeps stale
-    # English bytes, sitting past our NUL and never read.
+    # The pool is for overflows only; a translation that fits goes in the slot with the
+    # refs left alone. The freed tail keeps stale English, past our NUL and never read.
     for p in relocs:
         p["inlined"] = len(p["text"]) - 1 <= len(p["expect"])
     pooled = [p for p in relocs if not p["inlined"]]
 
-    # in-place edits: bytes/string at their own offset, inlined relocs at the slot their
-    # refs point to (p["off"] is a ref there, not the string).
+    # bytes/string at their own offset, inlined relocs at the slot their refs point to
     inplace = [(p["off"], p["payload"], p["label"])
                for p in patches if p["kind"] in ("bytes", "string")]
     inplace += [(p["src"], p["text"], p["label"]) for p in relocs if p["inlined"]]
@@ -443,7 +392,6 @@ def main():
     for off, payload, _ in inplace:
         data[off:off + len(payload)] = payload
 
-    # the rest: append text to the overflow pool, rewrite each ref pointer
     if pooled:
         pool_base = DS_BASE + POOL_DSOFF
         if len(data) < pool_base:
