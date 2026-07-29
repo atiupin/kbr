@@ -19,13 +19,17 @@ Rows are shape-checked before anything is applied; errors name the manifest line
 
 bytes : hex, equal length, overwritten in place.
 
-        NO CODE MOTION. Rewriting an instruction is fine (a flipped branch, a changed
-        immediate); MOVING one is not, even inside an equal-length block. The MZ
-        relocation table pins every far call's segment word BY FILE OFFSET and DOS adds
-        the load segment to it, so a slid `9a` is never fixed up while the loader
-        corrupts whatever took its place. Reordering the recruit line's calls at 0xACCD
-        drew a header and nothing else. To reorder OUTPUT move the cursor instead --
-        the drawing calls take absolute columns. check_relocations enforces this.
+        NO ACCIDENTAL CODE MOTION. Rewriting an instruction is fine (a flipped branch,
+        a changed immediate); MOVING one drags two things with it. The MZ relocation
+        table pins every far call's segment word BY FILE OFFSET and DOS adds the load
+        segment to it, so a slid `9a` is never fixed up while the loader corrupts
+        whatever took its place -- reordering the recruit line's calls at 0xACCD drew a
+        header and nothing else until a second row moved the entries. A slid `b8` that
+        a `reloc` row names moves that row's ref too. Both are legal when declared:
+        repoint the relocation entries in their own `bytes` row and give the `reloc`
+        row the ref's new offset. check_relocations rejects an undeclared slide.
+        Prefer moving the OUTPUT to moving code -- the drawing calls take absolute
+        columns -- and reorder only when the print order itself is the bug.
 
 string: CP866 written in place, NUL-terminated. `expect` is the complete original (its
         NUL is verified), so its length is the slot budget. A longer `write` is an
@@ -350,17 +354,9 @@ def main():
             f"       got             {digest}\n"
             f"       regenerate it with unpack_exepack.py.")
 
-    # every patch's expect, against the pristine image
+    # every bytes/string expect, against the pristine image
     for p in patches:
         if p["kind"] == "reloc":
-            for ref in p["offs"]:
-                src, got = deref(data, ref, p["label"])
-                if got != p["expect"]:
-                    die(f"{p['label']}: ref {ref:#x} points at "
-                        f"{got.decode(ENCODING)!r}, not {p['expect'].decode(ENCODING)!r}")
-                if p.setdefault("src", src) != src:
-                    die(f"{p['label']}: its refs point at different strings "
-                        f"({p['src']:#x} and {src:#x}) -- one row per string")
             continue
         end = p["off"] + len(p["expect"])
         need = end + 1 if p["kind"] == "string" else end     # a string needs its NUL too
@@ -375,7 +371,24 @@ def main():
             die(f"{p['label']}: original string at {p['off']:#x} is not "
                 f"NUL-terminated at its expected length")
 
+    # `bytes` rows land first, so a row that deliberately moves a `b8 <dsoff>` is resolved
+    # at the ref's NEW offset -- pristine would still show the pre-motion instruction there.
+    # `expect` is unchanged, so a wrong offset is still caught; it now just has to name
+    # where the ref ends up. The in-place pass below rewrites these identically.
+    for p in patches:
+        if p["kind"] == "bytes":
+            data[p["off"]:p["off"] + len(p["payload"])] = p["payload"]
+
     relocs = [p for p in patches if p["kind"] == "reloc"]
+    for p in relocs:
+        for ref in p["offs"]:
+            src, got = deref(data, ref, p["label"])
+            if got != p["expect"]:
+                die(f"{p['label']}: ref {ref:#x} points at "
+                    f"{got.decode(ENCODING)!r}, not {p['expect'].decode(ENCODING)!r}")
+            if p.setdefault("src", src) != src:
+                die(f"{p['label']}: its refs point at different strings "
+                    f"({p['src']:#x} and {src:#x}) -- one row per string")
     check_reloc_sources(relocs)
 
     # The pool is for overflows only; a translation that fits goes in the slot with the
