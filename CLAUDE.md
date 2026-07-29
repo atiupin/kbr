@@ -162,8 +162,9 @@ tools/ghidra.py run DumpDecomp.java build/decomp
   menu bar and its options and controls menus, town screen, the 14 spell names, the villain
   names and all 17 contract screens, the four continent names (with the boat's travel
   menu), the search prompt with all 7 treasure-chest events and all 8 artifact finds, the
-  adventure-map boxes (siege prompt, scouting, wandering armies) and the Castle/Town Gate
-  and Instant Army spell boxes.
+  adventure-map boxes (siege prompt, scouting, wandering armies) and the whole of spell
+  casting — the spell book, the cast prompt, every effect message and the Castle/Town Gate
+  and Instant Army boxes.
   Town and castle names are still English on purpose — one later pass.
 - [ ] **Patcher** — ownership-gated installer producing the translated build.
 

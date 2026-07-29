@@ -274,6 +274,76 @@ reloc,0x018e7d,"the King. Give up (y/n)?","к королю. Сдаться? (y/n
 
 # ==== SPELL CASTING =======================================================================
 
+# ---- not trained yet
+reloc,0x018637,"You have not been trained in","Вы ещё не обучены искусству"
+reloc,0x018639,"the art of spellcasting yet.","магии. Обратитесь к архимагу"
+reloc,0x01863b,"Visit the Archmage Aurange","Ауранжу в Континентии"
+reloc,0x01863d,"in Continentia at 11,19 for","(11,19), и он обучит вас"
+reloc,0x01863f,"this ability.","этому умению."
+
+# ---- spell book
+reloc,0x00e34b,"Spells","Заклинания"
+reloc,0x00e36c,"Combat","Боевые"
+reloc,0x00e385,"Adventuring","Походные"
+reloc,0x00e4b1,"Cast which ","Какое "
+reloc,0x0188de,"Adventure","походное"
+reloc,0x0188e0,"Combat","боевое"
+reloc,0x00e4ce," spell (A-G)?"," заклинание? (A-G) "
+reloc,0x00e654,"You don't know that spell!","Вы не знаете это заклинание!"
+
+# ---- combat target prompts
+# Line limit 35. The leading space is the centring fix -- FUN_2168_1063 centres over the
+# width less the cursor column, and FUN_1207_0caf leaves the cursor at col 1, so every line
+# rounds a column left; unlike patching 1063 it reaches only this sprintf. The bytes row
+# swaps the sprintf arguments so the spell name leads (Turbo C has no %1$s); the blocks are
+# adjacent and both 13 bytes, so nothing moves. Slot 6 hits the enemy, slot 7 your own;
+# Teleport skips the helper.
+bytes,0xF63F,"8a 46 08 b4 00 d1 e0 8b d8 ff b7 65 2e 8a 46 06 b4 00 d1 e0 8b d8 ff b7 52 32","8a 46 06 b4 00 d1 e0 8b d8 ff b7 52 32 8a 46 08 b4 00 d1 e0 8b d8 ff b7 65 2e"
+reloc,0x00f65a,"%s%s"," %s%s"
+reloc,0x0188ee,"Select enemy army to ",": выберите отряд врага"
+reloc,0x0188f0,"Select your army to ",": выберите свой отряд"
+reloc,0x00e89f,"Select army to %s"," %s: выберите свой отряд"
+reloc,0x0188f2,"Select new location","Куда телепортировать?"
+
+# ---- combat spell effects
+# Appended to a unit name (nominative plural, so the verb goes plural). Clone and Resurrect led
+# with printnum(n), a numeral in front of a nominative; each site is one 68-byte run of four
+# print blocks, reordered to name, verb, ' ', printnum(n). The count rides SI, which Turbo C
+# callees preserve. Far calls slide here, so the row after each repoints their four contiguous
+# relocation entries; Clone's ref slides too, 0xE863 -> 0xE848.
+bytes,0xE828,"b8 20 00 50 b8 01 00 50 56 9a 55 12 68 11 83 c4 06 b8 20 00 50 9a eb 05 68 11 59 a0 33 b5 b4 00 b1 04 d3 e0 8b d8 8a 87 98 63 b4 00 d1 e0 8b d8 ff b7 88 02 9a 63 10 68 11 59 b8 c9 0c 50 9a 63 10 68 11 59","a0 33 b5 b4 00 b1 04 d3 e0 8b d8 8a 87 98 63 b4 00 d1 e0 8b d8 ff b7 88 02 9a 63 10 68 11 59 b8 c9 0c 50 9a 63 10 68 11 59 b8 20 00 50 9a eb 05 68 11 59 b8 20 00 50 b8 01 00 50 56 9a 55 12 68 11 83 c4 06"
+bytes,0x15A0,"69 c8 00 00 5f c8 00 00 40 c8 00 00 34 c8 00 00","67 c8 00 00 58 c8 00 00 4e c8 00 00 44 c8 00 00"
+bytes,0xEAD7,"b8 20 00 50 b8 01 00 50 56 9a 55 12 68 11 83 c4 06 b8 20 00 50 9a eb 05 68 11 59 a0 33 b5 b4 00 b1 04 d3 e0 8b d8 8a 87 98 63 b4 00 d1 e0 8b d8 ff b7 88 02 9a 63 10 68 11 59 ff 36 5c 32 9a 63 10 68 11 59","a0 33 b5 b4 00 b1 04 d3 e0 8b d8 8a 87 98 63 b4 00 d1 e0 8b d8 ff b7 88 02 9a 63 10 68 11 59 ff 36 5c 32 9a 63 10 68 11 59 b8 20 00 50 9a eb 05 68 11 59 b8 20 00 50 b8 01 00 50 56 9a 55 12 68 11 83 c4 06"
+bytes,0x1648,"18 cb 00 00 0e cb 00 00 ef ca 00 00 e3 ca 00 00","16 cb 00 00 07 cb 00 00 fd ca 00 00 f3 ca 00 00"
+reloc,0x00e848," cloned"," клонированы:"
+# NOT VERIFIED
+reloc,0x0188ec," resurrected"," воскрешены:"
+reloc,0x0188e8," are frozen"," заморожены"
+
+# ---- combat damage log
+# Was <spell name> + " kills " + FUN_1f51_1024's "<count> <unit name>", a tail no Russian verb
+# can govern: the numeral wants a genitive the helper never prints. The line ends on the count
+# instead. The subject is Огненный шар, Молния or Экзорцизм, so the verb must be 3sg present to
+# skip gender agreement and intransitive to need no object; that leaves it 20 chars.
+# The bytes row drops the unit name by forcing the guard at 0x12A08 (jz -> jmp) that already
+# skips it for the helper's other callers, so no far call moves and no relocation entry with it.
+bytes,0x12A08,"74","eb"
+reloc,0x0188ea," kills "," разит цель. Убито: "
+
+# NOT VERIFIED
+reloc,0x0188e2,"This spell seems to have no effect!","Заклинание не подействовало!"
+# NOT VERIFIED
+reloc,0x0188e4,"No undead armies","Нежити здесь нет"
+# NOT VERIFIED
+reloc,0x0188e6,"No armies need resurrecting","Воскрешать некого"
+reloc,0x0188f4,"Only 1 spell per round!","Одно заклинание за раунд!"
+
+# ---- Bridge
+reloc,0x00ec14,"Build bridge in which direction \x1a\x18\x19\x1b"," В какую сторону строить мост? \x1a\x18\x19\x1b"
+reloc,0x00edcf," You've built your bridge too far!","   Мост не дотянется так далеко!"
+reloc,0x00edf1,"   What a waste of a good spell!","     Заклинание потрачено зря!"
+reloc,0x00eee5,"Not a suitable location for a bridge","    Здесь нельзя построить мост"
+
 # ---- Castle Gate / Town Gate
 # NOT VERIFIED
 reloc,0x018641,"Castles you have been to:","Замки, где вы побывали:"
@@ -511,7 +581,7 @@ reloc,0x0184f9,"Fireball","Огненный шар"
 reloc,0x0184fb,"Lightning","Молния"
 reloc,0x0184fd,"Freeze","Заморозка"
 reloc,0x0184ff,"Resurrect","Воскрешение"
-reloc,0x018501,"Turn Undead","Упокоение"
+reloc,0x018501,"Turn Undead","Экзорцизм"
 reloc,0x018503,"Bridge","Мост"
 reloc,0x018505,"Time Stop","Стазис"
 reloc,0x018507,"Find Villain","Поиск злодея"
