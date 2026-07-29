@@ -276,10 +276,26 @@ reloc,0x018e7d,"the King. Give up (y/n)?","к королю. Сдаться? (y/n
 
 # ---- not trained yet
 reloc,0x018637,"You have not been trained in","Вы ещё не обучены искусству"
-reloc,0x018639,"the art of spellcasting yet.","магии. Обратитесь к архимагу"
-reloc,0x01863b,"Visit the Archmage Aurange","Ауранжу в Континентии"
-reloc,0x01863d,"in Continentia at 11,19 for","(11,19), и он обучит вас"
-reloc,0x01863f,"this ability.","этому умению."
+reloc,0x018639,"the art of spellcasting yet.","магии. Обратитесь к великому"
+reloc,0x01863b,"Visit the Archmage Aurange","архимагу Ауранжу, что живёт"
+reloc,0x01863d,"in Continentia at 11,19 for","в Континентии (11,19), и он"
+reloc,0x01863f,"this ability.","посвятит вас в свои тайны."
+
+# ---- Archmage Aurange
+# FUN_18ac_0aa4 draws table DS 0x306b centred: entries 0-3 the offer, 4-8 the refusal. The
+# "Принять? (y/n)" foot is a separate draw, so it needs its own col 16 -> 15.
+bytes,0x00B5D0,"10","0f"
+reloc,0x0186fb,"The venerable Archmage,","Почтенный архимаг Ауранж"
+reloc,0x0186fd,"Aurange, will teach you the","готов открыть вам тайны"
+reloc,0x0186ff,"secrets of spell casting for","магического искусства"
+reloc,0x018701,"5000 gold. ","за 5000 золотых."
+
+# ---- Archmage Aurange, not enough gold
+reloc,0x018703,"The sign said 5000 gold! Why","На вывеске же чётко сказано:"
+reloc,0x018705,"waste my valuable time when","5000 золотых! Зачем тратить"
+reloc,0x018707,"you know you don''t have the","моё время, если у вас нет"
+reloc,0x018709,"required amount of gold?","нужной суммы? Возвращайтесь,"
+reloc,0x01870b,"Begone until you do!","когда соберёте её!"
 
 # ---- spell book
 reloc,0x00e34b,"Spells","Заклинания"
