@@ -471,6 +471,15 @@ string,0x01A146,"Hurry and recover my Scepter","Поспешите вернут�
 string,0x01A163,"of Order or all will be","порядка, или всё будет"
 reloc,0x0185CB,"lost!","потеряно!"
 
+# ---- sent back in disgrace
+reloc,0x018d48,"After being disgraced on the","После позорного поражения"
+reloc,0x018d4a,"field of battle, King","на поле боя король Максимус"
+reloc,0x018d4c,"Maximus summons you to his","вызывает вас в свой замок."
+reloc,0x018d4e,"castle. After a lesson in","Дав вам урок тактики, он"
+reloc,0x018d50,"tactics, he reluctantly re-","с неохотой возвращает вам"
+reloc,0x018d52,"issues your commission and","жалованье и отправляет вас"
+reloc,0x018d54,"sends you on your way.","в путь."
+
 # ==== TOWN SCREEN =========================================================================
 # 28 chars max. The rent price is one hardcoded digit ('1' or '5', chosen at 0x009605)
 # followed by the "00 week)" row, so the rent line is a fixed 27 chars and cannot grow with
