@@ -40,10 +40,12 @@ string,0x161F7,"Any line that has any kind of","вперёд, к приключ�
 string,0x16215,"text is considered a line.","в походе, герой!"
 
 # ---- new-game creation message
-reloc,0x01672c,"A new game is being created.","Создается новый мир. Немного"
-reloc,0x01672e,"Please wait while I perform","подождите, пока я творю     "
-reloc,0x016730,"godlike actions to make this","божественные чудеса, и      "
-reloc,0x016732,"game playable.","наполняю его жизнью.        "
+# FUN_155b_06dc draws all four at column 4, flush left, in a 32-column panel, so the ragged
+# right edge is on show: break by clause, not by leftover width.
+reloc,0x01672c,"A new game is being created.","Создаётся новый мир."
+reloc,0x01672e,"Please wait while I perform","Подождите, пока я творю"
+reloc,0x016730,"godlike actions to make this","божественные чудеса и"
+reloc,0x016732,"game playable.","наполняю его жизнью."
 
 # ---- destroy-saved-game confirmation
 string,0x16758,"Do you wish to destroy the","Это имя уже было. Стереть"
@@ -762,8 +764,8 @@ reloc,0x016AAA,"  Pencil thin moustache","  Тонкие усики и щёго�
 reloc,0x016AAC,"  and elegantly trimmed beard,","  подстриженная борода. Никогда"
 reloc,0x016AAE,"  never without a rapier.","  не расстаётся со своей рапирой."
 reloc,0x016AB0,"Crimes: Rob is wanted for piracy","Преступления: пиратство,"
-reloc,0x016AB2,"  as well a conspiracy and for","  заговор и освобождение пяти"
-reloc,0x016AB4,"  breaking out five traitors","  изменников, что были"
+reloc,0x016AB2,"  as well a conspiracy and for","  заговор и освобождение"
+reloc,0x016AB4,"  breaking out five traitors","  пяти изменников, что были"
 reloc,0x016AB6,"  sentenced to death in the","  приговорены к смерти"
 reloc,0x016AB8,"  Royal Dungeons.","  в королевских подземельях."
 
@@ -789,8 +791,8 @@ string,0x0174DF,"Reward: 12,000 gold","Награда: 12000 зол."
 string,0x0174F3,"Last Seen:","Континент:"
 string,0x0174FE,"Castle:"," Замок:"
 string,0x017506,"Distinguishing Features:","Особые приметы:"
-reloc,0x016ae2,"  Always wearing armor and","  Спит и ест в доспехах,"
-reloc,0x016ae4,"  concealed weapons, has two","  носит при себе скрытое оружие."
+reloc,0x016ae2,"  Always wearing armor and","  Спит и ест в доспехах, носит"
+reloc,0x016ae4,"  concealed weapons, has two","  при себе скрытое оружие."
 reloc,0x016ae6,"  prominent front teeth and an","  Два торчащих передних зуба,"
 reloc,0x016ae8,"  unkept beard.","  и косматая борода."
 reloc,0x016aea,"Crimes: Sir Moradon, an emissary","Преступления: сэр Морадон, посол"
@@ -806,12 +808,12 @@ string,0x01763A,"Last Seen:","Континент:"
 string,0x017645,"Castle:"," Замок:"
 string,0x01764D,"Distinguishing Features:","Особые приметы:"
 reloc,0x016afe,"  Pointed ears, sharp","  Заострённые уши, изящные"
-reloc,0x016b00,"  elfin features, pale blue eyes","  эльфийские черты, бледно-голубые"
-reloc,0x016b02,"  with no whites, glimmering","  глаза без белков, мерцающая"
-reloc,0x016b04,"  enchanted coin.","  зачарованная монета."
+reloc,0x016b00,"  elfin features, pale blue eyes","  эльфийские черты, глаза"
+reloc,0x016b02,"  with no whites, glimmering","  бледно-голубые, без белков,"
+reloc,0x016b04,"  enchanted coin.","  мерцающая волшебная монета."
 reloc,0x016b06,"Crimes: The prince is one of the","Преступления: принц - один"
-reloc,0x016b08,"  leaders of the conspiracy","  из главарей заговора"
-reloc,0x016b0a,"  against the Crown, he also","  против Короны. Он ещё торгует"
+reloc,0x016b08,"  leaders of the conspiracy","  из главарей заговора против"
+reloc,0x016b0a,"  against the Crown, he also","  Короны. Также он торгует"
 reloc,0x016b0c,"  traffics stolen artifacts.","  крадеными артефактами."
 
 # ---- villain 9, Bargash Eyesore
