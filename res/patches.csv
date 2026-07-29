@@ -363,7 +363,6 @@ reloc,0x0188ea," kills "," разит цель. Убито: "
 reloc,0x0188e2,"This spell seems to have no effect!","Заклинание не подействовало!"
 # NOT VERIFIED
 reloc,0x0188e4,"No undead armies","Нежити здесь нет"
-# NOT VERIFIED
 reloc,0x0188e6,"No armies need resurrecting","Воскрешать некого"
 reloc,0x0188f4,"Only 1 spell per round!","Одно заклинание за раунд!"
 
@@ -374,14 +373,12 @@ reloc,0x00edf1,"   What a waste of a good spell!","     Заклинание п�
 reloc,0x00eee5,"Not a suitable location for a bridge","    Здесь нельзя построить мост"
 
 # ---- Castle Gate / Town Gate
-# NOT VERIFIED
 reloc,0x018641,"Castles you have been to:","Замки, где вы побывали:"
 reloc,0x018643,"Revisit which castle? ","В какой замок? "
 reloc,0x018645,"Towns you have been to:","Города, где вы побывали:"
 reloc,0x018647,"Revisit which town? ","В какой город? "
 
 # ---- Instant Army
-# NOT VERIFIED
 reloc,0x0186c1,"have joined to your army.","вступили в ваше войско."
 reloc,0x0186c3,"   There are no open slots  ","   Нет ни свободных мест,"
 reloc,0x0186c5,"  or any of this army type! ","   ни отряда такого типа!"
@@ -833,6 +830,7 @@ reloc,0x016b26,"  and for leading an outright","  Он возглавил дер
 reloc,0x016b28,"  attack against the King.","  нападение на самого Короля."
 
 # ---- villain 10, Rinaldus Drybone
+# NOT VERIFIED
 reloc,0x016b2a,"Name: Rinaldus Drybone","Имя: Ринальдус Костлявый"
 string,0x01789F,"Alias: The Death Lord","Кличка: Лорд Смерти"
 string,0x0178B5,"Reward: 18,000 gold","Награда: 18000 зол."
@@ -849,6 +847,7 @@ reloc,0x016b42,"  and leading a rebellion on the","  Он поднял восс�
 reloc,0x016b44,"  continent of Saharia.","  на континенте Сахария."
 
 # ---- villain 11, Ragface
+# NOT VERIFIED
 reloc,0x016b46,"Name: Ragface","Имя: Лохмотник"
 string,0x0179F1,"Alias: None","Кличка: нет"
 string,0x0179FD,"Reward: 20,000 gold","Награда: 20000 зол."
@@ -865,6 +864,7 @@ reloc,0x016b5e,"  Crown and leading an","  Короны и руководств�
 reloc,0x016b60,"  insurrection in Saharia.","  в Сахарии."
 
 # ---- villain 12, Mahk Bellowspeak
+# NOT VERIFIED
 string,0x017B0F,"Name: Mahk Bellowspeak","Имя: Мак Горлопан"
 reloc,0x016b64,"Alias: Bruiser","Кличка: Громила"
 string,0x017B35,"Reward: 25,000 gold","Награда: 25000 зол."
@@ -881,6 +881,7 @@ reloc,0x016b7a,"  leading a jail break, and for","  в организации п
 reloc,0x016b7c,"  piracy on the open seas.","  и в морском разбое."
 
 # ---- villain 13, Auric Whiteskin
+# NOT VERIFIED
 string,0x017C58,"Name: Auric Whiteskin","Имя: Аурик Белошкурый"
 string,0x017C6E,"Alias: The Barbarian","Кличка: Варвар"
 string,0x017C83,"Reward: 30,000 gold","Награда: 30000 зол."
@@ -897,6 +898,7 @@ reloc,0x016b96,"  rebellion of the continent","  мятеж на контине�
 reloc,0x016b98,"  Saharia.","  Сахария."
 
 # ---- villain 14, Czar Nickolai the Mad
+# NOT VERIFIED
 string,0x017D88,"Name:Czar Nickolai the Mad","Имя: Царь Николай Безумный"
 reloc,0x016b9c,"Alias: The Mad Czar","Кличка: Безумный Царь"
 string,0x017DB7,"Reward: 35,000 gold","Награда: 35000 зол."
@@ -913,6 +915,7 @@ reloc,0x016bb2,"  violating diplomatic status,","  в злоупотреблен
 reloc,0x016bb4,"  and murder.","  дипломата и в убийстве."
 
 # ---- villain 15, Magus Deathspell
+# NOT VERIFIED
 reloc,0x016bb6,"Name: Magus Deathspell","Имя: Магус Чернокнижник"
 string,0x017EE2,"Alias: None","Кличка: нет"
 string,0x017EEE,"Reward: 40,000 gold","Награда: 40000 зол."
@@ -929,6 +932,7 @@ reloc,0x016bce,"  and for practicing forbidden","  и в занятии запр
 reloc,0x016bd0,"  magics.","  магией."
 
 # ---- villain 16, Urthrax Killspite
+# NOT VERIFIED
 string,0x017FF5,"Name: Urthrax Killspite","Имя: Уртракс Душегуб"
 reloc,0x016bd4,"Alias: The Demon King","Кличка: Король Демонов"
 string,0x018023,"Reward: 45,000 gold","Награда: 45000 зол."
@@ -943,6 +947,7 @@ reloc,0x016be6,"Crimes: Urthrax is wanted for","Преступления: Урт
 string,0x0180E5,"  conspiracy against the Crown.","  в заговоре против Короны."
 
 # ---- villain 17, Arech Dragonbreath
+# NOT VERIFIED
 string,0x018107,"Name: Arech Dragonbreath","Имя: Арех Огнедышащий"
 reloc,0x016bf0,"Alias: Mastermind","Кличка: Тёмный Гений"
 string,0x018132,"Reward: 50,000 gold","Награда: 50000 зол."
@@ -1094,20 +1099,15 @@ reloc,0x01829c,"King's Treasure Garden","Сад королевских сокр�
 reloc,0x0182a0,"There are two artifacts per","На каждом континенте"
 reloc,0x0182a2,"continent.","по два артефакта."
 
-# NOT VERIFIED
 reloc,0x0182a4,"Peasant Way","Крестьянский путь"
 
-# NOT VERIFIED
 reloc,0x0182a8,"Wonder Woods","Дивный лес"
 
-# NOT VERIFIED
 reloc,0x0182ac,"Pond of Peril","Гиблый пруд"
 
-# NOT VERIFIED
 reloc,0x0182b0,"It takes time to cross the","Пересечь пустыню - дело"
 reloc,0x0182b2,"desert.","небыстрое."
 
-# NOT VERIFIED
 reloc,0x0182b4,"Dead End","Тупик"
 
 reloc,0x0182b8,"Irok guards the north.","Irok стережёт север."
@@ -1120,7 +1120,6 @@ reloc,0x0182c4,"Bridge Port","Замостье"
 
 reloc,0x0182c8,"Hidden Grove","Тайная роща"
 
-# NOT VERIFIED
 reloc,0x0182cc,"Secret Pass","Тайный перевал"
 
 reloc,0x0182d0,"Isle of Death","Остров смерти"
@@ -1138,17 +1137,13 @@ reloc,0x0182e4,"Passage to Basefit.","Дорога на Basefit."
 # NOT VERIFIED
 reloc,0x0182e8,"The end is near.","Конец близок."
 
-# NOT VERIFIED
 reloc,0x0182ec,"Treasure at the river's end.","Клад в устье реки."
 
-# NOT VERIFIED
 reloc,0x0182f0,"The ogres are back... and","Огры вернулись... и они"
 reloc,0x0182f2,"they're hungry!","голодны!"
 
-# NOT VERIFIED
 reloc,0x0182f4,"Wood's End is south.","Woods End - к югу."
 
-# NOT VERIFIED
 reloc,0x0182f8,"Undead are everywhere!","Повсюду нежить!"
 
 reloc,0x0182fc,"Peasants are fodder!","Крестьяне - пушечное мясо!"
@@ -1163,13 +1158,11 @@ reloc,0x018306,"castle.","по одному городу."
 reloc,0x018308,"Remember, wherever you go","Помни: куда бы ты ни шёл,"
 reloc,0x01830a,"there you are.","ты уже там."
 
-# NOT VERIFIED
 reloc,0x01830c,"Forestria maze entrance!","Вход в лабиринт Форестрии!"
 
 # NOT VERIFIED
 reloc,0x018310,"Crossroads","Перекрёсток"
 
-# NOT VERIFIED
 reloc,0x018314,"No Trespassing!","Прохода нет!"
 
 # NOT VERIFIED
