@@ -183,6 +183,9 @@ tools/ghidra.py run DumpDecomp.java build/decomp
   finding, a constraint, or the reason behind a choice — never by restating the code, narrating
   how something ordinary works, or walking through examples. One dense sentence beats a
   paragraph; if it would only tell a competent reader what they can see, drop it.
+- **Comments and docs state what is true now, never how they got that way** — no earlier
+  wording, no corrections, no "previously"; git holds the history, and a mistake still worth
+  guarding against becomes a present-tense constraint.
 
 ## Commit Guidelines
 
