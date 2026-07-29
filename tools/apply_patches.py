@@ -81,8 +81,8 @@ BSSEND  = 0xB64C         # _end: heap floor / top of BSS (c0 constant, verified)
 # To re-measure: DOSBox-X debugger, `MEMDUMPBIN 0000:0000 100000`. DS:0000 sits 4 bytes
 # below the "Turbo C++ - Copyright 1990 Borla..." literal; RAM boots zeroed, so the
 # highest nonzero byte above _end and the lowest below 0xffff are the real water marks.
-POOL_DSOFF     = 0xD6D0                    # pool base, mid cold band
-POOL_SIZE      = 0x1000                    # 4 KB (whole-text overflow est. ~2.4-4 KB)
+POOL_DSOFF     = 0xD000                    # pool base, mid cold band
+POOL_SIZE      = 0x1800                    # 6 KB; the 4 KB first cut ran out mid-translation
 POOL_END_DSOFF = POOL_DSOFF + POOL_SIZE    # hard cap; clear of the stack's descent
 
 # Copy-protection segment (Ghidra 19fe:0000-0cc7). `reloc` rows MUST NOT repoint a ref
