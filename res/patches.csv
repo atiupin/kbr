@@ -154,13 +154,16 @@ reloc,0x01888c,"last army!","оставить в гарнизоне!"
 # ==== DISMISS ARMY ========================================================================
 
 # ---- picker
+# FUN_19fe_1cde draws the prompt at column 1 and then parks the cursor at a hardcoded column
+# 0x14, one past the 18-char English text; ours is 17.
 reloc,0x00dce6,"Dismiss which army","Распустить отряд:"
+bytes,0x00dd76,"14","13"
 
 # ---- confirmation
 reloc,0x01897d,"If you Dismiss your last","Распустив последний отряд,"
 reloc,0x01897f,"army, you will be sent back","вы с позором вернётесь"
 reloc,0x018981,"to the King in disgrace.","к королю."
-reloc,0x018983,"Dismiss last army (y/n)?","Распустить? (y/n)"
+reloc,0x018983,"Dismiss last army (y/n)?","Распустить? (y/n) "
 
 # ==== SEARCH PROMPT =======================================================================
 # NOT VERIFIED
