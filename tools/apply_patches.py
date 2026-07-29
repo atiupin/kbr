@@ -85,6 +85,11 @@ BSSEND  = 0xB64C         # _end: heap floor / top of BSS (c0 constant, verified)
 # To re-measure: DOSBox-X debugger, `MEMDUMPBIN 0000:0000 100000`. DS:0000 sits 4 bytes
 # below the "Turbo C++ - Copyright 1990 Borla..." literal; RAM boots zeroed, so the
 # highest nonzero byte above _end and the lowest below 0xffff are the real water marks.
+#
+# That reading holds only on a FRESHLY STARTED DOSBox running the game ONCE. DOS clears
+# nothing on load, so a later run leaves earlier builds' pool tails standing above its own
+# image end -- byte-exact translated strings, layered, each build's image covering the head
+# of the one before. They read as live writes past the pool and are nothing of the sort.
 POOL_DSOFF     = 0xD000                    # pool base, mid cold band
 POOL_SIZE      = 0x1800                    # 6 KB; the 4 KB first cut ran out mid-translation
 POOL_END_DSOFF = POOL_DSOFF + POOL_SIZE    # hard cap; clear of the stack's descent
