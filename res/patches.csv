@@ -114,17 +114,25 @@ reloc,0x018952,"any other key to continue.","или пробел чтобы пр
 string,0x1AC27,"Press 'ESC' to exit","ESC: Выйти"
 
 # ---- row labels
-string,0x016237,"HitPts:"," Жизни:"
-string,0x01623F,"SL:   MV:      Damage:","Ур:   Хд:        Урон:"
-string,0x016256,"Fly","Лет"
+string,0x016237,"HitPts:","Жизни: "
+string,0x01623F,"SL:   MV:      Damage:","Ур:   Ходы:    Урон:  "
+# FUN_19fe_0cc8 places the cursor once and then prints either the move value or the flying
+# word, so both start at the same column and the word cannot cover the label. The rewrite
+# picks the column before that gotoxy -- 19 for the digit, 13 for "Летает", which lands on
+# "Ходы:" -- and keeps the tail (the two prints) byte-identical. Two NOPs pad the run; the
+# three far calls slide, so the row after repoints their relocation entries, and the flying
+# word's ref slides with them, 0xCE13 -> 0xCE11.
+bytes,0xCDD0,"8a 46 06 b4 00 8b d8 8a 87 71 32 b4 00 05 0a 00 50 b8 11 00 50 9a b7 0f 68 11 59 59 8a 46 ff b4 00 8b d8 80 bf f2 02 00 74 18 8a 46 ff b4 00 8b d8 8a 87 f2 02 b4 00 05 30 00 50 9a eb 05 68 11 eb 09 b8 c6 0b 50 9a 63 10 68 11 59","8a 5e 06 b7 00 8a 9f 71 32 b7 00 8d bf 0a 00 8a 5e ff b7 00 b8 0d 00 80 bf f2 02 00 74 02 b0 13 53 57 50 9a b7 0f 68 11 59 59 5b 8a 87 f2 02 b4 00 08 c0 74 0b 05 30 00 50 9a eb 05 68 11 eb 09 b8 c6 0b 50 9a 63 10 68 11 59 90 90"
+bytes,0x1188,"e8 ad 00 00 0e ae 00 00 19 ae 00 00","f6 ad 00 00 0c ae 00 00 17 ae 00 00"
+reloc,0x00CE11,"Fly","Летает"
 string,0x01625A,"Out of Control","Неуправляемы"
-string,0x016269,"Morale:","Мораль:"
-string,0x016271,"G-Cost:","  Цена:"
+reloc,0x00CEAD,"Morale:","Мораль: "
+string,0x016271,"G-Cost:","Цена:  "
 
 # ---- morale
-string,0x015CBB,"Norm","Норм"
-reloc,0x01594C,"Low","Низк"
-string,0x015CC4,"High","Выс"
+reloc,0x01594A,"Norm","Норм."
+reloc,0x01594C,"Low","Низк."
+reloc,0x01594E,"High","Выс."
 
 # ==== GARRISON SCREEN =====================================================================
 
