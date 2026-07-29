@@ -218,15 +218,15 @@ reloc,0x010d5e," pass"," пропускают ход"
 reloc,0x011099," are out of control!"," неуправляемы!"
 reloc,0x012183," move"," идут"
 reloc,0x01230a," fly"," летят"
-reloc,0x01263c," shoot "," бьют: "
+reloc,0x01263c," shoot "," \xB0\xB1\xB2\xB3 "
 reloc,0x0128a1," retaliate"," отвечают"
-reloc,0x01887a," vs "," бьют: "
-reloc,0x01887c," killing ",", пало "
+reloc,0x01887a," vs "," \xB0\xB1\xB2\xB3 "
+reloc,0x01887c," killing ",", убито "
 # That shorter tally reads "1 dies" / "7 die" in English: the 's' is verb agreement, appended
-# when the count is 1. "пало" needs none, so the branch that adds it always jumps instead.
+# when the count is 1. "убито" needs none, so the branch that adds it always jumps instead.
 # NOT VERIFIED
 reloc,0x018880,", ",", "
-reloc,0x01887e," die"," пало"
+reloc,0x01887e," die"," убито"
 bytes,0x0129F8,"75","EB"
 
 # ---- refusals
