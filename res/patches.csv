@@ -60,6 +60,21 @@ reloc,0x01673c,"Please wait while I prepare","Подождите, я готов�
 reloc,0x01673e,"a suitable environment for","достойный вашей охоты за"
 reloc,0x016740,"your bountying enjoyment!","головами злодеев!"
 
+# ---- disk errors
+# Three boxes in the same 32-column panel at column 4 as the messages above (FUN_155b_0d90,
+# FUN_155b_1a78, FUN_155b_1ae6), so the same ragged right edge is on show: break by clause.
+reloc,0x016734,"This disk has no characters","Сохранённых игр не найдено."
+reloc,0x016736,"on it. Try creating a new","Создайте нового героя или"
+reloc,0x016738,"character or copy one from","скопируйте сохранение в"
+reloc,0x01673a,"another disk.","папку с игрой."
+reloc,0x016742,"Sorry,","Увы, сохранений может быть"
+reloc,0x016744,"the maximum number of saved","не больше девяти. Удалите"
+reloc,0x016746,"games is 9. Please delete or","одно из них или загрузите"
+reloc,0x016748,"load a saved game.","сохранённую игру."
+reloc,0x01674a,"There is not enough free","Не хватает свободного"
+reloc,0x01674c,"space on this disk to create","места, чтобы создать"
+reloc,0x01674e,"a character.","героя."
+
 # ==== MENU BAR ============================================================================
 
 # ---- header
