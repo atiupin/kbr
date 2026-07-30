@@ -247,10 +247,10 @@ reloc,0x01263c," shoot "," \xB0\xB1\xB2\xB3 "
 reloc,0x0128a1," retaliate"," отвечают"
 reloc,0x01887a," vs "," \xB0\xB1\xB2\xB3 "
 reloc,0x01887c," killing ",", убито "
-# That shorter tally reads "1 dies" / "7 die" in English: the 's' is verb agreement, appended
-# when the count is 1. "убито" needs none, so the branch that adds it always jumps instead.
-reloc,0x018880,", ",", "
-reloc,0x01887e," die"," убито"
+# That shorter tally is "7 die" / "1 dies": the 's' is verb agreement, appended when the count
+# is 1. With "убито" ahead of the number the trailing slot empties, so that branch always jumps.
+reloc,0x018880,", ",", убито "
+reloc,0x01887e," die",""
 bytes,0x0129F8,"75","EB"
 
 # ---- refusals
