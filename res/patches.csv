@@ -181,14 +181,13 @@ reloc,0x018981,"to the King in disgrace.","к королю."
 reloc,0x018983,"Dismiss last army (y/n)?","Распустить? (y/n) "
 
 # ==== SEARCH PROMPT =======================================================================
-# NOT VERIFIED
-# Four draws at col 1 plus the y/n line at col 16 (13 chars). The day count is 1 or 10
-# (0xE0FB..0xE12C), so " дн." is the only form that agrees with both. "Копать" matches the
-# menu-bar entry; line 3 is blanked, the phrase fits two lines.
-reloc,0x018e7f,"Search...","Раскопки..."
-reloc,0x018e81,"It will take ","Раскопки займут "
-reloc,0x018e83," days to do a"," дн."
-reloc,0x018e85,"search of this area.",""
+# Four draws at col 1 plus the y/n line at col 16; the 28-char English line 2 is the budget.
+# The day count prints inside line 2, between its two strings, so no wording can move it off;
+# it is always 10 -- the byte making it 1 (cmp DS:0x6457 at 0xE107) is BSS and never written.
+reloc,0x018e7f,"Search...","Раскопки"
+reloc,0x018e81,"It will take ","Тут работы на "
+reloc,0x018e83," days to do a"," дней -"
+reloc,0x018e85,"search of this area.","перекопать всю округу."
 reloc,0x018e87,"Search (y/n)?","Копать? (y/n)"
 reloc,0x018e89,"Your search of this area has","Раскопки ничего не дали."
 reloc,0x018e8b,"revealed nothing.",""
