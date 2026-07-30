@@ -260,8 +260,7 @@ reloc,0x0187d0,"Cast","Вы не умеете колдовать"
 reloc,0x0187d2,"Shoot","Не могут стрелять"
 
 # ---- demon's half ability
-# NOT VERIFIED
-reloc,0x01356c,"HALF","1/2"
+reloc,0x01356c,"HALF","1/2!"
 
 # ---- victory
 # The box is 36 columns wide, so "(пробел)" -- a char wider -- needs its gotoxy 28 -> 27.
