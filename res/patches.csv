@@ -1088,7 +1088,7 @@ reloc,0x018575,"The King rewards you for","Король награждает в�
 reloc,0x018577,"your find by increasing","находку и повышает ваше"
 reloc,0x018579,"your weekly income by ","недельное жалованье на "
 
-# ---- treasure: genie in a bottle, NOT VERIFIED
+# ---- treasure: genie in a bottle
 reloc,0x01857b,"Traversing the area, you","Бродя по округе, вы"
 reloc,0x01857d,"stumble upon a time worn","натыкаетесь на древний"
 reloc,0x01857f,"cannister. Curious, you un-","сосуд. Из любопытства вы"
@@ -1119,7 +1119,7 @@ reloc,0x0185a1,"Hidden within an ancient","В старинном сундуке 
 reloc,0x0185a3,"chest, you find maps and","находите карты, описывающие"
 reloc,0x0185a5,"charts describing passage to","морской путь на континент:"
 
-# ---- treasure: magic orb, map completed, NOT VERIFIED
+# ---- treasure: magic orb, map completed
 reloc,0x0185a7,"Peering through a magical","Заглянув в волшебный шар,"
 reloc,0x0185a9,"orb you are able to view the","вы видите весь континент"
 reloc,0x0185ab,"entire continent. Your map","как на ладони. Карта этих"
@@ -1278,56 +1278,39 @@ reloc,0x01832c,"Wrong Way!","Не туда!"
 
 reloc,0x018330,"Four villains rule Forestria","Форестрией правят четверо"
 
-# NOT VERIFIED
 reloc,0x018334,"There's no turning back!","Назад дороги нет!"
 
-# NOT VERIFIED
 reloc,0x018338,"Swamplands","Болотный край"
 
-# NOT VERIFIED
 reloc,0x01833c,"Pirate's Treasure Trove","Пиратская сокровищница"
 
-# NOT VERIFIED
 reloc,0x018340,"Corak was here!","Здесь был Корак!"
 
-# NOT VERIFIED
 reloc,0x018344,"Thieves will be eaten!","Воров тут едят!"
 
-# NOT VERIFIED
 reloc,0x018348,"Pirates have no mercy!","Пираты не знают пощады!"
 
-# NOT VERIFIED
 reloc,0x01834c,"The dead live!","Мёртвые живы!"
 
-# NOT VERIFIED
 reloc,0x018350,"There are five islands here.","Здесь пять островов."
 
-# NOT VERIFIED
 reloc,0x018354,"Maximus will DIE!","Максимус СДОХНЕТ!"
 
-# NOT VERIFIED
 reloc,0x018358,"Pool of Prosperity","Пруд изобилия"
 
-# NOT VERIFIED
 reloc,0x01835c,"Four villains rule here.","Здесь правят четыре злодея."
 
-# NOT VERIFIED
 reloc,0x018360,"Down with the King!","Долой короля!"
 
-# NOT VERIFIED
 reloc,0x018364,"The islands hide treasures.","На островах спрятаны клады."
 
-# NOT VERIFIED
 reloc,0x018368,"Time, is on our side!","Время на нашей стороне!"
 
-# NOT VERIFIED
 reloc,0x01836c,"Welcome to Archipelia!","Вас приветствует Архипелия!"
 
-# NOT VERIFIED
 reloc,0x018370,"Saharia is a volcano","Сахария - это вулкан,"
 reloc,0x018372,"surrounded by a desert.","окружённый пустыней."
 
-# NOT VERIFIED
 reloc,0x018374,"Three villains rule Saharia.","Сахарией правят трое."
 
 reloc,0x018378,"Your army will perish here!","Здесь твое войско сгинет!"
