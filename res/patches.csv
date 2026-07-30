@@ -110,6 +110,19 @@ reloc,0x01894c,"Your game has been saved.","Игра сохранена."
 reloc,0x018950,"Press Control-Q to Quit or","Нажмите Ctrl+Q чтобы выйти,"
 reloc,0x018952,"any other key to continue.","или пробел чтобы продолжить."
 
+# ==== VIEW MAP ============================================================================
+# FUN_1c2c_0f0d joins four table slots into the foot hint that SPC toggles:
+# <exit>< / SPC: ><whole|your>< map>, and nothing clears the line between the two, so the
+# your-line skeleton carries one trailing space per character the whole word is longer --
+# two for Полная over Ваша.
+reloc,0x00f289,"X=%2d Position Y=%2d","Позиция: X=%2d Y=%2d"
+reloc,0x0188f6,"'ESC' to exit","ESC: Выйти"
+reloc,0x0188fe," / 'SPC' "," / SPC: "
+reloc,0x0188f8,"whole","Полная"
+reloc,0x0188fa,"your","Ваша"
+reloc,0x0188fc," map"," карта"
+reloc,0x00f389,"%s%s%s%s ","%s%s%s%s  "
+
 # ==== ARMY SCREEN =========================================================================
 
 # ---- header bar
