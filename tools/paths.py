@@ -30,7 +30,6 @@ TMP = os.path.join(ROOT, "tmp")
 
 # --- inputs: the user's own copy, never modified -----------------------------
 KB_EXE = os.path.join(GAME, "KB.EXE")            # the packed game
-KB_COM = os.path.join(GAME, "KB!.COM")           # the launcher
 GAME_CC = {256: os.path.join(GAME, "256.CC"),    # graphics archives, one per
            416: os.path.join(GAME, "416.CC")}    # display mode
 
