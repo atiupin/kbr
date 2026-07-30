@@ -306,7 +306,7 @@ reloc,0x018736,"free.","пришлось отпустить."
 
 # ---- give up
 reloc,0x018e79,"Giving up will forfeit your","Сдавшись, вы потеряете"
-reloc,0x018e7b,"armies and send you back to","свое войско и вернётесь"
+reloc,0x018e7b,"armies and send you back to","своё войско и вернётесь"
 reloc,0x018e7d,"the King. Give up (y/n)?","к королю. Сдаться? (y/n)"
 
 # ==== SPELL CASTING =======================================================================
@@ -446,7 +446,7 @@ string,0x01A860,"Villains caught","Злодеев поймано"
 reloc,0x01891C,"Artifacts found","Артефактов найдено"
 string,0x01A880,"Castles garrisoned","Замков занято"
 string,0x01A893,"Followers killed","Воинов потеряно"
-string,0x01A8A4,"Current score","Текущий счет"
+string,0x01A8A4,"Current score","Текущий счёт"
 
 # ==== KING'S CASTLE =======================================================================
 
