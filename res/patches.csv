@@ -229,6 +229,14 @@ reloc,0x018bc5,"  V View Char","  V Герой"
 reloc,0x018bc7,"  W Wait","  W Ждать"
 reloc,0x018bc9,"  SPC Pass","SPC Пропустить ход"
 
+# ---- status line: the acting army's flags
+# Same top line, right of the name: comma-joined single letters, each a putchar immediate in
+# FUN_1d9b_0cc7 rather than a string, so `bytes` rows are the only handle. Fly is a flag, the
+# other two carry a count -- Л(етает), Х(оды), В(ыстрелы).
+bytes,0x106E1,"46","8B"
+bytes,0x107A7,"4D","95"
+bytes,0x10829,"53","82"
+
 # ---- action log
 # One line in the lower bar: the acting army's name (FUN_1d9b_1663), then fragments at the
 # cursor (FUN_1f51_1024). Every shape, all sized to a 35-column budget:
