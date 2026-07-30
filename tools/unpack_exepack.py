@@ -41,8 +41,15 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from paths import KBU1, KBU2                                 # noqa: E402
 
 
+def die(msg):
+    sys.exit(f"error: {msg}")
+
+
 def unpack(src_path=KBU1, dst_path=KBU2):
-    d = open(src_path, "rb").read()
+    try:
+        d = open(src_path, "rb").read()
+    except FileNotFoundError:
+        die(f"{src_path} not found -- run tools/unpack_nwc.py first")
     # Take the load image exactly as the DOS header declares it, never the file
     # size: the declared length is what DOS would load, and what the EXEPACK
     # offsets below assume. Any tail past it is not part of the image.
