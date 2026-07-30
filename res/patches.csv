@@ -592,6 +592,69 @@ reloc,0x01895c,"Balance","Итого"
 reloc,0x01895e,"Leave","Ушли"
 reloc,0x00d870,"Leave","Ушли"
 
+# ==== ENDINGS ==============================================================================
+# FUN_1207_2b88 draws 20 rows from table DS 0x37fd -- victory slots 0-19, defeat 20-39 --
+# into box 13, x 16..159, the ending picture flush against it at x 160: 18 columns, of which
+# the text uses 16 from column 1. The row count is fixed and the last slot of each stays
+# empty: victory's would land on row 20, where the caller draws the score (fixed y 0xb6),
+# and defeat's is the bottom margin. The hero's name follows slot 0 (victory: alone on its
+# row, leaving slot 1 unused) or slot 20, and the rank title from the class table opens the
+# next row for slot 2 / 21 to continue -- those two rows lose the longest rank's 9 chars.
+
+# ---- margins: text starts at column 1, row 1
+# The five `xor ax,ax` are the cursor's x argument -- row loop, victory name row, both rank
+# rows (via FUN_1207_2de4), score row in the caller; `mov al,1` is the same length and AH is
+# already 0 from the y computation. The sixth patch is the row counter's initial value.
+bytes,0x006BC0,33C0,B001
+bytes,0x006C42,33C0,B001
+bytes,0x006C89,33C0,B001
+bytes,0x006CBA,33C0,B001
+bytes,0x006CD8,33C0,B001
+bytes,0x006C05,00,01
+
+# ---- victory
+reloc,0x018e8d,"Congratulations,","Поздравляем,"
+reloc,0x018e91,"! You","! Вы"
+reloc,0x018e93,"have recovered the","вырвали Скипетр"
+reloc,0x018e95,"Sceptre of Order","порядка из лап"
+reloc,0x018e97,"from the clutches","лютых злодеев."
+reloc,0x018e99,"of the evil Master","В награду за то,"
+reloc,0x018e9b,"Villains. As a","что вы спасли"
+reloc,0x018e9d,"reward for saving","короля от верной"
+reloc,0x018e9f,"himself and the","гибели, а четыре"
+reloc,0x018ea1,"four continents","континента - от"
+reloc,0x018ea3,"from ruin, King","разорения, сам"
+reloc,0x018ea5,"Maximus and his","Максимус и его"
+reloc,0x018ea7,"subjects reward","подданные жалуют"
+reloc,0x018ea9,"you with a large","вам обширный"
+reloc,0x018eab,"parcel of land,","земельный надел,"
+reloc,0x018ead,"a rank of nobility","дворянский титул"
+reloc,0x018eaf,"and a medal","и медаль с вашим"
+reloc,0x018eb1,"announcing your","итоговым счётом:"
+reloc,0x018eb3,"Final Score:",""
+
+# ---- defeat
+reloc,0x018eb5,"Oh, ","Увы, "
+reloc,0x018eb7,", you",", вы не"
+reloc,0x018eb9,"have failed to","успели вернуть"
+reloc,0x018ebb,"recover the","Скипетр порядка"
+reloc,0x018ebd,"Sceptre of Order","и спасти страну!"
+reloc,0x018ebf,"in time to save","Всеми любимый"
+reloc,0x018ec1,"the land! Beloved","король Максимус"
+reloc,0x018ec3,"King Maximus has","мёртв, а трон"
+reloc,0x018ec5,"died and the Demon","его занял король"
+reloc,0x018ec7,"King Urthrax","демонов Уртракс"
+reloc,0x018ec9,"Killspite rules in","Душегуб. Четыре"
+reloc,0x018ecb,"his place. The","континента лежат"
+reloc,0x018ecd,"Four Continents","в руинах, а их"
+reloc,0x018ecf,"lay in ruin about","народ обречён на"
+reloc,0x018ed1,"you, its people","жизнь в нищете и"
+reloc,0x018ed3,"doomed to a life","угнетении. А всё"
+reloc,0x018ed5,"of misery and","потому, что вы"
+reloc,0x018ed7,"oppression because","так и не нашли"
+reloc,0x018ed9,"you could not find","Скипетр."
+reloc,0x018edb,"the Sceptre.",""
+
 # ==== NAME TABLES =========================================================================
 
 # ---- unit names
