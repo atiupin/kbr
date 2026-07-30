@@ -44,6 +44,7 @@ BUILD_CC = {256: os.path.join(BUILD, "256.CC"),  # run-dir copies, carrying the
 # --- hand-written build inputs (tracked) -------------------------------------
 PATCHES_CSV = os.path.join(RES, "patches.csv")
 FONT_PNG = os.path.join(RES, "font.png")
+GATE_PICKER_ASM = os.path.join(RES, "gate_picker.asm")   # injected code, see apply_patches
 
 # KBU2.EXE's SHA-256. Every tool that reads KBU2 gates on this: the file offsets
 # in patches.csv are only meaningful against this exact image, so a mismatch

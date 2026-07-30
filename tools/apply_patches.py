@@ -53,6 +53,11 @@ Every reloc ref MUST come from find_ref.py, which proves the site is a real code
 immediate or table slot. A hand-picked 2-byte value that merely happens to equal the
 string's DS offset repoints something else: that mistake (a ref inside a counter table)
 corrupted game data and crashed the puzzle map.
+
+One stage is not manifest-driven: res/gate_picker.asm, assembled by asm16.py and injected
+after the pool (see inject_gate_picker). It is code, not translation, and carries
+relocation bookkeeping the four-column manifest cannot express. Deleting that file is not
+how to turn it off -- the stage is part of the build; revert it through git.
 """
 
 import csv
@@ -63,7 +68,9 @@ import struct
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from paths import KBU2 as INPUT, KBR as OUTPUT, PATCHES_CSV as MANIFEST, KBU2_SHA256  # noqa: E402
+from asm16 import AsmError, assemble  # noqa: E402
+from paths import (KBU2 as INPUT, KBR as OUTPUT, PATCHES_CSV as MANIFEST,  # noqa: E402
+                   GATE_PICKER_ASM, KBU2_SHA256)
 
 ENCODING = "cp866"
 
@@ -107,6 +114,39 @@ POOL_END_DSOFF = POOL_DSOFF + POOL_SIZE    # hard cap; clear of the stack's desc
 # string reached from here is protection UI that fits its own slot as a `string` row.
 # Rejected at parse time: an inlined reloc is harmless today, one rewording from fatal.
 PROT_LO, PROT_HI = 0xBFE0, 0xCCA7          # file offsets, inclusive
+
+# --- Town/Castle Gate destination picker (res/gate_picker.asm) ----------------------------
+# Why the gate needs a window of its own is in that file's header; what matters here is
+# placement. The routine lands at CODE_DSOFF, the pool's hard cap: the pool bump-allocates
+# upward and can never reach it, so string growth and code never compete. DGROUP is the
+# routine's code segment as well as its data segment, so its labels are DS offsets.
+CODE_DSOFF = POOL_END_DSOFF                # 0xE800, paragraph-aligned, just above the pool
+
+# The gate's header/list/prompt/decode block. Everything from the box being drawn to the
+# key being turned into a slot index; the tail that resolves coordinates is left alone.
+STUB_AT, STUB_END = 0xF7C1, 0xF8C4
+GATE_RESUME = 0xF900                       # past the visited re-check, now unreachable
+GATE_EXIT = 0xF979                         # pop si / mov sp,bp / pop bp / retf
+STUB_PAD = 0x90
+
+STUB_SRC = """
+    push si
+    callf {seg:#06x}:{off:#06x}
+    pop  cx
+    cmp  al,0xff
+    jz   cancelled
+    mov  [bp-1],al
+    jmp  {resume:#06x}
+cancelled:
+    xor  ax,ax
+    push ax
+    mov  ax,1
+    push ax
+    callf 0x1168:0x0d4d
+    pop  cx
+    pop  cx
+    jmp  {exit:#06x}
+"""
 
 
 def die(msg):
@@ -300,27 +340,57 @@ def check_reloc_sources(relocs):
                 f"(offset column: \"{prev['off']:#08x} {p['off']:#08x}\").")
 
 
+def mz_reloc_table(data):
+    """-> (entry count, header size in bytes, table file offset)."""
+    nrel, = struct.unpack_from("<H", data, 0x06)
+    hdr = struct.unpack_from("<H", data, 0x08)[0] * 16
+    tbl, = struct.unpack_from("<H", data, 0x18)
+    return nrel, hdr, tbl
+
+
+def reloc_target(data, ent, hdr):
+    off, seg = struct.unpack_from("<HH", data, ent)
+    return hdr + seg * 16 + off
+
+
+def set_reloc_entry(data, ent, target, hdr):
+    """Aim one entry at a file offset. Existing entries all use seg=0, which only reaches
+    the first 64K; the injected routine is past that, so the offset is split."""
+    seg, off = divmod(target - hdr, 16)
+    if seg > 0xFFFF:
+        die(f"relocation target {target:#x} is past the addressable image")
+    struct.pack_into("<HH", data, ent, off, seg)
+
+
 def check_relocations(orig, data):
     """Gate the "no code motion" rule instead of trusting it: a relocation target's word
     may not change.
 
       entry untouched -> the word must still be what pristine KBU2 had there
       entry repointed -> its new target must be a far call's segment word (`9a` +3)
+      entry appended  -> same, and it must fit in the header's own spare slots
 
     Repointing is how deliberate code motion declares itself; the `9a` proves the entry
-    landed on a call and not on an arbitrary word."""
-    nrel, = struct.unpack_from("<H", data, 0x06)
-    hdr = struct.unpack_from("<H", data, 0x08)[0] * 16
-    tbl, = struct.unpack_from("<H", data, 0x18)
-    if (nrel, hdr, tbl) != tuple(x[0] for x in (struct.unpack_from("<H", orig, 0x06),
-                                                (struct.unpack_from("<H", orig, 0x08)[0] * 16,),
-                                                struct.unpack_from("<H", orig, 0x18))):
-        die("the MZ relocation table itself moved or changed size -- unsupported")
+    landed on a call and not on an arbitrary word. The table may grow into the zeros
+    between its end and the end of the header, which shifts nothing; it may not move."""
+    nrel, hdr, tbl = mz_reloc_table(data)
+    orig_nrel, orig_hdr, orig_tbl = mz_reloc_table(orig)
+    if (hdr, tbl) != (orig_hdr, orig_tbl):
+        die("the MZ relocation table itself moved -- unsupported")
+    if nrel < orig_nrel:
+        die(f"the relocation table shrank ({orig_nrel} -> {nrel}) -- unsupported")
+    if tbl + 4 * nrel > hdr:
+        die(f"the relocation table ({nrel} entries) ran past the end of the header")
 
-    for i in range(nrel):
+    for i in range(orig_nrel, nrel):
+        target = reloc_target(data, tbl + 4 * i, hdr)
+        if data[target - 3] != 0x9A:
+            die(f"appended relocation entry {i} aims at {target:#x}, which is not a "
+                f"far call's segment word (no 9a at {target - 3:#x})")
+
+    for i in range(orig_nrel):
         ent = tbl + 4 * i
-        off, seg = struct.unpack_from("<HH", data, ent)
-        target = hdr + seg * 16 + off
+        target = reloc_target(data, ent, hdr)
         if data[ent:ent + 4] != orig[ent:ent + 4]:          # repointed on purpose
             if data[target - 3] != 0x9A:
                 die(f"relocation entry {i} at {ent:#x} was repointed to {target:#x}, "
@@ -333,6 +403,80 @@ def check_relocations(orig, data):
                 f"       breaks the call that moved AND corrupts what took its place. "
                 f"See 'NO CODE MOTION'\n"
                 f"       in this script's docstring.")
+
+
+
+def retarget_relocations(data, lo, hi, sites):
+    """Re-aim every entry pointing into [lo,hi) at one of `sites`, then append the rest.
+
+    Both halves matter. An entry left pointing into overwritten code has DOS add the load
+    segment to whatever byte pair took its place -- silent corruption far from the edit.
+    A new far call with no entry keeps its link-time segment and calls into whatever the
+    loader put there."""
+    nrel, hdr, tbl = mz_reloc_table(data)
+    dead = [tbl + 4 * i for i in range(nrel) if lo <= reloc_target(data, tbl + 4 * i, hdr) < hi]
+    if len(dead) > len(sites):
+        die(f"{len(dead)} relocation entries point into [{lo:#x},{hi:#x}) but the "
+            f"replacement has only {len(sites)} far calls to re-aim them at.\n"
+            f"       Removing an entry means compacting the table, which this does not do.")
+
+    todo = list(sites)
+    for ent in dead:
+        set_reloc_entry(data, ent, todo.pop(0), hdr)
+
+    room = (hdr - (tbl + 4 * nrel)) // 4
+    if len(todo) > room:
+        die(f"{len(todo)} new relocation entries needed but only {room} free slots "
+            f"before the header ends -- growing the table would shift the whole image")
+    for k, site in enumerate(todo):
+        set_reloc_entry(data, tbl + 4 * (nrel + k), site, hdr)
+    struct.pack_into("<H", data, 0x06, nrel + len(todo))
+    return len(dead), len(todo)
+
+
+def inject_gate_picker(data):
+    """Assemble res/gate_picker.asm into the image and hand the gate spell over to it."""
+    try:
+        source = open(GATE_PICKER_ASM, encoding="utf-8").read()
+    except FileNotFoundError:
+        die(f"gate picker source not found: {GATE_PICKER_ASM}")
+    try:
+        code, code_relocs, _ = assemble(source, org=CODE_DSOFF)
+    except AsmError as e:
+        die(f"{GATE_PICKER_ASM}: {e}")
+
+    # DGROUP's own paragraph, image-relative; DOS adds the load segment via the entry.
+    dgroup_para, slack = divmod(DS_BASE - mz_reloc_table(data)[1], 16)
+    if slack:
+        die(f"DGROUP is not paragraph-aligned (DS_BASE {DS_BASE:#x}) -- "
+            f"the injected routine cannot be reached by a far call")
+
+    stub_src = STUB_SRC.format(seg=dgroup_para, off=CODE_DSOFF,
+                               resume=GATE_RESUME, exit=GATE_EXIT)
+    try:
+        stub, stub_relocs, _ = assemble(stub_src, org=STUB_AT)
+    except AsmError as e:
+        die(f"gate stub: {e}")
+    if STUB_AT + len(stub) > STUB_END:
+        die(f"gate stub is {len(stub)}B but the block it replaces is "
+            f"{STUB_END - STUB_AT}B")
+
+    data[STUB_AT:STUB_END] = stub + bytes([STUB_PAD]) * (STUB_END - STUB_AT - len(stub))
+
+    code_at = DS_BASE + CODE_DSOFF
+    if len(data) > code_at:
+        die(f"the overflow pool reached {len(data) - DS_BASE:#x}, past the code region "
+            f"at DS {CODE_DSOFF:#06x} -- lower POOL_SIZE or move CODE_DSOFF")
+    data.extend(b"\x00" * (code_at - len(data)))
+    data.extend(code)
+
+    sites = [STUB_AT + r for r in stub_relocs] + [code_at + r for r in code_relocs]
+    for site in sites:                       # the entry is only ever correct on a `9a` +3
+        if data[site - 3] != 0x9A:
+            die(f"internal: reloc site {site:#x} is not a far call's segment word")
+    reaimed, added = retarget_relocations(data, STUB_AT, STUB_END, sites)
+    return {"code": len(code), "stub": len(stub),
+            "sites": len(sites), "reaimed": reaimed, "added": added}
 
 
 def fix_mz_header(data):
@@ -424,7 +568,13 @@ def main():
             for ref in p["offs"]:                               # all pointers move together
                 struct.pack_into("<H", data, ref, new_dsoff)
             p["new_dsoff"] = new_dsoff
-        fix_mz_header(data)
+
+    # After the pool: the routine sits at the pool's cap, so it must be placed once the
+    # pool has stopped growing. Measure the pool first -- injection pads the file out to
+    # the code region, which would otherwise read as a full pool.
+    pool_used = max(0, len(data) - (DS_BASE + POOL_DSOFF))
+    picker = inject_gate_picker(data)
+    fix_mz_header(data)
 
     check_relocations(open(INPUT, "rb").read(), data)
 
@@ -447,9 +597,13 @@ def main():
         print(f"  inlined {len(inlined)} of {len(relocs)} reloc row(s) into their own "
               f"slots: {saved}B of pool not spent")
     if pooled:
-        used = len(data) - (DS_BASE + POOL_DSOFF)
-        print(f"  overflow pool: DS {POOL_DSOFF:#06x}..{POOL_DSOFF + used:#06x} "
-              f"({used}B used / {POOL_SIZE}B); image grown to {len(data)} bytes")
+        print(f"  overflow pool: DS {POOL_DSOFF:#06x}..{POOL_DSOFF + pool_used:#06x} "
+              f"({pool_used}B used / {POOL_SIZE}B)")
+    print(f"  gate picker: {picker['code']}B at DS {CODE_DSOFF:#06x}, "
+          f"{picker['stub']}B stub at {STUB_AT:#x} (block is {STUB_END - STUB_AT}B); "
+          f"{picker['sites']} far call(s): {picker['reaimed']} entry re-aimed, "
+          f"{picker['added']} appended")
+    print(f"  image grown to {len(data)} bytes")
 
 
 if __name__ == "__main__":
