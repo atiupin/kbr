@@ -21,10 +21,11 @@ build/   *** generated *** — also the RUN DIR (DOSBox mounts it as C:). Everyt
            *.DAT       *** the user's saves — NOT regenerable, never delete ***
            decomp/     Ghidra output
 res/     *** hand-written build INPUTS *** — patches.csv (the patch manifest, i.e. the
-         translation itself) and font.png (the Cyrillic-extended glyph sheet).
+         translation itself), font.png (the Cyrillic-extended glyph sheet) and
+         gate_picker.asm (the one patch that is new code rather than new text).
 tools/   *** the build *** — SCRIPTS ONLY, hand-written Python, stdlib only: paths.py (the
          shared layout), unpack_nwc.py, unpack_exepack.py, apply_patches.py, cc.py,
-         find_ref.py, addr.py
+         find_ref.py, addr.py, asm16.py
            ghidra.py   the analysis front-end (diagnostic only — the build never calls it)
            ghidra/     its *.java analysis scripts. No game data.
 tmp/     *** scratch, gitignored *** — the Ghidra project DB (regenerable), DOSBox captures.
@@ -48,6 +49,7 @@ tools/cc.py font-build                     res/font.png -> build/256.CC + 416.CC
 # translating
 tools/find_ref.py <offset | "substring">   the ref pointing at a string; prints a reloc row
 tools/addr.py <0xoffset | seg:off>         file offset <-> Ghidra address
+tools/asm16.py selftest                    prove the assembler still matches Turbo C
 
 # CC archives — one-offs; font-build is the only one the build needs
 tools/cc.py list <archive.CC>
@@ -90,6 +92,7 @@ it — read those, and put new findings there rather than here.
 | patch manifest, `reloc` pool, protection guard | `apply_patches.py` docstring + constants |
 | ref discovery and why it is conservative       | `find_ref.py`                            |
 | file offset ↔ Ghidra address                   | `addr.py`                                |
+| assembling new code, injecting it              | `asm16.py` / `apply_patches.py`          |
 | what a Ghidra script does                      | its first comment line                   |
 
 ## Translating
@@ -165,7 +168,9 @@ tools/ghidra.py run DumpDecomp.java build/decomp
   adventure-map boxes (siege prompt, scouting, wandering armies) and the whole of spell
   casting — the spell book, the cast prompt, every effect message and the Castle/Town Gate
   and Instant Army boxes.
-  Town and castle names are still English on purpose — one later pass.
+  Town and castle names are still English on purpose — one later pass. The Town/Castle
+  Gate spells now draw a named, letter-keyed list (`res/gate_picker.asm`) instead of the
+  original's bare letters, so those names carry no constraint on their first letter.
 - [ ] **Patcher** — ownership-gated installer producing the translated build.
 
 ## Conventions
