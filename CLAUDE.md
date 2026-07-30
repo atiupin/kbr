@@ -1,8 +1,9 @@
 # King's Bounty — Russian Translation (KBR)
 
 Fan translation of the **original 1990 DOS King's Bounty** (New World Computing) into Russian,
-by **binary patching** the unpacked EXE. Unpacking, the copy protection and the Cyrillic font are
-all solved; what remains is translating text and shipping an installer.
+by **binary patching** the unpacked EXE. Unpacking, the copy protection, the Cyrillic font and the
+text itself are all done — every string a player sees is in `res/patches.csv`; the few left in
+English are startup-console and floppy-era messages unreachable in normal play.
 
 ## Project layout
 
@@ -156,22 +157,6 @@ tools/ghidra.py import 'game/KB!.COM' -loader BinaryLoader \
 tools/ghidra.py run AnnotateKbCom.java                     # decline auto-analysis on the .COM
 tools/ghidra.py run DumpDecomp.java build/decomp
 ```
-
-## Status
-
-- [~] **Translation** — underway in `res/patches.csv`: title screen + credits, protection prompt,
-  new-game/difficulty menus, load-game picker, character classes, army screen (25 unit names,
-  army-size prefixes, stat labels, morale), dwelling screen, character screen, king's castle,
-  menu bar and its options and controls menus, town screen, the 14 spell names, the villain
-  names and all 17 contract screens, the four continent names (with the boat's travel
-  menu), the search prompt with all 7 treasure-chest events and all 8 artifact finds, the
-  adventure-map boxes (siege prompt, scouting, wandering armies) and the whole of spell
-  casting — the spell book, the cast prompt, every effect message and the Castle/Town Gate
-  and Instant Army boxes, the 26 castle and 26 town names, both ending screens
-  (victory and out of days) and the three load/save disk-error boxes. The Town/Castle Gate
-  spells draw a named, letter-keyed list (`res/gate_picker.asm`) instead of the
-  original's bare letters, so those names carry no constraint on their first letter.
-- [ ] **Patcher** — ownership-gated installer producing the translated build.
 
 ## Conventions
 
