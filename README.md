@@ -11,7 +11,8 @@ game/    *** the user's pristine originals *** — never modified, untracked (no
 build/   *** generated *** — the whole build chain's output, and the RUN DIR (DOSBox mounts
          it as C:, so it is also where the user's saves land).
 res/     *** hand-written build INPUTS *** — the patch manifest (i.e. the translation
-         itself), the glyph sheet, the one patch that is new code rather than new text.
+         itself), the glyph sheet, and `gate_picker.asm`: the town/castle gate
+         destination list, rewritten as new code because translating it was not enough.
 tools/   *** the build *** — SCRIPTS ONLY, hand-written Python, stdlib only, plus the
          diagnostic Ghidra front-end and its ghidra/*.java scripts.
 tmp/     *** scratch, gitignored *** — the Ghidra project DB and its dumps, DOSBox captures.
