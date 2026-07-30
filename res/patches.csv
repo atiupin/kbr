@@ -102,8 +102,8 @@ reloc,0x018BBD,"  Q Quit and Save","  Q Запись и выход"
 # mutable line -- so find_ref.py sees no ref -- and Fly doubles as a combat entry. All three
 # pad to 17 to erase each other on redraw.
 string,0x01ABF1,"  N New Continent","  N Континент"
-string,0x01AC03,"  L Land         ","  L Посадка      "
-string,0x01AC15,"  F Fly          ","  F Полет        "
+string,0x01AC03,"  L Land         ","  L Приземлиться "
+string,0x01AC15,"  F Fly          ","  F Лететь       "
 
 # ---- quit confirmation
 string,0x162D1,"Quit to DOS without saving (y/n) ","Выйти без сохранения? (y/n) "
