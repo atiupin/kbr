@@ -54,7 +54,8 @@ CLI
     cc.py list <archive.CC>
     cc.py extract <archive.CC> <id-hex> <out.bin>      # decoded (raw) bytes
     cc.py replace <archive.CC> <id-hex> <in.bin> <out.CC>
-    cc.py font-export <archive.CC> <out.png> [--glyphs 128|256]
+    cc.py font-export <archive.CC> <out.png> [--glyphs N]  # N defaults to the
+                                                       # member's own glyph count
     cc.py font-import <in.png> <archive.CC> <out.CC>   # PNG -> font member 0x9bb2
 
 font-build is font-import run over both display modes with the project's own
@@ -435,11 +436,15 @@ def main(argv):
         open(argv[5], "wb").write(rebuild(data, {hid: raw}))
         print(f"wrote {argv[5]}")
     elif cmd == "font-export":
-        glyphs = 256 if "--glyphs" in argv and argv[argv.index("--glyphs") + 1] == "256" else 128
         data = open(argv[2], "rb").read()
         entry = next(e for e in read_toc(data) if e[0] == FONT_ID)
         font = decode_member(member_bytes(data, entry))
-        font_to_png(font + bytes(max(0, glyphs * 8 - len(font))), argv[3], glyphs)
+        # Whatever the member holds: 256 for ours, 128 for a pristine archive. Exporting
+        # 128 from a 256-glyph font drops the Cyrillic half, and the sheet it writes is
+        # then too short to import back. --glyphs overrides, which is how a stock archive
+        # yields a 256-cell sheet with a blank upper half to draw into.
+        glyphs = int(argv[argv.index("--glyphs") + 1]) if "--glyphs" in argv else len(font) // 8
+        font_to_png(font, argv[3], glyphs)
         print(f"wrote {argv[3]} ({glyphs} glyphs)")
     elif cmd == "font-import":
         font_import(argv[2], argv[3], argv[4])
