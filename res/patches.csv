@@ -721,7 +721,7 @@ reloc,0x016a20,"Uzare","Узаре"
 reloc,0x016a22,"Vutar","Вутар"
 reloc,0x016a24,"Wankelforte","Ванкельфорт"
 reloc,0x016a26,"Xelox","Ксилокс"
-reloc,0x016a28,"Yeneverre","Йеневерре"
+reloc,0x016a28,"Yeneverre","Эневерре"
 reloc,0x016a2a,"Zyzzarzaz","Зиззарзаз"
 # Slot 26 is the king's castle: unreachable here (the contract screen indexes 0..25), but
 # kept in step with the other copy's slot 26, which the castle screen prints. That screen
@@ -751,7 +751,7 @@ reloc,0x018456,"Uzare","Узаре"
 reloc,0x018458,"Vutar","Вутар"
 reloc,0x01845a,"Wankelforte","Ванкельфорт"
 reloc,0x01845c,"Xelox","Ксилокс"
-reloc,0x01845e,"Yeneverre","Йеневерре"
+reloc,0x01845e,"Yeneverre","Эневерре"
 reloc,0x018460,"Zyzzarzaz","Зиззарзаз"
 
 # ---- town names
