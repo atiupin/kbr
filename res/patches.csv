@@ -880,7 +880,7 @@ reloc,0x016AB8,"  Royal Dungeons.","  в королевских подземел
 
 # ---- villain 6, Canegor the Mystic
 string,0x01737B,"Name: Canegor the Mystic","Имя: Канегор Мистик"
-reloc,0x016abc,"Alias: The Majestic Sage","Кличка: Пресветлый Мудрец"
+reloc,0x016abc,"Alias: The Majestic Sage","Кличка: Пресветлый мудрец"
 string,0x0173AD,"Reward: 10,000 gold","Награда: 10000 зол."
 string,0x0173C1,"Last Seen:","Континент:"
 string,0x0173CC,"Castle:"," Замок:"
@@ -911,7 +911,7 @@ reloc,0x016af0,"  topple the kingdom.","  и его законного коро�
 
 # ---- villain 8, Prince Barrowpine
 string,0x0175FA,"Name: Prince Barrowpine","Имя: Принц Барроупайн"
-string,0x017612,"Alias: The Elf Lord","Кличка: Лорд Эльфов"
+string,0x017612,"Alias: The Elf Lord","Кличка: Лорд эльфов"
 string,0x017626,"Reward: 14,000 gold","Награда: 14000 зол."
 string,0x01763A,"Last Seen:","Континент:"
 string,0x017645,"Castle:"," Замок:"
@@ -943,7 +943,7 @@ reloc,0x016b28,"  attack against the King.","  нападение на само�
 
 # ---- villain 10, Rinaldus Drybone
 reloc,0x016b2a,"Name: Rinaldus Drybone","Имя: Ринальдус Костлявый"
-string,0x01789F,"Alias: The Death Lord","Кличка: Лорд Смерти"
+string,0x01789F,"Alias: The Death Lord","Кличка: Лорд смерти"
 string,0x0178B5,"Reward: 18,000 gold","Награда: 18000 зол."
 string,0x0178C9,"Last Seen:","Континент:"
 string,0x0178D4,"Castle:"," Замок:"
@@ -1007,7 +1007,7 @@ reloc,0x016b98,"  Saharia.","  Сахария."
 
 # ---- villain 14, Czar Nickolai the Mad
 string,0x017D88,"Name:Czar Nickolai the Mad","Имя: Царь Николай Безумный"
-reloc,0x016b9c,"Alias: The Mad Czar","Кличка: Безумный Царь"
+reloc,0x016b9c,"Alias: The Mad Czar","Кличка: Безумный царь"
 string,0x017DB7,"Reward: 35,000 gold","Награда: 35000 зол."
 string,0x017DCB,"Last Seen:","Континент:"
 string,0x017DD6,"Castle:"," Замок:"
@@ -1039,7 +1039,7 @@ reloc,0x016bd0,"  magics.","  магией."
 
 # ---- villain 16, Urthrax Killspite
 string,0x017FF5,"Name: Urthrax Killspite","Имя: Уртракс Душегуб"
-reloc,0x016bd4,"Alias: The Demon King","Кличка: Король Демонов"
+reloc,0x016bd4,"Alias: The Demon King","Кличка: Король демонов"
 string,0x018023,"Reward: 45,000 gold","Награда: 45000 зол."
 string,0x018037,"Last Seen:","Континент:"
 string,0x018042,"Castle:"," Замок:"
@@ -1053,7 +1053,7 @@ string,0x0180E5,"  conspiracy against the Crown.","  в заговоре про�
 
 # ---- villain 17, Arech Dragonbreath
 string,0x018107,"Name: Arech Dragonbreath","Имя: Арех Огнедышащий"
-reloc,0x016bf0,"Alias: Mastermind","Кличка: Тёмный Гений"
+reloc,0x016bf0,"Alias: Mastermind","Кличка: Тёмный гений"
 string,0x018132,"Reward: 50,000 gold","Награда: 50000 зол."
 string,0x018146,"Last Seen:","Континент:"
 string,0x018151,"Castle:"," Замок:"
