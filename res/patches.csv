@@ -941,7 +941,6 @@ reloc,0x016b26,"  and for leading an outright","  Он возглавил дер
 reloc,0x016b28,"  attack against the King.","  нападение на самого Короля."
 
 # ---- villain 10, Rinaldus Drybone
-# NOT VERIFIED
 reloc,0x016b2a,"Name: Rinaldus Drybone","Имя: Ринальдус Костлявый"
 string,0x01789F,"Alias: The Death Lord","Кличка: Лорд Смерти"
 string,0x0178B5,"Reward: 18,000 gold","Награда: 18000 зол."
@@ -958,7 +957,6 @@ reloc,0x016b42,"  and leading a rebellion on the","  Он поднял восс�
 reloc,0x016b44,"  continent of Saharia.","  на континенте Сахария."
 
 # ---- villain 11, Ragface
-# NOT VERIFIED
 reloc,0x016b46,"Name: Ragface","Имя: Лохмотник"
 string,0x0179F1,"Alias: None","Кличка: нет"
 string,0x0179FD,"Reward: 20,000 gold","Награда: 20000 зол."
@@ -975,7 +973,6 @@ reloc,0x016b5e,"  Crown and leading an","  Короны и руководств�
 reloc,0x016b60,"  insurrection in Saharia.","  в Сахарии."
 
 # ---- villain 12, Mahk Bellowspeak
-# NOT VERIFIED
 string,0x017B0F,"Name: Mahk Bellowspeak","Имя: Мак Горлопан"
 reloc,0x016b64,"Alias: Bruiser","Кличка: Громила"
 string,0x017B35,"Reward: 25,000 gold","Награда: 25000 зол."
@@ -992,7 +989,6 @@ reloc,0x016b7a,"  leading a jail break, and for","  в организации п
 reloc,0x016b7c,"  piracy on the open seas.","  и в морском разбое."
 
 # ---- villain 13, Auric Whiteskin
-# NOT VERIFIED
 string,0x017C58,"Name: Auric Whiteskin","Имя: Аурик Белошкурый"
 string,0x017C6E,"Alias: The Barbarian","Кличка: Варвар"
 string,0x017C83,"Reward: 30,000 gold","Награда: 30000 зол."
@@ -1009,7 +1005,6 @@ reloc,0x016b96,"  rebellion of the continent","  мятеж на контине�
 reloc,0x016b98,"  Saharia.","  Сахария."
 
 # ---- villain 14, Czar Nickolai the Mad
-# NOT VERIFIED
 string,0x017D88,"Name:Czar Nickolai the Mad","Имя: Царь Николай Безумный"
 reloc,0x016b9c,"Alias: The Mad Czar","Кличка: Безумный Царь"
 string,0x017DB7,"Reward: 35,000 gold","Награда: 35000 зол."
@@ -1026,7 +1021,6 @@ reloc,0x016bb2,"  violating diplomatic status,","  в злоупотреблен
 reloc,0x016bb4,"  and murder.","  дипломата и в убийстве."
 
 # ---- villain 15, Magus Deathspell
-# NOT VERIFIED
 reloc,0x016bb6,"Name: Magus Deathspell","Имя: Магус Чернокнижник"
 string,0x017EE2,"Alias: None","Кличка: нет"
 string,0x017EEE,"Reward: 40,000 gold","Награда: 40000 зол."
@@ -1043,7 +1037,6 @@ reloc,0x016bce,"  and for practicing forbidden","  и в занятии запр
 reloc,0x016bd0,"  magics.","  магией."
 
 # ---- villain 16, Urthrax Killspite
-# NOT VERIFIED
 string,0x017FF5,"Name: Urthrax Killspite","Имя: Уртракс Душегуб"
 reloc,0x016bd4,"Alias: The Demon King","Кличка: Король Демонов"
 string,0x018023,"Reward: 45,000 gold","Награда: 45000 зол."
@@ -1058,7 +1051,6 @@ reloc,0x016be6,"Crimes: Urthrax is wanted for","Преступления: Урт
 string,0x0180E5,"  conspiracy against the Crown.","  в заговоре против Короны."
 
 # ---- villain 17, Arech Dragonbreath
-# NOT VERIFIED
 string,0x018107,"Name: Arech Dragonbreath","Имя: Арех Огнедышащий"
 reloc,0x016bf0,"Alias: Mastermind","Кличка: Тёмный Гений"
 string,0x018132,"Reward: 50,000 gold","Награда: 50000 зол."
