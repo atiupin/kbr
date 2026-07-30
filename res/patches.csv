@@ -249,7 +249,6 @@ reloc,0x01887a," vs "," \xB0\xB1\xB2\xB3 "
 reloc,0x01887c," killing ",", убито "
 # That shorter tally reads "1 dies" / "7 die" in English: the 's' is verb agreement, appended
 # when the count is 1. "убито" needs none, so the branch that adds it always jumps instead.
-# NOT VERIFIED
 reloc,0x018880,", ",", "
 reloc,0x01887e," die"," убито"
 bytes,0x0129F8,"75","EB"
@@ -357,7 +356,6 @@ bytes,0x15A0,"69 c8 00 00 5f c8 00 00 40 c8 00 00 34 c8 00 00","67 c8 00 00 58 c
 bytes,0xEAD7,"b8 20 00 50 b8 01 00 50 56 9a 55 12 68 11 83 c4 06 b8 20 00 50 9a eb 05 68 11 59 a0 33 b5 b4 00 b1 04 d3 e0 8b d8 8a 87 98 63 b4 00 d1 e0 8b d8 ff b7 88 02 9a 63 10 68 11 59 ff 36 5c 32 9a 63 10 68 11 59","a0 33 b5 b4 00 b1 04 d3 e0 8b d8 8a 87 98 63 b4 00 d1 e0 8b d8 ff b7 88 02 9a 63 10 68 11 59 ff 36 5c 32 9a 63 10 68 11 59 b8 20 00 50 9a eb 05 68 11 59 b8 20 00 50 b8 01 00 50 56 9a 55 12 68 11 83 c4 06"
 bytes,0x1648,"18 cb 00 00 0e cb 00 00 ef ca 00 00 e3 ca 00 00","16 cb 00 00 07 cb 00 00 fd ca 00 00 f3 ca 00 00"
 reloc,0x00e848," cloned"," клонированы:"
-# NOT VERIFIED
 reloc,0x0188ec," resurrected"," воскрешены:"
 reloc,0x0188e8," are frozen"," заморожены"
 
@@ -371,9 +369,7 @@ reloc,0x0188e8," are frozen"," заморожены"
 bytes,0x12A08,"74","eb"
 reloc,0x0188ea," kills "," разит цель. Убито: "
 
-# NOT VERIFIED
 reloc,0x0188e2,"This spell seems to have no effect!","Заклинание не подействовало!"
-# NOT VERIFIED
 reloc,0x0188e4,"No undead armies","Нежити здесь нет"
 reloc,0x0188e6,"No armies need resurrecting","Воскрешать некого"
 reloc,0x0188f4,"Only 1 spell per round!","Одно заклинание за раунд!"
