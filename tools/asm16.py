@@ -50,7 +50,8 @@ JCC = {"jo": 0x0, "jno": 0x1, "jb": 0x2, "jc": 0x2, "jnae": 0x2,
        "jle": 0xE, "jng": 0xE, "jg": 0xF, "jnle": 0xF}
 
 NO_OPERAND = {"nop": 0x90, "cbw": 0x98, "cwd": 0x99, "ret": 0xC3, "retf": 0xCB,
-              "clc": 0xF8, "stc": 0xF9, "pushf": 0x9C, "popf": 0x9D}
+              "clc": 0xF8, "stc": 0xF9, "pushf": 0x9C, "popf": 0x9D,
+              "xlat": 0xD7}      # al = ds:[bx+al], the whole point of a lookup patch
 
 
 class AsmError(Exception):
@@ -118,12 +119,12 @@ def parse_operand(tok, symbols, need):
     if m:
         # Only the base-register part folds case; the displacement may be a symbol.
         inner = m.group(1).strip()
+        if inner.lower() in RM16:          # a base pair first: [bx+si] is not bx plus si
+            return "mem", Mem(inner.lower(), 0)
         mm = re.fullmatch(r"([a-zA-Z+]+?)\s*([+-])\s*(\S+)", inner)
         if mm and mm.group(1).lower() in RM16:
             disp = parse_num(mm.group(3), symbols, need)
             return "mem", Mem(mm.group(1).lower(), -disp if mm.group(2) == "-" else disp)
-        if inner.lower() in RM16:
-            return "mem", Mem(inner.lower(), 0)
         return "mem", Mem(None, parse_num(inner, symbols, need))
     return "imm", parse_num(tok, symbols, need)
 
