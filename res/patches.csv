@@ -534,6 +534,9 @@ string,0x1A181," the ",", "
 # ---- gold amounts (town, dwellings, etc.)
 reloc,0x005E82,"GP=","Зол:"
 
+# ---- empty-list placeholder; res/gate_picker.asm hardcodes DS 0x0d9e, so this must stay in place
+string,0x01642E,"(none)","(нет)"
+
 # ==== BOAT TRAVEL MENU ====================================================================
 string,0x01A992,"1. Continentia","1. Континентия"
 string,0x01A9A1,"2. Forestria","2. Форестрия"
