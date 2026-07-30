@@ -98,6 +98,9 @@ string,0x01AB66,"  U Use Magic","  U Колдовать"
 string,0x01AB74,"  V View Character","  V Герой"
 string,0x01AB87,"  W Wait End Week","  W Ждать неделю"
 reloc,0x018BBD,"  Q Quit and Save","  Q Запись и выход"
+# The last three are one indexed mini-table (`mov ax,[bx+0x353b]`) feeding this list's single
+# mutable line -- so find_ref.py sees no ref -- and Fly doubles as a combat entry. All three
+# pad to 17 to erase each other on redraw.
 string,0x01ABF1,"  N New Continent","  N Континент"
 string,0x01AC03,"  L Land         ","  L Посадка      "
 string,0x01AC15,"  F Fly          ","  F Полет        "
@@ -221,6 +224,9 @@ reloc,0x0186f9,"Accept (y/n)?","Принять? (y/n)"
 
 # ==== COMBAT SCREEN =======================================================================
 # ---- menu bar
+# Entries 0-9 (the movement keys, A/C) are drawn by the same loop as the map's, then the index
+# jumps to 19 -- these six. "  F Fly" is printed in between, from the map's block below: the
+# one entry the two lists genuinely share.
 reloc,0x01086f,"Options / ","О:Помощь  "
 reloc,0x018bbf,"  G Give Up","  G Сдаться"
 reloc,0x018bc1,"  S Shoot","  S Стрелять"
