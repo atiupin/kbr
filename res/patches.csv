@@ -431,7 +431,7 @@ string,0x01A8A4,"Current score","Текущий счет"
 
 # ---- main
 string,0x016047,"Castle ","Замок "
-string,0x019A78,"of King Maximus","Максимуса"
+reloc,0x018462,"of King Maximus","короля Максимуса"
 string,0x01A6CF,"B) Audience with the King","B) Аудиенция у короля"
 
 # ---- recruit soldiers
@@ -507,9 +507,7 @@ reloc,0x0098dc,"You have seige weapons!","Катапульта уже купле
 # ---- gather information
 # Line 1 is "Castle " + name + this row; line 2 is ["your" | "no one's" | villain name +
 # "'s"] + " rule" + '.'. No Russian genitive can agree with an undeclinable name, so it is
-# recast as a label and its answer, with " rule" and "'s" blanked. Castle names are still
-# English, so line 1 has 10 chars left after the longest of them ("Замок Quinderwitch" is
-# already 18).
+# recast as a label and its answer, with " rule" and "'s" blanked.
 reloc,0x0097d4," is under",", хозяин:"
 reloc,0x0097ff,"your","вы"
 reloc,0x00980f,"no one's","никто"
@@ -671,6 +669,95 @@ reloc,0x018280,"Czar Nickolai the Mad","Царь Николай Безумный
 reloc,0x018282,"Magus Deathspell","Магус Чернокнижник"
 reloc,0x018284,"Urthrax Killspite","Уртракс Душегуб"
 reloc,0x018286,"Arech Dragonbreath","Арех Огнедышащий"
+
+# ---- castle names
+# Two copies of the same 27 entries that must stay in lockstep: table DS 0x1368 (contract
+# screens) and DS 0x2d9e (town gather-information, king's castle, the gate picker).
+reloc,0x0169f8,"Azram","Азрам"
+reloc,0x0169fa,"Basefit","Бейсфит"
+reloc,0x0169fc,"Cancomar","Канкомар"
+reloc,0x0169fe,"Duvock","Дувок"
+reloc,0x016a00,"Endryx","Эндрикс"
+reloc,0x016a02,"Faxis","Факсис"
+reloc,0x016a04,"Goobare","Губаре"
+reloc,0x016a06,"Hyppus","Хиппус"
+reloc,0x016a08,"Irok","Ирок"
+reloc,0x016a0a,"Jhan","Джан"
+reloc,0x016a0c,"Kookamunga","Кукамунга"
+reloc,0x016a0e,"Lorsche","Лорше"
+reloc,0x016a10,"Mooseweigh","Мусвей"
+reloc,0x016a12,"Nilslag","Нильслаг"
+reloc,0x016a14,"Ophiraund","Офираунд"
+reloc,0x016a16,"Portalis","Порталис"
+reloc,0x016a18,"Quinderwitch","Куиндервич"
+reloc,0x016a1a,"Rythacon","Ритакон"
+reloc,0x016a1c,"Spockana","Спокана"
+reloc,0x016a1e,"Tylitch","Тилич"
+reloc,0x016a20,"Uzare","Узаре"
+reloc,0x016a22,"Vutar","Вутар"
+reloc,0x016a24,"Wankelforte","Ванкельфорт"
+reloc,0x016a26,"Xelox","Ксилокс"
+reloc,0x016a28,"Yeneverre","Йеневерре"
+reloc,0x016a2a,"Zyzzarzaz","Зиззарзаз"
+# Slot 26 is the king's castle: unreachable here (the contract screen indexes 0..25), but
+# kept in step with the other copy's slot 26, which the castle screen prints. That screen
+# is the only reader of either, and it is 27 chars wide after "Замок ", not 13.
+reloc,0x016a2c,"of King Maximus","короля Максимуса"
+reloc,0x01842e,"Azram","Азрам"
+reloc,0x018430,"Basefit","Бейсфит"
+reloc,0x018432,"Cancomar","Канкомар"
+reloc,0x018434,"Duvock","Дувок"
+reloc,0x018436,"Endryx","Эндрикс"
+reloc,0x018438,"Faxis","Факсис"
+reloc,0x01843a,"Goobare","Губаре"
+reloc,0x01843c,"Hyppus","Хиппус"
+reloc,0x01843e,"Irok","Ирок"
+reloc,0x018440,"Jhan","Джан"
+reloc,0x018442,"Kookamunga","Кукамунга"
+reloc,0x018444,"Lorsche","Лорше"
+reloc,0x018446,"Mooseweigh","Мусвей"
+reloc,0x018448,"Nilslag","Нильслаг"
+reloc,0x01844a,"Ophiraund","Офираунд"
+reloc,0x01844c,"Portalis","Порталис"
+reloc,0x01844e,"Quinderwitch","Куиндервич"
+reloc,0x018450,"Rythacon","Ритакон"
+reloc,0x018452,"Spockana","Спокана"
+reloc,0x018454,"Tylitch","Тилич"
+reloc,0x018456,"Uzare","Узаре"
+reloc,0x018458,"Vutar","Вутар"
+reloc,0x01845a,"Wankelforte","Ванкельфорт"
+reloc,0x01845c,"Xelox","Ксилокс"
+reloc,0x01845e,"Yeneverre","Йеневерре"
+reloc,0x018460,"Zyzzarzaz","Зиззарзаз"
+
+# ---- town names
+# Table DS 0x2e25. Same 13-char budget as the castles, for the gate picker's columns.
+reloc,0x0184b5,"Riverton","Приречье"
+reloc,0x0184b7,"Underfoot","Подножье"
+reloc,0x0184b9,"Path's End","Конец Пути"
+reloc,0x0184bb,"Anomaly","Аномалия"
+reloc,0x0184bd,"Topshore","Взморье"
+reloc,0x0184bf,"Lakeview","Приозёрье"
+reloc,0x0184c1,"Simpleton","Простаково"
+reloc,0x0184c3,"Centrapf","Центрапф"
+reloc,0x0184c5,"Quiln Point","Мыс Куилн"
+reloc,0x0184c7,"Midland","Срединное"
+reloc,0x0184c9,"Xoctan","Ксоктан"
+reloc,0x0184cb,"Overthere","Затамье"
+reloc,0x0184cd,"Elan's Landing","Причал Элана"
+reloc,0x0184cf,"King's Haven","Приют Короля"
+reloc,0x0184d1,"Bayside","Заливье"
+reloc,0x0184d3,"Nyre","Найр"
+reloc,0x0184d5,"Dark Corner","Тёмный Угол"
+reloc,0x0184d7,"Isla Vista","Исла Виста"
+reloc,0x0184d9,"Grimwold","Гримволд"
+reloc,0x0184db,"Japper","Джаппер"
+reloc,0x0184dd,"Vengeance","Возмездие"
+reloc,0x0184df,"Hunterville","Охотничье"
+reloc,0x0184e1,"Fjord","Фьорд"
+reloc,0x0184e3,"Yakonia","Якония"
+reloc,0x0184e5,"Woods End","Опушка"
+reloc,0x0184e7,"Zaezoizu","Заэзойзу"
 
 # ==== CONTRACT SCREENS ====================================================================
 # 17 records, each a 14-entry pointer table (villain 1 at 0x016A2E, stride 28), so every
@@ -1109,7 +1196,7 @@ reloc,0x0182b2,"desert.","небыстрое."
 
 reloc,0x0182b4,"Dead End","Тупик"
 
-reloc,0x0182b8,"Irok guards the north.","Irok стережёт север."
+reloc,0x0182b8,"Irok guards the north.","Ирок стережёт север."
 
 reloc,0x0182bc,"A-maze-ing Forest","Лес-лабиринт"
 
@@ -1127,11 +1214,11 @@ reloc,0x0182d4,"Pirate's Cove","Пиратская бухта"
 
 reloc,0x0182d8,"Boon Docks","Глухая гавань"
 
-reloc,0x0182dc,"Welcome to Kookamunga!","Вас приветствует Kookamunga!"
+reloc,0x0182dc,"Welcome to Kookamunga!","Вас приветствует Кукамунга!"
 
 reloc,0x0182e0,"Time is on our side.","Время работает на нас."
 
-reloc,0x0182e4,"Passage to Basefit.","Дорога на Basefit."
+reloc,0x0182e4,"Passage to Basefit.","Дорога на Бейсфит."
 
 reloc,0x0182e8,"The end is near.","Конец близок."
 
@@ -1140,7 +1227,7 @@ reloc,0x0182ec,"Treasure at the river's end.","Клад в устье реки."
 reloc,0x0182f0,"The ogres are back... and","Огры вернулись... и они"
 reloc,0x0182f2,"they're hungry!","голодны!"
 
-reloc,0x0182f4,"Wood's End is south.","Woods End - к югу."
+reloc,0x0182f4,"Wood's End is south.","Опушка - к югу."
 
 reloc,0x0182f8,"Undead are everywhere!","Повсюду нежить!"
 

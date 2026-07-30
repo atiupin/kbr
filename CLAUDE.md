@@ -167,9 +167,8 @@ tools/ghidra.py run DumpDecomp.java build/decomp
   menu), the search prompt with all 7 treasure-chest events and all 8 artifact finds, the
   adventure-map boxes (siege prompt, scouting, wandering armies) and the whole of spell
   casting — the spell book, the cast prompt, every effect message and the Castle/Town Gate
-  and Instant Army boxes.
-  Town and castle names are still English on purpose — one later pass. The Town/Castle
-  Gate spells now draw a named, letter-keyed list (`res/gate_picker.asm`) instead of the
+  and Instant Army boxes, and the 26 castle and 26 town names. The Town/Castle Gate
+  spells draw a named, letter-keyed list (`res/gate_picker.asm`) instead of the
   original's bare letters, so those names carry no constraint on their first letter.
 - [ ] **Patcher** — ownership-gated installer producing the translated build.
 

@@ -53,8 +53,8 @@ ASK_TOWN    equ 0x2fb7
 NONE_STR    equ 0x0d9e          ; "(none)" -- fits its own slot, so a plain `string` row
 
 ; ---- layout -------------------------------------------------------------------------
-; 26 destinations at most, so two columns of 13. Each column is 17 cells: 14 for the widest
-; entry ("A) Тёмный Угол") and 3 of gutter, inside a 36-cell window.
+; 26 destinations at most, so two columns of 13. Each column is 17 cells: 15 for the widest
+; entry ("A) Приют Короля") and 2 of gutter, inside a 36-cell window.
 ;
 ; Window edges snap to the 8px cell grid while the text inside them does not, and the play
 ; area leaves only 2 scanlines above the window and 6 below -- so this is the lowest row
