@@ -1034,22 +1034,22 @@ reloc,0x0183aa,"a ferocious beast, the","от свирепого зверя. З�
 reloc,0x0183ac,"Magistrate presents you","магистрат вручает вам"
 string,0x01969A,"with: The Ring of Heroism...","Кольцо героизма..."
 
-# ---- artifact: Shield of Protection, NOT VERIFIED
+# ---- artifact: Shield of Protection
 string,0x0196B8,"Challenged to a joust by the","Вызванный на поединок"
 reloc,0x0183b4,"dread Dark Knight, you","грозным Чёрным Рыцарем, вы"
 reloc,0x0183b6,"quickly dispose of him and","быстро расправляетесь с ним"
 reloc,0x0183b8,"receive: The Shield of","и получаете Щит стойкости..."
 reloc,0x0183ba,"Protection...",""
 
-# ---- artifact: Crown of Command, NOT VERIFIED
+# ---- artifact: Crown of Command
 reloc,0x0183bc,"Resting on a throne in a","На троне призрачного замка"
 reloc,0x0183be,"phantom castle, you have","вы находите Корону власти..."
 string,0x01975E,"found: The Crown of Command.",""
 
-# ---- artifact: Amulet of Augmentation, NOT VERIFIED
-string,0x01977D,"Hidden within an enchanted","В зачарованной роще"
-reloc,0x0183c8,"grove, you find: The Amulet","вы находите Амулет"
-reloc,0x0183ca,"of Augmentation...","чародейства..."
+# ---- artifact: Amulet of Augmentation
+reloc,0x0183c6,"Hidden within an enchanted","Глубоко в зачарованной роще"
+reloc,0x0183c8,"grove, you find: The Amulet","вы находите мистический"
+reloc,0x0183ca,"of Augmentation...","Амулет чародейства..."
 
 # ---- artifact: Articles of Nobility
 string,0x0197C9,"Freeing a virtuous maiden","Вы освобождаете юную"
@@ -1065,17 +1065,17 @@ reloc,0x0183de,"of the oceans. Mariners, in","океанов. В благода�
 reloc,0x0183e0,"gratitude, bestow upon you:","мореходы даруют вам"
 reloc,0x0183e2,"The Anchor of Admirality...","Адмиральский якорь..."
 
-# ---- artifact: Book of Necros, NOT VERIFIED
+# ---- artifact: Book of Necros
 reloc,0x0183e4,"In the study of a deserted","В кабинете заброшенной"
 reloc,0x0183e6,"wizard's tower, you have","башни мага вы находите"
 string,0x019902,"found: The Book of Necros...","Книгу Некроса..."
 
-# ---- artifact: Sword of Prowess, NOT VERIFIED
-string,0x019921,"Following rumors of a great","Идя по слухам о великом"
-reloc,0x0183f0,"and powerful sword, you","и могучем мече, вы"
-reloc,0x0183f2,"defeat its fearsome guardian","побеждаете его грозного"
-reloc,0x0183f4,"and gain possession of: The","стража и получаете"
-string,0x01998E,"Sword of Prowess...","Меч доблести..."
+# ---- artifact: Sword of Prowess
+string,0x019921,"Following rumors of a great","Следуя слухам о великом"
+reloc,0x0183f0,"and powerful sword, you","и могучем мече, вы находите"
+reloc,0x0183f2,"defeat its fearsome guardian","и побеждаете его грозного"
+reloc,0x0183f4,"and gain possession of: The","стража. Вам достается Меч"
+string,0x01998E,"Sword of Prowess...","доблести..."
 
 # ==== SIGNPOSTS ==========================================================================
 reloc,0x00a04f,"A sign reads:","Знак гласит:"
@@ -1095,7 +1095,6 @@ reloc,0x01829a,"found!","Скипетр!"
 
 reloc,0x01829c,"King's Treasure Garden","Сад королевских сокровищ"
 
-# NOT VERIFIED
 reloc,0x0182a0,"There are two artifacts per","На каждом континенте"
 reloc,0x0182a2,"continent.","по два артефакта."
 
@@ -1134,7 +1133,6 @@ reloc,0x0182e0,"Time is on our side.","Время работает на нас."
 
 reloc,0x0182e4,"Passage to Basefit.","Дорога на Basefit."
 
-# NOT VERIFIED
 reloc,0x0182e8,"The end is near.","Конец близок."
 
 reloc,0x0182ec,"Treasure at the river's end.","Клад в устье реки."
@@ -1148,10 +1146,8 @@ reloc,0x0182f8,"Undead are everywhere!","Повсюду нежить!"
 
 reloc,0x0182fc,"Peasants are fodder!","Крестьяне - пушечное мясо!"
 
-# NOT VERIFIED
 reloc,0x018300,"Monster Way","Путь чудовищ"
 
-# NOT VERIFIED
 reloc,0x018304,"There is one town for each","На каждый замок здесь"
 reloc,0x018306,"castle.","по одному городу."
 
@@ -1160,26 +1156,21 @@ reloc,0x01830a,"there you are.","ты уже там."
 
 reloc,0x01830c,"Forestria maze entrance!","Вход в лабиринт Форестрии!"
 
-# NOT VERIFIED
 reloc,0x018310,"Crossroads","Перекрёсток"
 
 reloc,0x018314,"No Trespassing!","Прохода нет!"
 
-# NOT VERIFIED
 reloc,0x018318,"Beware the moors!","Берегись болот!"
 
-# NOT VERIFIED
-reloc,0x01831c,"You'll never find the","Здесь вам Скипетра"
+reloc,0x01831c,"You'll never find the","Здесь тебе Скипетра"
 reloc,0x01831e,"Sceptre here!","не найти!"
 
 reloc,0x018320,"Your quest is doomed!","Твой поход обречён!"
 
 reloc,0x018324,"Stay on the road!","Держитесь дороги!"
 
-# NOT VERIFIED
-reloc,0x018328,"Don't go any farther!","Дальше не ходите!"
+reloc,0x018328,"Don't go any farther!","Дальше не ходи!"
 
-# NOT VERIFIED
 reloc,0x01832c,"Wrong Way!","Не туда!"
 
 reloc,0x018330,"Four villains rule Forestria","Форестрией правят четверо"
@@ -1236,36 +1227,25 @@ reloc,0x018372,"surrounded by a desert.","окружённый пустыней.
 # NOT VERIFIED
 reloc,0x018374,"Three villains rule Saharia.","Сахарией правят трое."
 
-# NOT VERIFIED
-reloc,0x018378,"Your army will perish here!","Здесь ваше войско сгинет!"
+reloc,0x018378,"Your army will perish here!","Здесь твое войско сгинет!"
 
-# NOT VERIFIED
 reloc,0x01837c,"Oasis","Оазис"
 
-# NOT VERIFIED
 reloc,0x018380,"Wading Pool","Лягушатник"
 
-# NOT VERIFIED
 reloc,0x018384,"Oasis of Plenty","Оазис изобилия"
 
-# NOT VERIFIED
-reloc,0x018388,"There is no escaping the","От пророчества"
-reloc,0x01838a,"prophecy!","не уйти!"
+reloc,0x018388,"There is no escaping the","От пророчества не уйти!"
+reloc,0x01838a,"prophecy!",""
 
-# NOT VERIFIED
 reloc,0x01838c,"Volcano Guardian","Страж вулкана"
 
-# NOT VERIFIED
 reloc,0x018390,"Time is running out!","Время на исходе!"
 
-# NOT VERIFIED
 reloc,0x018394,"Treasure Trough","Кладезь сокровищ"
 
-# NOT VERIFIED
 reloc,0x018398,"Rest Stop","Привал"
 
-# NOT VERIFIED
 reloc,0x01839c,"Treasure Zone","Земля сокровищ"
 
-# NOT VERIFIED
 reloc,0x0183a0,"This place is a nightmare!","Это место - сущий кошмар!"
