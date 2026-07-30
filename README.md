@@ -3,6 +3,9 @@
 Fan translation of the **original 1990 DOS King's Bounty** (New World Computing) into Russian,
 by **binary patching** the unpacked EXE.
 
+Made by [Aleksandr Tiupin](https://t.me/luna_game). Font design by
+[Dmitry Sivukhin](https://t.me/dmitrysivukhin).
+
 ## Project layout
 
 ```
