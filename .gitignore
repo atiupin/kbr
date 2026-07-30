@@ -1,12 +1,6 @@
-# Generated, plus the saves — game-derived, none of it ours to distribute.
 build/
-
-# Scratch: DOSBox-X captures, the Ghidra project database.
 tmp/
-
-# The user's own game files; the README stays so there is somewhere to drop them.
 /game/*
 !/game/README.md
 
-# macOS
 .DS_Store
