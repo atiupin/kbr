@@ -9,11 +9,14 @@ that reasons about them.
 The directories, and the rule each one carries:
 
     GAME    the user's pristine originals -- READ ONLY, never write here
-    BUILD   everything generated, and the DOSBox run dir (mounted as C:)
+    BUILD   everything generated, and the DOSBox run dir (mounted as C:) --
+            so the *.DAT saves DOSBox writes there are the one thing in it
+            that no script can regenerate
     RES     hand-written build INPUTS: the patch manifest, the font sheet
     TOOLS   this directory: scripts only -- the build scripts, plus ghidra.py
             and its ghidra/*.java scripts
-    TMP     scratch -- the Ghidra project DB, DOSBox captures
+    TMP     scratch -- the Ghidra project DB and its decomp dumps, DOSBox
+            captures
 
 Paths are absolute and derived from this file's own location, so the scripts
 work from any working directory.

@@ -1,6 +1,6 @@
 // Dumps decompiled C for every function in the program, plus a map of
 // defined strings -> the functions that reference them.
-// Usage: tools/ghidra.py run DumpDecomp.java build/decomp
+// Usage: tools/ghidra.py run DumpDecomp.java tmp/decomp
 
 import ghidra.app.script.GhidraScript;
 import ghidra.app.decompiler.DecompInterface;

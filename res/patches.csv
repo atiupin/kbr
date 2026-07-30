@@ -753,7 +753,7 @@ string,0x016C2B,"Saharia","Сахария"
 # ---- villain names
 # Their own table, separate from the contract screen's "Name: " lines: it feeds the town's
 # gather-information line 2 (<= 26 chars, the '.' follows) and the victory screen. The first
-# two fit their own slots (16 and 14 chars) and are left in place; both have a ref now if a
+# two fit their own slots (16 and 14 chars) and are left in place; both have a ref if a
 # rewording needs the pool.
 string,0x018EDF,"Murray the Miser","Мюррей Скряга"
 string,0x018EF0,"Hack the Rogue","Хак Прохвост"

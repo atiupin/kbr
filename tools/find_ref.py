@@ -23,8 +23,7 @@ this way -- "not repointable by this tool", never "not a pointer".
 A `table-entry` verdict says nothing about liveness. Tables are read base+index,
 often from SEVERAL bases into one array (DS 0x3252 is indexed from both 0x324e and
 0x3252), so no immediate ever equals a slot's own DS offset -- grepping for one
-proves nothing. Two slots were called dead that way and turned out to be the combat
-targeting prompt. Only a screenshot settles it.
+cannot prove a slot dead. Only a screenshot settles it.
 """
 
 import hashlib
@@ -44,7 +43,7 @@ IMAGE_END = 0x1BA20      # end of the original loaded image = DS offset 0x6390
 # mov ax/cx/dx/bx/si/di, imm16 ; push imm16
 LOAD_OPS = frozenset({0xB8, 0xB9, 0xBA, 0xBB, 0xBE, 0xBF, 0x68})
 # Copy-protection segment: refs here are genuine pointers, but repointing any of them
-# hangs the game much later (cause unknown -- see apply_patches.py / CLAUDE.md).
+# hangs the game much later (cause unknown -- see apply_patches.py / README.md).
 # Reported, never offered as a paste-ready reloc row.
 PROT_LO, PROT_HI = 0xBFE0, 0xCCA7
 
@@ -71,9 +70,8 @@ def chains(data, i):
     """True if slots `i` and `i+2` are CONSECUTIVE entries of a pointer table.
 
     Not "both look like strings" -- that test is far too weak, it promotes any
-    coincidental byte pair to a ref (the bug that let a slot inside a descending
-    counter table, file 0x18855, pose as a pointer to DS 0x0b0c and corrupted the
-    table when the build rewrote it). This asks the arithmetic question instead:
+    coincidental byte pair to a ref, and a slot in a descending counter table
+    (file 0x18855) passes it. This asks the arithmetic question instead:
 
         table[k+1] == table[k] + len(string k) + 1
 
@@ -99,21 +97,19 @@ def find_refs(data, str_off):
     Conservative is not the same as sound, and `code-immediate` is the weaker of
     the two tests: it only asks whether the PRECEDING BYTE is a load opcode, and
     nothing here tracks instruction boundaries. A jump whose displacement happens
-    to equal a load opcode is enough to fake one. Real case: DS 0x47eb ('A tribe
-    of nomads greet you') is reported at file 0x5240, which is `eb 47`, the
-    `jmp short` two bytes into `74 bf eb 47` -- the 0xbf that vouched for it is
-    the displacement of the preceding `jz`, not a `mov di`. Repointing it would
-    have rewritten a branch target. So when a string reports BOTH a table entry
-    and a lone code-immediate, disassemble the code site before trusting it;
-    a table entry needs no such check, the chain already validated it.
+    to equal a load opcode fakes one -- DS 0x47eb is reported at file 0x5240,
+    where the vouching 0xbf is the displacement of a `jz`, not a `mov di`, and
+    repointing it would rewrite a branch target. So when a string reports BOTH a
+    table entry and a lone code-immediate, disassemble the code site before
+    trusting it (tools/ghidra/FindStringUsers.java scans decoded instructions and
+    settles it); a table entry needs no such check, the chain already validated it.
 
-    A slot is accepted when it sits in a run of THREE chained slots, in any of
-    the three positions -- which is what reaches a table's first and last entry,
-    the case an earlier both-neighbours-must-validate test could not see. TWO
+    A slot is accepted when it sits in a run of THREE chained slots, in any of the
+    three positions -- which is what reaches a table's first and last entry. TWO
     chained slots are not enough: an arithmetic ramp fakes one link whenever its
-    step equals a string length there, and the menu table at 0x18cc8 (step 9)
-    does exactly that, offering `DS 0x102` -- two bytes into ' Controls ' -- as a
-    pointer. Its second link fails, so the run test rejects it."""
+    step equals a string length there, as the menu table at 0x18cc8 (step 9) does,
+    offering `DS 0x102` -- two bytes into ' Controls ' -- as a pointer. Its second
+    link fails, so the run test rejects it."""
     dsoff = str_off - DS_BASE
     needle = struct.pack("<H", dsoff)
     refs = []

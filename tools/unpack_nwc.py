@@ -4,11 +4,6 @@ build/KBU1.EXE -- the inner (still EXEPACK-packed) EXE.
 
     python3 tools/unpack_nwc.py            # game/KB.EXE -> build/KBU1.EXE
 
-This replaced CUP386, the DOS code-tracing unpacker originally used for this
-step (since deleted from tools/), so the whole build runs in plain Python.
-Verified: the image it produces is byte-identical to CUP386's, all 107,501
-bytes.
-
 How the NWC layer works
 -----------------------
 KB.EXE = [ 1177-byte NWC stub ][ inner MZ header ][ LZW stream ]
@@ -100,9 +95,9 @@ def unpack(src_path=INPUT, dst_path=OUTPUT):
               file=sys.stderr)
 
     # ---- rebuild a loadable EXE around the image ---------------------------
-    # A 2-paragraph (32-byte) header, matching what CUP386 emitted, so
-    # unpack_exepack.py sees the file layout it expects. No relocations (crlc
-    # was verified 0 above), entry/stack taken from the inner header.
+    # A 2-paragraph (32-byte) header, which is the layout unpack_exepack.py
+    # expects. No relocations (crlc was verified 0 above), entry/stack taken
+    # from the inner header.
     total = 32 + len(image)
     hdr = bytearray(32)
     MZ.pack_into(hdr, 0, 0x5A4D, total % 512, (total + 511) // 512, 0, 2,

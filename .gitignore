@@ -1,14 +1,10 @@
-# Generated — safe to delete (see CLAUDE.md project layout).
-# Also where every game-derived binary lives: KBU2/KBR.EXE, the run-dir .CC
-# copies, saves. None of it is ours to distribute.
+# Generated, plus the saves — game-derived, none of it ours to distribute.
 build/
 
-# Scratch: DOSBox-X captures (screenshots, MEMDUMP.BIN), the Ghidra project
-# database (game-derived and fully regenerable — see CLAUDE.md), throwaway files
+# Scratch: DOSBox-X captures, the Ghidra project database.
 tmp/
 
-# The user's own game files. The directory itself stays in git (game/README.md)
-# so there is somewhere to drop them.
+# The user's own game files; the README stays so there is somewhere to drop them.
 /game/*
 !/game/README.md
 

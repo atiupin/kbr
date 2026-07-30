@@ -23,9 +23,8 @@ bytes : hex, equal length, overwritten in place.
         a changed immediate); MOVING one drags two things with it. The MZ relocation
         table pins every far call's segment word BY FILE OFFSET and DOS adds the load
         segment to it, so a slid `9a` is never fixed up while the loader corrupts
-        whatever took its place -- reordering the recruit line's calls at 0xACCD drew a
-        header and nothing else until a second row moved the entries. A slid `b8` that
-        a `reloc` row names moves that row's ref too. Both are legal when declared:
+        whatever took its place. A slid `b8` that a `reloc` row names moves that row's
+        ref too. Both are legal when declared:
         repoint the relocation entries in their own `bytes` row and give the `reloc`
         row the ref's new offset. check_relocations rejects an undeclared slide.
         Prefer moving the OUTPUT to moving code -- the drawing calls take absolute
@@ -51,8 +50,8 @@ reloc : `offset` is NOT the string -- it is the REF, the file offset of the 2-by
 
 Every reloc ref MUST come from find_ref.py, which proves the site is a real code
 immediate or table slot. A hand-picked 2-byte value that merely happens to equal the
-string's DS offset repoints something else: that mistake (a ref inside a counter table)
-corrupted game data and crashed the puzzle map.
+string's DS offset repoints something else -- a slot inside a counter table, say --
+and the corruption surfaces far from the edit.
 
 One stage is not manifest-driven: res/gate_picker.asm, assembled by asm16.py and injected
 after the pool (see inject_gate_picker). It is code, not translation, and carries
@@ -87,7 +86,7 @@ BSSEND  = 0xB64C         # _end: heap floor / top of BSS (c0 constant, verified)
 # high-water DS 0xb6cf, stack low-water DS 0xfe2c -- a 17.8 KB cold band. The pool sits
 # mid-band, so heap and stack each keep KB of slack, and c0's BSS wipe stops at _end, so
 # its file-loaded bytes survive startup. DGROUP is left FLOATING (_heaplen 0): capping it
-# was tried and reverted, it buys nothing and costs stack headroom.
+# buys nothing and costs stack headroom.
 #
 # To re-measure: DOSBox-X debugger, `MEMDUMPBIN 0000:0000 100000`. DS:0000 sits 4 bytes
 # below the "Turbo C++ - Copyright 1990 Borla..." literal; RAM boots zeroed, so the
@@ -98,16 +97,17 @@ BSSEND  = 0xB64C         # _end: heap floor / top of BSS (c0 constant, verified)
 # image end -- byte-exact translated strings, layered, each build's image covering the head
 # of the one before. They read as live writes past the pool and are nothing of the sort.
 POOL_DSOFF     = 0xD000                    # pool base, mid cold band
-POOL_SIZE      = 0x1800                    # 6 KB; the 4 KB first cut ran out mid-translation
+POOL_SIZE      = 0x1800                    # 6 KB
 POOL_END_DSOFF = POOL_DSOFF + POOL_SIZE    # hard cap; clear of the stack's descent
 
 # Copy-protection segment (Ghidra 19fe:0000-0cc7). `reloc` rows MUST NOT repoint a ref
 # in here. THE RULE IS SOLID; THE MECHANISM IS UNKNOWN -- distrust any explanation.
 #
 # One repointed immediate plays for minutes, then hangs in an INT 6 loop on entering the
-# king's castle. Bisected: repointing to another string INSIDE the original image still
-# hangs, and swapping two immediates -- byte-sum AND XOR unchanged -- still hangs, so it
-# is no simple checksum. Falsified: heap exhaustion, stack exhaustion, pool placement.
+# king's castle. It is not a simple checksum: repointing to another string inside the
+# original image hangs too, and so does swapping two immediates, which leaves both the
+# byte sum and the XOR unchanged. Heap exhaustion, stack exhaustion and pool placement
+# are all ruled out -- re-testing those is wasted effort.
 #
 # Not "any byte here is fatal": our own flip at 0xC40A is exactly what KB!.COM patches at
 # runtime, so nothing can guard it. The fence is conservative and costs nothing -- every
@@ -403,7 +403,6 @@ def check_relocations(orig, data):
                 f"       breaks the call that moved AND corrupts what took its place. "
                 f"See 'NO CODE MOTION'\n"
                 f"       in this script's docstring.")
-
 
 
 def retarget_relocations(data, lo, hi, sites):

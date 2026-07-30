@@ -13,10 +13,9 @@ Each member is:
 Compression is variable-width LZW, LSB-first bit packing, 9->12 bits, clear=0x100,
 end=0x101, first dictionary code=0x102, GIF-style width growth (no early change),
 CLEAR emitted when the dictionary fills. The stream starts with a CLEAR code.
-This matches the game's decompressor (FUN_230a_02f1); the decoder was validated
-against all 199 members of both archives (each decodes to exactly its declen).
-The same codec packs KB.EXE's outer NWC layer, so tools/unpack_nwc.py imports
-lzw_decode from here -- keep this module stdlib-only and cheap to import.
+This matches the game's decompressor (FUN_230a_02f1). The same codec packs
+KB.EXE's outer NWC layer, so tools/unpack_nwc.py imports lzw_decode from here --
+keep this module stdlib-only and cheap to import.
 
 Members are looked up by name, not by index: the loader hashes the requested
 filename (hash = rol16(hash,1) + upper(ch) per char) and matches it against the
@@ -34,8 +33,7 @@ puts every Cyrillic letter -- undefined. This project EXTENDS it to 2048 bytes /
 256 glyphs with Cyrillic drawn into the upper half; the run-dir archives in
 build/ therefore differ from the pristine game/ copies. Nothing had to be
 patched for this: the CC loader mallocs each member by its declen, so the larger
-font auto-allocates, and the glyph blitter indexes the font unsigned (confirmed
-in DOSBox-X).
+font auto-allocates, and the glyph blitter indexes the font unsigned.
 
 The upper half is not all Cyrillic: CP866 spends 0xB0-0xDF and 0xF2-0xFF on box
 drawing and blocks, which no Russian text reaches and the game -- shipped with a
@@ -59,8 +57,8 @@ CLI
     cc.py font-import <in.png> <archive.CC> <out.CC>   # PNG -> font member 0x9bb2
 
 font-build is font-import run over both display modes with the project's own
-paths (from paths.py), which is all the build ever needs; the explicit form is
-kept for one-off experiments on an archive elsewhere.
+paths (from paths.py), which is all the build ever needs; the explicit form
+takes any archive.
 
 Stdlib only -- the PNG read/write the font paths need is implemented below on
 zlib, so the whole build runs in a bare Python 3 with nothing installed.
@@ -449,8 +447,7 @@ def main(argv):
     elif cmd == "font-import":
         font_import(argv[2], argv[3], argv[4])
     elif cmd == "font-build":
-        # The build step: both run-dir archives from the pristine originals, no
-        # arguments, so it reads like the rest of the pipeline.
+        # The build step: both run-dir archives from the pristine originals.
         for mode in (256, 416):
             font_import(paths.FONT_PNG, paths.GAME_CC[mode], paths.BUILD_CC[mode])
     else:

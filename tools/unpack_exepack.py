@@ -43,11 +43,9 @@ from paths import KBU1, KBU2                                 # noqa: E402
 
 def unpack(src_path=KBU1, dst_path=KBU2):
     d = open(src_path, "rb").read()
-    # Take the load image exactly as the DOS header declares it -- KBU1's
-    # header is 32 bytes and its image 107501 bytes, but reading the fields
-    # keeps this honest if the file is ever regenerated differently. (CUP386's
-    # output carried ~78 KB of dump tail past the declared end; the declared
-    # length is what DOS would load, and what the EXEPACK offsets below assume.)
+    # Take the load image exactly as the DOS header declares it, never the file
+    # size: the declared length is what DOS would load, and what the EXEPACK
+    # offsets below assume. Any tail past it is not part of the image.
     cblp, cp, _crlc, cparhdr = struct.unpack_from("<4H", d, 2)
     img = bytearray(d[cparhdr * 16:(cp - 1) * 512 + cblp])
 
