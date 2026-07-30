@@ -1,12 +1,15 @@
 # King's Bounty — Russian Translation (KBR)
 
-Fan translation of the **original 1990 DOS King's Bounty** (New World Computing) into Russian,
-by **binary patching** the unpacked EXE.
+Fan translation of the original 1990 DOS King's Bounty into Russian.
 
 Made by [Aleksandr Tiupin](https://t.me/luna_game). Font design by
 [Dmitry Sivukhin](https://t.me/dmitrysivukhin).
 
-## Project layout
+King's Bounty © 1990 New World Computing; the trademark and the rights to the original game
+belong to their present holders. This is an unofficial fan project, not affiliated with or
+endorsed by them, and it ships no game data.
+
+## Project Layout
 
 ```
 game/    *** the user's pristine originals *** — never modified, untracked (not ours to
