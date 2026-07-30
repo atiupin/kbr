@@ -12,6 +12,9 @@ The directories, and the rule each one carries:
     BUILD   everything generated, and the DOSBox run dir (mounted as C:) --
             so the *.DAT saves DOSBox writes there are the one thing in it
             that no script can regenerate
+    DIST    what a player gets: the patched game plus its DOSBox config --
+            also a run dir (the shipped config mounts it as C:), so like BUILD
+            it may hold *.DAT saves and must never be wiped wholesale
     RES     hand-written build INPUTS: the patch manifest, the font sheet
     TOOLS   this directory: scripts only -- the build scripts, plus ghidra.py
             and its ghidra/*.java scripts
@@ -28,6 +31,7 @@ TOOLS = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(TOOLS)
 GAME = os.path.join(ROOT, "game")
 BUILD = os.path.join(ROOT, "build")
+DIST = os.path.join(ROOT, "dist")
 RES = os.path.join(ROOT, "res")
 TMP = os.path.join(ROOT, "tmp")
 
@@ -47,6 +51,7 @@ BUILD_CC = {256: os.path.join(BUILD, "256.CC"),  # run-dir copies, carrying the
 PATCHES_CSV = os.path.join(RES, "patches.csv")
 FONT_PNG = os.path.join(RES, "font.png")
 GATE_PICKER_ASM = os.path.join(RES, "gate_picker.asm")   # injected code, see apply_patches
+DOSBOX_CONF = os.path.join(RES, "dosbox.conf")           # shipped in DIST, not used to test
 
 # KBU2.EXE's SHA-256. Every tool that reads KBU2 gates on this: the file offsets
 # in patches.csv are only meaningful against this exact image, so a mismatch

@@ -10,9 +10,12 @@ game/    *** the user's pristine originals *** — never modified, untracked (no
          distribute).
 build/   *** generated *** — the whole build chain's output, and the RUN DIR (DOSBox mounts
          it as C:, so it is also where the user's saves land).
+dist/    *** generated *** — what a player gets: the patched game plus `dosbox.conf`.
+         Also a run dir (that config mounts it as C:), so saves land here too.
 res/     *** hand-written build INPUTS *** — the patch manifest (i.e. the translation
-         itself), the glyph sheet, and `gate_picker.asm`: the town/castle gate
-         destination list, rewritten as new code because translating it was not enough.
+         itself), the glyph sheet, `gate_picker.asm` (the town/castle gate destination
+         list, rewritten as new code because translating it was not enough), and
+         `dosbox.conf`, the config shipped to players.
 tools/   *** the build *** — SCRIPTS ONLY, hand-written Python, stdlib only, plus the
          diagnostic Ghidra front-end and its ghidra/*.java scripts.
 tmp/     *** scratch, gitignored *** — the Ghidra project DB and its dumps, DOSBox captures.
@@ -24,7 +27,10 @@ Every command in the project. Each script's own docstring is the reference — r
 arguments to print it.
 
 ```
-# build chain, in order — no arguments, nothing to configure
+# the whole build, then dist/ — this is the one to run
+tools/build.py
+
+# its steps, in order — no arguments, nothing to configure
 tools/unpack_nwc.py                        KB.EXE -> KBU1.EXE    (outer NWC packer)
 tools/unpack_exepack.py                    KBU1 -> KBU2.EXE      (EXEPACK; the edit base)
 tools/apply_patches.py                     KBU2 + res/patches.csv -> KBR.EXE
@@ -58,11 +64,14 @@ DumpDecomp.java [outdir]                   decompiled C for every function + a s
 Needs your own copy of the game in `game/`: `KB.EXE`, `256.CC` and `416.CC` (nothing reads the
 `KB!.COM` launcher — the patch disables the protection itself).
 
-Run the four build-chain commands above in order. **Pure Python 3 stdlib**. Every step takes no
+Run `tools/build.py`, which runs the four steps in order and stages `dist/`; run them
+individually when only one part changed. **Pure Python 3 stdlib**. Every step takes no
 arguments and reads its paths from **`tools/paths.py`**, which is the one place that knows the
 layout — put a path there, not in a script.
 
-To test: `dosbox-x -conf dosbox-x.conf` from the repo root (C: is `build/`), then `KBR`.
+To test: `dosbox-x -conf dosbox-x.conf` from the repo root (C: is `build/`), then `KBR`. That
+config is the development one — it keeps the debugger usable and does not touch `dist/`; what
+players get is `res/dosbox.conf`.
 
 ## Translating
 

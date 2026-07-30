@@ -2,9 +2,10 @@
 
 ## Files
 
-- **Never `rm -rf build/`.** Everything there is rebuildable except `*.DAT`, the user's
-  in-game saves — nothing regenerates them, so wiping the directory destroys play
-  progress. Delete the generated files by name instead.
+- **Never `rm -rf build/` or `dist/`.** Everything there is rebuildable except `*.DAT`, the
+  in-game saves — nothing regenerates them, and both directories are run dirs DOSBox
+  writes saves into, so wiping one destroys play progress. Delete the generated files by
+  name instead.
 
 ## Writing
 
