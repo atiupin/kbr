@@ -19,9 +19,9 @@ build/   *** generated *** — the whole build chain's output, and the RUN DIR (
 dist/    *** generated *** — what a player gets: the patched game plus `dosbox.conf`.
          Also a run dir (that config mounts it as C:), so saves land here too.
 res/     *** hand-written build INPUTS *** — the patch manifest (i.e. the translation
-         itself), the glyph sheet, `gate_picker.asm` (the town/castle gate destination
-         list, rewritten as new code because translating it was not enough), and
-         `dosbox.conf`, the config shipped to players.
+         itself), the glyph sheet, `gate_picker.asm` and `name_tables.asm` (injected code
+         and data, each explained in its own header), and `dosbox.conf`, the config
+         shipped to players.
 tools/   *** the build *** — SCRIPTS ONLY, hand-written Python, stdlib only, plus the
          diagnostic Ghidra front-end and its ghidra/*.java scripts.
 tmp/     *** scratch, gitignored *** — the Ghidra project DB and its dumps, DOSBox captures.
@@ -39,7 +39,7 @@ tools/build.py
 # its steps, in order — no arguments, nothing to configure
 tools/unpack_nwc.py                        KB.EXE -> KBU1.EXE    (outer NWC packer)
 tools/unpack_exepack.py                    KBU1 -> KBU2.EXE      (EXEPACK; the edit base)
-tools/apply_patches.py                     KBU2 + res/patches.csv -> KBR.EXE
+tools/apply_patches.py                     KBU2 + res/patches.csv + res/*.asm -> KBR.EXE
 tools/cc.py font-build                     res/font.png -> build/256.CC + 416.CC
 
 # translating
