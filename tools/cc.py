@@ -409,6 +409,12 @@ def font_import(png_path, cc_path, out_path):
     print(f"wrote {out_path} (font {len(font)} bytes)")
 
 
+def font_build():
+    """The build step: both run-dir archives from the pristine originals."""
+    for mode in (256, 416):
+        font_import(paths.FONT_PNG, paths.GAME_CC[mode], paths.BUILD_CC[mode])
+
+
 def main(argv):
     if len(argv) < 2:
         print(__doc__)
@@ -447,9 +453,7 @@ def main(argv):
     elif cmd == "font-import":
         font_import(argv[2], argv[3], argv[4])
     elif cmd == "font-build":
-        # The build step: both run-dir archives from the pristine originals.
-        for mode in (256, 416):
-            font_import(paths.FONT_PNG, paths.GAME_CC[mode], paths.BUILD_CC[mode])
+        font_build()
     else:
         print(__doc__)
         return 1
