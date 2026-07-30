@@ -63,6 +63,9 @@ reloc,0x016740,"your bountying enjoyment!","головами злодеев!"
 # ==== MENU BAR ============================================================================
 
 # ---- header
+# FUN_1207_0c36 prints header + counter label + ":%d" as one line, so the two share the
+# original's 34 columns — the day count reaches 900, and 36 columns overflows on screen.
+# The label is padded to keep the colon in a fixed column across both counters.
 string,0x0157A5,"Options / Controls / ","О:Помощь  C:Опции    "
 reloc,0x004a88," Options "," О:Помощь "
 string,0x015790," Controls "," C:Опции "
