@@ -15,9 +15,6 @@ by unpack_nwc.py) wrapping an inner Microsoft EXEPACK layer (removed here).
 KBU2.EXE is the flat, uncompressed translation base: every string sits at a
 fixed offset, editable in place.
 
-Validated: KBU2's decompressed image matches the live running game (dump1)
-98.9% after relocation; the ~1% delta is runtime-mutated variables.
-
 The EXEPACK format
 ------------------
 The packer stub is identified by the signature "RB" at its CS:0x10, and by its
@@ -44,8 +41,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from paths import KBU1, KBU2                                 # noqa: E402
 
 
-def unpack(src_path=KBU1, dst_path=KBU2,
-           validate=None, validate_base=0x8920, load_seg=0x892):
+def unpack(src_path=KBU1, dst_path=KBU2):
     d = open(src_path, "rb").read()
     # Take the load image exactly as the DOS header declares it -- KBU1's
     # header is 32 bytes and its image 107501 bytes, but reading the fields
@@ -94,20 +90,6 @@ def unpack(src_path=KBU1, dst_path=KBU2,
             relocs.append((section * 0x1000, off))
 
     out = bytes(dest)
-
-    # ---- optional byte-level validation against a live memory dump ----
-    if validate:
-        try:
-            gt = open(validate, "rb").read()[validate_base:validate_base + dest_len * 16]
-            applied = bytearray(out)
-            for seg, off in relocs:
-                lin = seg * 16 + off
-                w = (applied[lin] | (applied[lin + 1] << 8)) + load_seg & 0xffff
-                applied[lin] = w & 0xff; applied[lin + 1] = w >> 8
-            same = sum(1 for a, b in zip(applied, gt) if a == b)
-            print(f"validation vs {validate}: {100 * same / len(gt):.2f}% match after relocation")
-        except FileNotFoundError:
-            pass
 
     # ---- write flat MZ with a real relocation table ----
     reloc_bytes = b"".join(struct.pack("<HH", off, seg) for seg, off in relocs)
