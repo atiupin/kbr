@@ -53,10 +53,11 @@ immediate or table slot. A hand-picked 2-byte value that merely happens to equal
 string's DS offset repoints something else -- a slot inside a counter table, say --
 and the corruption surfaces far from the edit.
 
-One stage is not manifest-driven: res/gate_picker.asm, assembled by asm16.py and injected
-after the pool (see inject_gate_picker). It is code, not translation, and carries
-relocation bookkeeping the four-column manifest cannot express. Deleting that file is not
-how to turn it off -- the stage is part of the build; revert it through git.
+Two stages are not manifest-driven, both assembled by asm16.py and injected after the pool:
+res/gate_picker.asm (see inject_gate_picker) and res/name_tables.asm (see inject_name_tables).
+They are code and code-addressed data, not translation, and carry relocation bookkeeping and
+resolved DS addresses the four-column manifest cannot express. Deleting either file is not
+how to turn it off -- the stages are part of the build; revert them through git.
 """
 
 import csv
@@ -69,7 +70,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from asm16 import AsmError, assemble  # noqa: E402
 from paths import (KBU2 as INPUT, KBR as OUTPUT, PATCHES_CSV as MANIFEST,  # noqa: E402
-                   GATE_PICKER_ASM, KBU2_SHA256)
+                   GATE_PICKER_ASM, NAME_TABLES_ASM, KBU2_SHA256)
 
 ENCODING = "cp866"
 
@@ -146,6 +147,55 @@ cancelled:
     pop  cx
     pop  cx
     jmp  {exit:#06x}
+"""
+
+
+# --- Cyrillic hero names (res/name_tables.asm) --------------------------------------------
+# Neither site can be a manifest row: both need the DS address of a table that only exists
+# once the tables are placed. What each table is for is in that file's header.
+#
+# NAME_AT is the accept path of the name field's key loop. It is rewritten whole because the
+# mapping must happen before the byte is BOTH stored and echoed, and because loading the key
+# into AL once -- the original re-reads [bp-1] at every test -- is what pays for the xlat.
+#
+# FNAME_AT is the save-file name builder's per-character test, "A-Z, or else '_'". The table
+# answers that for every byte, so the test collapses into a lookup plus a jump to the store
+# the block already ends with. Only the first 6 bytes are rewritten and the rest is left as
+# dead code, which keeps the relocation entry at 0x8FED pinning the word it always pinned.
+# Overwriting that word means re-aiming the entry, and the replacement has no far call to
+# re-aim it at; jumping over it costs nothing since nothing there runs any more.
+TABLES_DSOFF = 0xEC00                      # clear of the gate picker below, the stack above
+NAME_AT, NAME_END = 0x6750, 0x6776
+NAME_REJECT = 0x677D                       # the key loop's "not accepted" tail
+FNAME_AT = 0x8FE0
+FNAME_PINNED = 0x8FED                      # relocation target, must stay where it is
+FNAME_STORE = 0x8FFF                       # mov [si+0x6438],al -- reached with AL already set
+
+NAME_SRC = """
+    mov  al,[bp-1]
+    cmp  al,0x20
+    jb   {reject:#06x}
+    cmp  al,0x7f
+    ja   {reject:#06x}
+    cmp  si,[bp+8]
+    jge  {reject:#06x}
+    or   si,si
+    jnz  map
+    cmp  al,0x20
+    je   {reject:#06x}
+map:
+    mov  bx,{keymap:#06x}
+    xlat
+    mov  bx,[bp+6]
+    mov  [bx+si],al
+    inc  si
+    mov  ah,0
+"""
+
+FNAME_SRC = """
+    mov  bx,{translit:#06x}
+    xlat
+    jmp  {store:#06x}
 """
 
 
@@ -478,6 +528,58 @@ def inject_gate_picker(data):
             "sites": len(sites), "reaimed": reaimed, "added": added}
 
 
+def inject_name_tables(data):
+    """Place res/name_tables.asm in DGROUP and point the two name sites at it."""
+    try:
+        source = open(NAME_TABLES_ASM, encoding="utf-8").read()
+    except FileNotFoundError:
+        die(f"name tables not found: {NAME_TABLES_ASM}")
+    try:
+        tables, tbl_relocs, symbols = assemble(source, org=TABLES_DSOFF)
+    except AsmError as e:
+        die(f"{NAME_TABLES_ASM}: {e}")
+    if tbl_relocs:
+        die(f"{NAME_TABLES_ASM}: data only -- a far call there would need its own "
+            f"relocation entry")
+    for want in ("keymap", "translit"):
+        if want not in symbols:
+            die(f"{NAME_TABLES_ASM}: no {want}: label")
+
+    # Both tables are indexed by the raw byte, so a label IS its xlat base -- and a row of
+    # the wrong length would silently shift every entry past it instead of failing.
+    keymap, translit = symbols["keymap"], symbols["translit"]
+    for lo, hi, want, name in ((keymap, translit, 0x80, "keymap"),
+                               (translit, TABLES_DSOFF + len(tables), 0x100, "translit")):
+        if hi - lo != want:
+            die(f"{NAME_TABLES_ASM}: {name} spans {hi - lo}B, want {want}B -- "
+                f"it must cover its whole index range, 16 bytes to the row")
+
+    at = DS_BASE + TABLES_DSOFF
+    if len(data) > at:
+        die(f"the image reached DS {len(data) - DS_BASE:#06x}, past the name tables at "
+            f"DS {TABLES_DSOFF:#06x} -- raise TABLES_DSOFF")
+    data.extend(b"\x00" * (at - len(data)))
+    data.extend(tables)
+
+    try:
+        entry, _, _ = assemble(NAME_SRC.format(reject=NAME_REJECT, keymap=keymap), org=NAME_AT)
+        fname, _, _ = assemble(FNAME_SRC.format(translit=translit, store=FNAME_STORE),
+                               org=FNAME_AT)
+    except AsmError as e:
+        die(f"name site: {e}")
+    if NAME_AT + len(entry) > NAME_END:
+        die(f"the name entry block is {len(entry)}B but the accept path it replaces is "
+            f"{NAME_END - NAME_AT}B")
+    if FNAME_AT + len(fname) > FNAME_PINNED:
+        die(f"the file name block is {len(fname)}B and would reach the relocation target "
+            f"at {FNAME_PINNED:#x}")
+
+    data[NAME_AT:NAME_END] = entry + bytes([STUB_PAD]) * (NAME_END - NAME_AT - len(entry))
+    data[FNAME_AT:FNAME_AT + len(fname)] = fname
+    return {"tables": len(tables), "entry": len(entry), "fname": len(fname),
+            "keymap": keymap, "translit": translit}
+
+
 def fix_mz_header(data):
     """Rewrite the MZ page-count fields so DOS loads the grown image. minalloc is left
     as-is: the runtime's BSS/heap/stack now sit in the file-backed region as harmless
@@ -573,6 +675,7 @@ def main():
     # the code region, which would otherwise read as a full pool.
     pool_used = max(0, len(data) - (DS_BASE + POOL_DSOFF))
     picker = inject_gate_picker(data)
+    names = inject_name_tables(data)
     fix_mz_header(data)
 
     check_relocations(open(INPUT, "rb").read(), data)
@@ -602,6 +705,10 @@ def main():
           f"{picker['stub']}B stub at {STUB_AT:#x} (block is {STUB_END - STUB_AT}B); "
           f"{picker['sites']} far call(s): {picker['reaimed']} entry re-aimed, "
           f"{picker['added']} appended")
+    print(f"  name tables: {names['tables']}B at DS {TABLES_DSOFF:#06x} "
+          f"(keymap {names['keymap']:#06x}, translit {names['translit']:#06x}); "
+          f"{names['entry']}B at {NAME_AT:#x} (block is {NAME_END - NAME_AT}B), "
+          f"{names['fname']}B at {FNAME_AT:#x}")
     print(f"  image grown to {len(data)} bytes")
 
 

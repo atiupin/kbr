@@ -51,6 +51,7 @@ BUILD_CC = {256: os.path.join(BUILD, "256.CC"),  # run-dir copies, carrying the
 PATCHES_CSV = os.path.join(RES, "patches.csv")
 FONT_PNG = os.path.join(RES, "font.png")
 GATE_PICKER_ASM = os.path.join(RES, "gate_picker.asm")   # injected code, see apply_patches
+NAME_TABLES_ASM = os.path.join(RES, "name_tables.asm")   # injected data, see apply_patches
 DOSBOX_CONF = os.path.join(RES, "dosbox.conf")           # shipped in DIST, not used to test
 
 # KBU2.EXE's SHA-256. Every tool that reads KBU2 gates on this: the file offsets
