@@ -74,6 +74,10 @@ export const setU16 = (b: Uint8Array, off: number, v: number): void => {
   b[off + 1] = v >>> 8;
 };
 
+export const setU16s = (b: Uint8Array, off: number, values: readonly number[]): void => {
+  values.forEach((v, i) => setU16(b, off + i * 2, v));
+};
+
 export const setU24 = (b: Uint8Array, off: number, v: number): void => {
   check(b, off, 3);
   fits(v, 3);

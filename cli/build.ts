@@ -22,7 +22,9 @@ const emit = (path: string, data: Uint8Array): void => {
 
 export const build = (): void => {
   step(1, 4, "unpack the NWC packer");
-  emit(paths.KBU1, unpackNwc(read(paths.KB_EXE)));
+  const nwc = unpackNwc(read(paths.KB_EXE));
+  for (const warning of nwc.warnings) line(`warning: ${warning}`);
+  emit(paths.KBU1, nwc.image);
 
   step(2, 4, "unpack EXEPACK");
   emit(paths.KBU2, unpackExepack(read(paths.KBU1)));

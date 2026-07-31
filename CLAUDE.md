@@ -83,9 +83,9 @@ emitted; `npm run typecheck` is what a "build" means here. The TypeScript chain 
 **1 — Unpack chain.** Gate: `KBU1.EXE` and `KBU2.EXE` byte-identical, `KBU2` matching its
 pinned hash.
 
-- [ ] `lzw_decode`, checked first against a member the Python `cc.py extract` wrote.
-- [ ] `unpack_nwc`, keeping the refusal on a nonzero inner `e_crlc` and the known-image warning.
-- [ ] `unpack_exepack`, including the reloc-table rebuild from the 16 sections.
+- [x] `lzw_decode`, checked first against a member the Python `cc.py extract` wrote.
+- [x] `unpack_nwc`, keeping the refusal on a nonzero inner `e_crlc` and the known-image warning.
+- [x] `unpack_exepack`, including the reloc-table rebuild from the 16 sections.
 
 **2 — Assembler.** Gate: `selftest` reassembles both shipped routines byte-identically.
 
