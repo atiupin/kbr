@@ -34,25 +34,24 @@
 
 ## TypeScript
 
-- **`core/` is universal.** Pure functions over `Uint8Array`: no `node:` imports, no DOM, no
-  I/O, no process access — it compiles without the DOM lib, so a stray `document` or
-  `node:fs` is a type error rather than a runtime surprise. Everything platform-shaped —
-  reading files, writing `build/`, zip, printing — lives in `cli/`, so the web front-end is
-  additive and never forces a change inside.
-- **Never the `function` keyword.** Every named function is a `const` bound to an arrow, at
-  any level; an anonymous arrow passed inline stays inline.
+- **`core/` is universal.** Pure functions over `Uint8Array`: no `node:`, no DOM, no I/O, no
+  process access — it compiles without the DOM lib, so a stray `document` or `node:fs` is a
+  type error rather than a runtime surprise. Everything platform-shaped — files, `build/`,
+  zip, printing — lives in `cli/`, so the web front-end is additive and never forces a
+  change inside.
+- **Never the `function` keyword.** A named function is a `const` bound to an arrow, at any
+  level; an anonymous arrow passed inline stays inline.
 - **A function's name starts with a verb** — `patchFont`, `decodeLzw`, never the noun first.
-  The exception is one named for what it returns rather than what it does: an accessor
-  (`u16`, `hexOffset`), an X-to-Y converter (`fontToSheet`), a predicate that reads as its
-  condition (`fits`, `chains`), and a command, which is named after itself (`build`).
-- **Imports carry a `.ts` extension.** Node runs the sources directly and nothing is ever
-  emitted, so `npm run typecheck` is what a "build" means here.
-- **Validate yourself before reporting anything done**:
-  `npm run typecheck && npm run format`, after every change, including a one-line edit and
-  including changes to Markdown. Whatever else a task is gated on comes on top of this,
-  never instead of it.
-- **Every stage emits bytes deterministically**, so a change is judged by `sha256`, never by
-  "it looks right".
+  The exception is one named for what it returns: an accessor (`u16`, `hexOffset`), an
+  X-to-Y converter (`fontToSheet`), a predicate that reads as its condition (`fits`,
+  `chains`), and a command, named after itself (`build`).
+- **Imports carry a `.ts` extension.** Nothing is ever emitted, so `npm run typecheck` is
+  what a "build" means here.
+- **Validate before reporting anything done**: `npm run typecheck && npm run format`, after
+  every change, a one-line edit and Markdown included — whatever else a task is gated on
+  comes on top of this, never instead of it.
+- **Every stage emits bytes deterministically**, so judge a change by `sha256`, never by "it
+  looks right".
 - Ghidra stays in Python: it spawns a JVM and is diagnostic, not part of the build.
 
 ## Web Front-End
