@@ -9,7 +9,7 @@ import { decodeMember, readToc, rebuild } from "../core/cc.ts";
 import { u32 } from "../core/bytes.ts";
 import { build } from "./build.ts";
 import { findRef } from "./findRef.ts";
-import { fontExport, fontImport } from "./font.ts";
+import { exportFont, importFont } from "./font.ts";
 import { read, rel, write } from "./io.ts";
 import { line } from "./report.ts";
 import { selftest } from "./selftest.ts";
@@ -100,7 +100,7 @@ const cmdCcReplace = (args: string[]): void => {
 
 const cmdFontExport = (args: string[]): void => {
   const glyphs = args[2];
-  fontExport(
+  exportFont(
     arg(args, 0, "archive.CC"),
     arg(args, 1, "out.png"),
     glyphs === undefined ? undefined : Number.parseInt(glyphs, 10),
@@ -108,7 +108,7 @@ const cmdFontExport = (args: string[]): void => {
 };
 
 const cmdFontImport = (args: string[]): void =>
-  fontImport(arg(args, 0, "in.png"), arg(args, 1, "archive.CC"), arg(args, 2, "out.CC"));
+  importFont(arg(args, 0, "in.png"), arg(args, 1, "archive.CC"), arg(args, 2, "out.CC"));
 
 const COMMANDS = new Map<string, (args: string[]) => void>([
   ["build", build],

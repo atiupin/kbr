@@ -16,7 +16,7 @@
  */
 
 import { concat, packU32, setU16, setU24, u16, u24, u32 } from "./bytes.ts";
-import { lzwDecode, lzwEncode } from "./lzw.ts";
+import { decodeLzw, encodeLzw } from "./lzw.ts";
 
 /**
  * The font member, byte-identical in both archives -- glyph bitmaps are display
@@ -54,7 +54,7 @@ export const decodeMember = (archive: Uint8Array, id: number): Uint8Array => {
   const { offset, size } = entryOf(archive, id);
   const member = archive.subarray(offset, offset + size);
   const declen = u32(member, 0);
-  const raw = lzwDecode(member.subarray(4), declen);
+  const raw = decodeLzw(member.subarray(4), declen);
   if (raw.length !== declen) {
     throw new Error(
       `member 0x${id.toString(16)}: stream ended after ${raw.length} of ${declen} bytes`,
@@ -63,7 +63,7 @@ export const decodeMember = (archive: Uint8Array, id: number): Uint8Array => {
   return raw;
 };
 
-const encodeMember = (raw: Uint8Array): Uint8Array => concat([packU32(raw.length), lzwEncode(raw)]);
+const encodeMember = (raw: Uint8Array): Uint8Array => concat([packU32(raw.length), encodeLzw(raw)]);
 
 /** A new archive with the given members replaced, everything else byte-for-byte. */
 export const rebuild = (archive: Uint8Array, replacements: Map<number, Uint8Array>): Uint8Array => {

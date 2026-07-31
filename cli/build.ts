@@ -7,7 +7,7 @@ import { applyPatches } from "../core/applyPatches.ts";
 import { unpackExepack } from "../core/unpackExepack.ts";
 import { unpackNwc } from "../core/unpackNwc.ts";
 import { read, readText, rel, write } from "./io.ts";
-import { fontBuild } from "./font.ts";
+import { buildFonts } from "./font.ts";
 import { line, step } from "./report.ts";
 import * as paths from "./paths.ts";
 
@@ -46,7 +46,7 @@ export const build = (): void => {
   emit(paths.KBR, patched.image);
 
   step(4, 4, "build the Cyrillic-extended fonts");
-  fontBuild();
+  buildFonts();
 
   line("\nbuilt -- C: is build/, so `dosbox-x -conf dosbox-x.conf` then KBR runs it");
 };

@@ -37,7 +37,7 @@ const writeSheet = (path: string, { width, height, rgba }: Sheet): void => {
   write(path, PNG.sync.write(png));
 };
 
-export const fontImport = (pngPath: string, ccPath: string, outPath: string): void => {
+export const importFont = (pngPath: string, ccPath: string, outPath: string): void => {
   const font = sheetToMember(readSheet(pngPath));
   write(outPath, rebuild(read(ccPath), new Map([[FONT_ID, font]])));
   line(`${rel(outPath)}  (font ${font.length} bytes)`);
@@ -49,7 +49,7 @@ export const fontImport = (pngPath: string, ccPath: string, outPath: string): vo
  * too short to import back, so `glyphs` overrides -- which is how a stock archive
  * yields a 256-cell sheet with a blank upper half to draw into.
  */
-export const fontExport = (ccPath: string, pngPath: string, glyphs?: number): void => {
+export const exportFont = (ccPath: string, pngPath: string, glyphs?: number): void => {
   const font = decodeMember(read(ccPath), FONT_ID);
   const count = glyphs ?? font.length / 8;
   writeSheet(pngPath, fontToSheet(font, count));
@@ -57,8 +57,8 @@ export const fontExport = (ccPath: string, pngPath: string, glyphs?: number): vo
 };
 
 /** THE BUILD STEP: res/font.png + the pristine archives -> both run-dir archives. */
-export const fontBuild = (): void => {
+export const buildFonts = (): void => {
   for (const mode of [256, 416] as const) {
-    fontImport(paths.FONT_PNG, paths.GAME_CC[mode], paths.BUILD_CC[mode]);
+    importFont(paths.FONT_PNG, paths.GAME_CC[mode], paths.BUILD_CC[mode]);
   }
 };

@@ -27,7 +27,7 @@
  */
 
 import { concat, setU16s, u16, u16s } from "./bytes.ts";
-import { lzwDecode } from "./lzw.ts";
+import { decodeLzw } from "./lzw.ts";
 import { sha256 } from "./sha256.ts";
 
 /** Stub offset holding the inner header's file offset. */
@@ -67,7 +67,7 @@ export const unpackNwc = (kbExe: Uint8Array): NwcResult => {
   }
 
   const imgLen = (cp - 1) * 512 + cblp - cparhdr * 16;
-  const image = lzwDecode(kbExe.subarray(base + cparhdr * 16), imgLen);
+  const image = decodeLzw(kbExe.subarray(base + cparhdr * 16), imgLen);
   if (image.length !== imgLen) {
     throw new Error(`LZW stream ended early: ${image.length} of ${imgLen} bytes`);
   }

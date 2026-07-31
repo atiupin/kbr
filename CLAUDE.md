@@ -39,6 +39,10 @@
   additive and never forces a change inside.
 - **Never the `function` keyword.** Every named function is a `const` bound to an arrow, at
   any level; an anonymous arrow passed inline stays inline.
+- **A function's name starts with a verb** — `patchFont`, `decodeLzw`, never the noun first.
+  The exception is one named for what it returns rather than what it does: an accessor
+  (`u16`, `hexOffset`), an X-to-Y converter (`fontToSheet`), a predicate that reads as its
+  condition (`fits`, `chains`), and a command, which is named after itself (`build`).
 - **Imports carry a `.ts` extension.** Node runs the sources directly and nothing is ever
   emitted, so `npm run typecheck` is what a "build" means here.
 - **Validate yourself before reporting anything done**: `npm run typecheck && npm run format`,

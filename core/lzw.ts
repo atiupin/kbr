@@ -25,7 +25,7 @@ const extend = (entry: Uint8Array, byte: number): Uint8Array => {
  * dictionary cannot explain -- a truncated or corrupt stream yields what it
  * decoded rather than throwing, so the caller decides what a short result means.
  */
-export const lzwDecode = (stream: Uint8Array, declen: number): Uint8Array => {
+export const decodeLzw = (stream: Uint8Array, declen: number): Uint8Array => {
   let out = new Uint8Array(Math.max(declen, 64));
   let len = 0;
   const emit = (entry: Uint8Array): void => {
@@ -86,7 +86,7 @@ export const lzwDecode = (stream: Uint8Array, declen: number): Uint8Array => {
  * Encode a stream the game's decompressor accepts: a leading CLEAR, and another
  * whenever the dictionary fills, so no code ever exceeds MAXBITS.
  *
- * The width schedule is the delicate part. lzwDecode skips its dictionary add on
+ * The width schedule is the delicate part. decodeLzw skips its dictionary add on
  * the first code after a CLEAR, so its `next` runs one behind this side's;
  * growing the width at `next > 1 << width` here against the decoder's `>=` is
  * what keeps the two reading the same bit boundaries.
@@ -95,7 +95,7 @@ export const lzwDecode = (stream: Uint8Array, declen: number): Uint8Array => {
  * byte identify it -- hence the (prefix, byte) key rather than the string it
  * stands for.
  */
-export const lzwEncode = (data: Uint8Array): Uint8Array => {
+export const encodeLzw = (data: Uint8Array): Uint8Array => {
   const bits: number[] = [];
   let acc = 0;
   let nbits = 0;
