@@ -4,11 +4,11 @@
  * anything thrown, from here or from core, prints one line and exits 1.
  */
 
-import { findRefs } from "../core/findRef.ts";
-import { fileToSegOff, segOffToFile } from "../core/addr.ts";
+import { fromFile, fromSegOff } from "../core/addr.ts";
 import { decodeMember, readToc, rebuild } from "../core/cc.ts";
 import { u32 } from "../core/bytes.ts";
 import { build } from "./build.ts";
+import { findRef } from "./findRef.ts";
 import { fontBake, fontExport, fontImport } from "./font.ts";
 import { read, rel, write } from "./io.ts";
 import { line } from "./report.ts";
@@ -23,7 +23,8 @@ const USAGE = `kbr <command> [args]
   asm-selftest               reassemble two shipped routines, demand byte equality
 
   find-ref <offset|"text">   what points at a string; a reloc row, paste-ready
-  addr <0xoffset|seg:off>    file offset <-> Ghidra address
+  addr <0xoffset|seg:off> [seg]
+                             file offset <-> Ghidra address, in a chosen segment
 
   cc-list <archive.CC>       every member: id, offset, packed and decoded size
   cc-extract <archive.CC> <id-hex> <out.bin>
@@ -33,25 +34,27 @@ const USAGE = `kbr <command> [args]
   font-bake                  res/font.png -> the raw font member, for the web bundle
 `;
 
-const cmdFindRef = (args: string[]): void => {
-  const [target] = args;
-  if (target === undefined) throw new Error("find-ref needs an offset or a substring");
-  const image = read(paths.KBU2);
-  const strOff = target.startsWith("0x") ? Number.parseInt(target, 16) : Number.NaN;
-  if (Number.isNaN(strOff)) throw new Error("find-ref by substring: not implemented yet");
-  for (const ref of findRefs(image, strOff)) line(`0x${ref.offset.toString(16)}  ${ref.kind}`);
-};
-
 const cmdAddr = (args: string[]): void => {
   const [target] = args;
   if (target === undefined) throw new Error("addr needs a file offset or seg:off");
+  const seg = args[1] === undefined ? undefined : Number.parseInt(args[1], 16);
+
+  let at;
   if (target.includes(":")) {
-    const [seg, off] = target.split(":").map((n) => Number.parseInt(n, 16));
-    line(`0x${segOffToFile({ seg, off }).toString(16)}`);
+    const [s, o] = target.split(":").map((n) => Number.parseInt(n, 16));
+    at = fromSegOff(s, o);
   } else {
-    const at = fileToSegOff(Number.parseInt(target, 16));
-    line(`${at.seg.toString(16)}:${at.off.toString(16)}`);
+    at = fromFile(Number.parseInt(target, 16), seg);
   }
+
+  const hex = (v: number): string => `0x${v.toString(16).toUpperCase()}`;
+  line(`file offset    ${hex(at.file)}   (xxd -s ${hex(at.file)} ${rel(paths.KBU2)})`);
+  line(`image offset   ${hex(at.image)}`);
+  line(`Ghidra linear  ${hex(at.linear)}`);
+  line(
+    `Ghidra address ${at.seg.toString(16).padStart(4, "0")}:` +
+      `${at.off.toString(16).padStart(4, "0")}   (press G in the Listing, type this)`,
+  );
 };
 
 const arg = (args: string[], i: number, what: string): string => {
@@ -114,7 +117,7 @@ const COMMANDS = new Map<string, (args: string[]) => void>([
   ["build", build],
   ["verify", verify],
   ["asm-selftest", selftest],
-  ["find-ref", cmdFindRef],
+  ["find-ref", findRef],
   ["addr", cmdAddr],
   ["cc-list", cmdCcList],
   ["cc-extract", cmdCcExtract],

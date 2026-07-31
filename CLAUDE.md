@@ -118,8 +118,8 @@ pinned hash.
 **5 — Authoring aids.** Gate: same refs reported for a handful of known strings, then the
 Python build retired.
 
-- [ ] `find_ref`, chain validation and paste-ready row included.
-- [ ] `addr`.
+- [x] `find_ref`, chain validation and paste-ready row included.
+- [x] `addr`.
 - [ ] Retire `tools/*.py` bar the Ghidra front-end: `OUT` becomes `BUILD`, `verify` keeps
       whatever still gates without a reference build, and `README.md`'s tool table and build
       instructions become the npm ones. `dist/` goes with it — the web patcher is what a

@@ -76,7 +76,7 @@ const OFFSET_RE = /^0x[0-9a-fA-F]+$/;
 const HEX_RE = /^[0-9a-fA-F]+$/;
 
 /** DGROUP layout of KBU2.EXE: the file offset of DS:0000. */
-const DS_BASE = 0x15690;
+export const DS_BASE = 0x15690;
 
 // Pool placement, measured from MEMDUMP.BIN (heavy session, puzzle map open): heap
 // high-water DS 0xb6cf, stack low-water DS 0xfe2c -- a 17.8 KB cold band above _end, the
@@ -109,8 +109,8 @@ const POOL_END_DSOFF = POOL_DSOFF + POOL_SIZE; // hard cap; clear of the stack's
 // runtime, so nothing can guard it. The fence is conservative and costs nothing -- every
 // string reached from here is protection UI that fits its own slot as a `string` row.
 // Rejected at parse time: an inlined reloc is harmless today, one rewording from fatal.
-const PROT_LO = 0xbfe0; // file offsets, inclusive
-const PROT_HI = 0xcca7;
+export const PROT_LO = 0xbfe0; // file offsets, inclusive
+export const PROT_HI = 0xcca7;
 
 // --- Town/Castle Gate destination picker (res/gate_picker.asm) ------------------------
 // Why the gate needs a window of its own is in that file's header; what matters here is
