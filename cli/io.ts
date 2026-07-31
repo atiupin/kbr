@@ -25,5 +25,8 @@ export const write = (path: string, data: Uint8Array): void => {
   writeFileSync(path, data);
 };
 
-/** For messages: paths print relative to the repo root. */
-export const rel = (path: string): string => relative(ROOT, path);
+/** For messages: paths print relative to the repo root, or in full when outside it. */
+export const rel = (path: string): string => {
+  const inside = relative(ROOT, path);
+  return inside.startsWith("..") ? path : inside;
+};
