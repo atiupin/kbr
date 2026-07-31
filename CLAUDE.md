@@ -129,9 +129,8 @@ Python build retired.
 
 - [ ] Bundler and a static build that deploys as a plain directory.
 - [ ] Design: drop target, the run's log, the download.
-- [ ] Zip, in the web shell and nowhere else: read via
-      `DecompressionStream("deflate-raw")`, write store-only since the payload is already
-      compressed.
+- [ ] Zip through `fflate` — `unzipSync` in, store-only out since the payload is already
+      compressed — in the web shell and nowhere else.
 - [ ] Bundle `patches.csv`, the baked font member and `dosbox.conf` as assets.
 - [ ] Every failure as UI, the KBU2 hash gate reading "not the release this patch targets".
 - [ ] Confirm nothing leaves the page — no network call on the patch path.
