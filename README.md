@@ -24,6 +24,10 @@ res/     *** hand-written build INPUTS *** — the patch manifest (i.e. the tran
          shipped to players.
 tools/   *** the build *** — SCRIPTS ONLY, hand-written Python, stdlib only, plus the
          diagnostic Ghidra front-end and its ghidra/*.java scripts.
+core/    *** the format work *** — pure functions over bytes: no I/O, no platform, so the
+         command line and the browser share one implementation.
+cli/     *** the shell around core *** — paths, files, argv, printing. `npm run verify`
+         gates every artifact it writes on sha256 equality with the reference build.
 tmp/     *** scratch, gitignored *** — the Ghidra project DB and its dumps, DOSBox captures.
 ```
 
