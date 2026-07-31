@@ -1,8 +1,6 @@
 {
   "name": "kbr",
-  "version": "0.0.0",
   "private": true,
-  "description": "King's Bounty Russian translation — build chain",
   "type": "module",
   "engines": {
     "node": ">=22.18"
