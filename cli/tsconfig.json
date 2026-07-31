@@ -1,0 +1,10 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "lib": ["ES2023"],
+    "types": ["node"]
+  },
+  // core/ is pulled in through the imports and re-checked here; the pass that
+  // holds it to the universality rule is core's own.
+  "include": ["**/*.ts"]
+}

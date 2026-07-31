@@ -1,0 +1,23 @@
+{
+  "name": "kbr",
+  "version": "0.0.0",
+  "private": true,
+  "description": "King's Bounty Russian translation — build chain",
+  "type": "module",
+  "engines": {
+    "node": ">=22.18"
+  },
+  "scripts": {
+    "typecheck": "tsc -p core && tsc -p cli",
+    "kbr": "node cli/main.ts",
+    "build": "node cli/main.ts build",
+    "verify": "node cli/main.ts verify",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "prettier": "^3.9.6",
+    "typescript": "^7.0.2"
+  }
+}

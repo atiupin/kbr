@@ -1,0 +1,11 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    // The universality rule, enforced by the type checker rather than by review:
+    // no DOM lib and no ambient types at all, so `document` and `node:fs` are
+    // both errors here even though cli/ can see the latter.
+    "lib": ["ES2023"],
+    "types": []
+  },
+  "include": ["**/*.ts"]
+}
