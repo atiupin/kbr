@@ -82,6 +82,64 @@ export const lzwDecode = (stream: Uint8Array, declen: number): Uint8Array => {
   return out.subarray(0, len);
 };
 
-export const lzwEncode = (_data: Uint8Array): Uint8Array => {
-  throw new Error("lzwEncode: not implemented yet");
+/**
+ * Encode a stream the game's decompressor accepts: a leading CLEAR, and another
+ * whenever the dictionary fills, so no code ever exceeds MAXBITS.
+ *
+ * The width schedule is the delicate part. lzwDecode skips its dictionary add on
+ * the first code after a CLEAR, so its `next` runs one behind this side's;
+ * growing the width at `next > 1 << width` here against the decoder's `>=` is
+ * what keeps the two reading the same bit boundaries.
+ *
+ * A dictionary entry is always some earlier entry plus one byte, so a code and a
+ * byte identify it -- hence the (prefix, byte) key rather than the string it
+ * stands for.
+ */
+export const lzwEncode = (data: Uint8Array): Uint8Array => {
+  const bits: number[] = [];
+  let acc = 0;
+  let nbits = 0;
+  const emit = (code: number, width: number): void => {
+    acc |= code << nbits;
+    nbits += width;
+    while (nbits >= 8) {
+      bits.push(acc & 0xff);
+      acc >>>= 8;
+      nbits -= 8;
+    }
+  };
+
+  let width = 9;
+  const table = new Map<number, number>();
+  let next = FIRST;
+  emit(CLEAR, width);
+
+  if (data.length > 0) {
+    let prefix = data[0];
+    for (let i = 1; i < data.length; i++) {
+      const byte = data[i];
+      const key = prefix * 256 + byte;
+      const known = table.get(key);
+      if (known !== undefined) {
+        prefix = known;
+        continue;
+      }
+      emit(prefix, width);
+      table.set(key, next);
+      next++;
+      if (next > 1 << width && width < MAXBITS) width++;
+      if (next > 1 << MAXBITS) {
+        emit(CLEAR, width);
+        width = 9;
+        table.clear();
+        next = FIRST;
+      }
+      prefix = byte;
+    }
+    emit(prefix, width);
+  }
+
+  emit(END, width);
+  if (nbits > 0) bits.push(acc & 0xff);
+  return Uint8Array.from(bits);
 };
