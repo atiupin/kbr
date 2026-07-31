@@ -10,6 +10,8 @@ string breaks something and you need to know what code touched it, or when you a
 writing a new `bytes` row and need the surrounding disassembly. Reach for a
 DOSBox-X breakpoint first; it is usually faster.
 
+This is the one Python left in the project -- it spawns a JVM and answers questions
+about the image, so it has nothing to share with the build, which is TypeScript.
 The hand-written parts are this script and the analysis scripts in tools/ghidra/.
 The project DATABASE lives in tmp/ (KBR.gpr / KBR.rep): it is game-derived and
 fully regenerable, so it is scratch, not source. It is kept only as a warm cache
@@ -42,13 +44,11 @@ import subprocess
 import sys
 from pathlib import Path
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from paths import TOOLS, TMP, KBU2                           # noqa: E402
-
-PROJECT_DIR = Path(TMP)                    # scratch: the project is regenerable
+TOOLS = Path(__file__).resolve().parent
+PROJECT_DIR = TOOLS.parent / "tmp"         # scratch: the project is regenerable
 PROJECT_NAME = "KBR"
-SCRIPTS = Path(TOOLS) / "ghidra"           # the .java analysis scripts
-PROGRAM = Path(KBU2).name                   # what `run` selects with -process
+SCRIPTS = TOOLS / "ghidra"                 # the .java analysis scripts
+PROGRAM = "KBU2.EXE"                       # what `run` selects with -process
 
 # Ghidra logs its whole startup at INFO, and prefixes script output with
 # "INFO  Foo.java> ... (GhidraScript)". Strip both so results read clean;

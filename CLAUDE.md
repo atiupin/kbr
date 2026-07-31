@@ -37,10 +37,10 @@
 
 ## TypeScript Port
 
-The build moves from Python to TypeScript so one implementation serves both the command line
-and, in the end, a browser: a player drops in a zip of their own game copy and downloads a
-patched one, from a static page with no backend — their files never leave the machine, and the
-project still ships no game data.
+The build is TypeScript so one implementation serves both the command line and, in the end, a
+browser: a player drops in a zip of their own game copy and downloads a patched one, from a
+static page with no backend — their files never leave the machine, and the project still ships
+no game data.
 
 **`core/` is universal.** Pure functions over `Uint8Array`: no `node:` imports, no DOM, no I/O,
 no process access. Everything platform-shaped — reading files, writing `dist/`, zip, printing —
@@ -50,17 +50,16 @@ Node; what stays hand-written is only what npm has no equivalent for — LZW, EX
 container, CP866, the assembler.
 
 **Never the `function` keyword.** Every named function is a `const` bound to an arrow, at any
-level; an anonymous arrow passed inline stays inline. **File names are camelCase**, so a module
-per Python script means `unpack_nwc.py` -> `unpackNwc.ts`. Prettier owns the layout of every
-`.ts` and `.md` file — run `npm run format`, never hand-align.
+level; an anonymous arrow passed inline stays inline. **File names are camelCase**:
+`unpackNwc.ts`, `applyPatches.ts`. Prettier owns the layout of every `.ts` and `.md` file —
+run `npm run format`, never hand-align.
 
 **Validate yourself before reporting anything done**: `npm run typecheck && npm run format`,
 after every change, including a one-line edit and including changes to Markdown. Whatever else
 a task is gated on comes on top of this, never instead of it.
 
-Every stage emits bytes deterministically, so each step is gated on **`sha256` equality with
-the Python output**, never on "it looks right". Ghidra stays in Python: it spawns a JVM and is
-diagnostic, not part of the build.
+Every stage emits bytes deterministically, so a change is judged by **`sha256`**, never by "it
+looks right". Ghidra stays in Python: it spawns a JVM and is diagnostic, not part of the build.
 
 Each phase ends on its stated gate, and the next one does not start until it holds.
 
@@ -72,13 +71,12 @@ Each phase ends on its stated gate, and the next one does not start until it hol
       them needs, and `sha256.ts` over `@noble/hashes`.
 - [x] `cli/` shell: paths, argv, a reporter that prints, thrown error -> exit 1.
 - [x] Byte-equality harness: hash `KBU1.EXE`, `KBU2.EXE`, `KBR.EXE`, `256.CC`, `416.CC` from
-      the Python build, then assert the TypeScript output matches. This is the gate every
+      the reference build, then assert this one's output matches. This is the gate every
       phase below is measured against.
 
 Node runs the `.ts` sources directly, so imports carry a `.ts` extension and nothing is ever
-emitted; `npm run typecheck` is what a "build" means here. The TypeScript chain writes to
-`build/ts/` while both builds coexist, and `npm run verify` compares that directory against
-`build/` file by file.
+emitted; `npm run typecheck` is what a "build" means here. The chain writes to `build/`, and
+`npm run verify` gates it on the one hash that outlives any build: the pinned `KBU2.EXE`.
 
 **1 — Unpack chain.** Gate: `KBU1.EXE` and `KBU2.EXE` byte-identical, `KBU2` matching its
 pinned hash.
@@ -120,7 +118,7 @@ Python build retired.
 
 - [x] `find_ref`, chain validation and paste-ready row included.
 - [x] `addr`.
-- [ ] Retire `tools/*.py` bar the Ghidra front-end: `OUT` becomes `BUILD`, `verify` keeps
+- [x] Retire `tools/*.py` bar the Ghidra front-end: `OUT` becomes `BUILD`, `verify` keeps
       whatever still gates without a reference build, and `README.md`'s tool table and build
       instructions become the npm ones. `dist/` goes with it — the web patcher is what a
       player gets, so no command stages a run dir.

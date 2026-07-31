@@ -1,5 +1,5 @@
 ; Hero-name lookup tables -- two 8086 xlat tables, no code. Assembled into DGROUP by
-; apply_patches.py, which rewrites the two sites that read them; the labels are DS offsets.
+; the patcher, which rewrites the two sites that read them; the labels are DS offsets.
 ;
 ; keymap makes Cyrillic typable with no DOS keyboard driver at all. The game reads keys
 ; through INT 16h, so a Russian name would otherwise need the player's own DOSBox to load

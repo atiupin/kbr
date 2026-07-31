@@ -18,8 +18,8 @@ import * as paths from "./paths.ts";
 
 const USAGE = `kbr <command> [args]
 
-  build                      the whole chain: game/KB.EXE -> build/ts/
-  verify                     every artifact against the reference build, by sha256
+  build                      the whole chain: game/KB.EXE + res/ -> build/
+  verify                     the pinned edit base, and every artifact's sha256
   asm-selftest               reassemble two shipped routines, demand byte equality
 
   find-ref <offset|"text">   what points at a string; a reloc row, paste-ready

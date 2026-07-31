@@ -117,7 +117,7 @@ string,0x01AB74,"  V View Character","  V Герой"
 string,0x01AB87,"  W Wait End Week","  W Ждать неделю"
 reloc,0x018BBD,"  Q Quit and Save","  Q Запись и выход"
 # The last three are one indexed mini-table (`mov ax,[bx+0x353b]`) feeding this list's single
-# mutable line -- so find_ref.py sees no ref -- and Fly doubles as a combat entry. All three
+# mutable line -- so find-ref sees no ref -- and Fly doubles as a combat entry. All three
 # pad to 17 to erase each other on redraw.
 string,0x01ABF1,"  N New Continent","  N Континент"
 string,0x01AC03,"  L Land         ","  L Приземлиться "
@@ -439,7 +439,7 @@ reloc,0x0186D9,"-------","-------"
 # block at 0xACCD splits 15/42/15/19/10 = A/B/C/D/E and is rewritten A+D+E+B + "eb 0d" +
 # filler, putting the count at the cursor; the dropped goto(5,0x98) pays for the jmp and its
 # filler keeps a 68 11 at 0xAD2F so no relocation target changes value. The second row
-# repoints the 3 far calls that slid (apply_patches.py does no code motion).
+# repoints the 3 far calls that slid (the patcher does no code motion).
 bytes,0xACCD,"b8 98 00 50 b8 01 00 50 9a b7 0f 68 11 59 59 b8 20 00 50 b8 01 00 50 8a 46 f8 b4 00 ba 0b 00 f7 ea 8a 56 06 b6 00 03 c2 8b d8 8a 87 ae 72 b4 00 50 9a 55 12 68 11 83 c4 06 b8 98 00 50 b8 05 00 50 9a b7 0f 68 11 59 59 8a 46 ff b4 00 d1 e0 8b d8 ff b7 88 02 9a 63 10 68 11 59 b8 48 0a 50 9a 63 10 68 11 59","b8 98 00 50 b8 01 00 50 9a b7 0f 68 11 59 59 8a 46 ff b4 00 d1 e0 8b d8 ff b7 88 02 9a 63 10 68 11 59 b8 48 0a 50 9a 63 10 68 11 59 b8 20 00 50 b8 01 00 50 8a 46 f8 b4 00 ba 0b 00 f7 ea 8a 56 06 b6 00 03 c2 8b d8 8a 87 ae 72 b4 00 50 9a 55 12 68 11 83 c4 06 eb 0d 90 90 90 90 90 90 90 90 90 90 68 11 90"
 bytes,0xDD4,"25 8d 00 00 11 8d 00 00 01 8d 00 00","1e 8d 00 00 f6 8c 00 00 ec 8c 00 00"
 string,0x0160D8," are available"," к найму: "
@@ -870,7 +870,7 @@ reloc,0x0184e7,"Zaezoizu","Заэзойзу"
 # Descriptions are reloc by default, but Russian usually fits its own slot: all 17 records
 # land at ~2.1 KB of pool, well inside POOL_SIZE, so no budget change was needed.
 # Rows that fit their own slot are written in place as 'string'; that is a byte budget, not
-# a limit -- find_ref.py reaches every slot of these tables.
+# a limit -- find-ref reaches every slot of these tables.
 
 # ---- shared with every record
 reloc,0x0051d3,"Unknown","Неизвестен"

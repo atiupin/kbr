@@ -16,47 +16,45 @@ game/    *** the user's pristine originals *** — never modified, untracked (no
          distribute).
 build/   *** generated *** — the whole build chain's output, and the RUN DIR (DOSBox mounts
          it as C:, so it is also where the user's saves land).
-dist/    *** generated *** — what a player gets: the patched game plus `dosbox.conf`.
-         Also a run dir (that config mounts it as C:), so saves land here too.
 res/     *** hand-written build INPUTS *** — the patch manifest (i.e. the translation
          itself), the glyph sheet, `gate_picker.asm` and `name_tables.asm` (injected code
          and data, each explained in its own header), and `dosbox.conf`, the config
          shipped to players.
-tools/   *** the build *** — SCRIPTS ONLY, hand-written Python, stdlib only, plus the
-         diagnostic Ghidra front-end and its ghidra/*.java scripts.
 core/    *** the format work *** — pure functions over bytes: no I/O, no platform, so the
          command line and the browser share one implementation.
-cli/     *** the shell around core *** — paths, files, argv, printing. `npm run verify`
-         gates every artifact it writes on sha256 equality with the reference build.
+cli/     *** the shell around core *** — paths, files, argv, printing. Every command lives
+         here; `cli/main.ts` is the only entry point.
+tools/   *** analysis, not the build *** — the diagnostic Ghidra front-end and its
+         ghidra/*.java scripts, the one thing here still written in Python.
 tmp/     *** scratch, gitignored *** — the Ghidra project DB and its dumps, DOSBox captures.
 ```
 
 ## Tools
 
-Every command in the project. Each script's own docstring is the reference — run it with no
-arguments to print it.
+Every command in the project. `npm run kbr` with no arguments prints the same list; each
+module's own header is the reference for what it does.
 
 ```
-# the whole build, then dist/ — this is the one to run
-tools/build.py
-
-# its steps, in order — no arguments, nothing to configure
-tools/unpack_nwc.py                        KB.EXE -> KBU1.EXE    (outer NWC packer)
-tools/unpack_exepack.py                    KBU1 -> KBU2.EXE      (EXEPACK; the edit base)
-tools/apply_patches.py                     KBU2 + res/patches.csv + res/*.asm -> KBR.EXE
-tools/cc.py font-build                     res/font.png -> build/256.CC + 416.CC
+# the whole build — this is the one to run
+npm run build                              game/KB.EXE + res/ -> build/
+npm run verify                             what a build can be held to: the pinned edit base
 
 # translating
-tools/find_ref.py <offset | "substring">   the ref pointing at a string; prints a reloc row
-tools/addr.py <0xoffset | seg:off>         file offset <-> Ghidra address
-tools/asm16.py selftest                    prove the assembler still matches Turbo C
+npm run kbr find-ref <offset | "text">     the refs pointing at a string; prints a reloc row
+npm run kbr addr <0xoffset | seg:off>      file offset <-> Ghidra address
+npm run kbr asm-selftest                   prove the assembler still matches Turbo C
 
-# CC archives — one-offs; font-build is the only one the build needs
-tools/cc.py list <archive.CC>
-tools/cc.py extract <archive.CC> <id-hex> <out.bin>
-tools/cc.py replace <archive.CC> <id-hex> <in.bin> <out.CC>
-tools/cc.py font-export <archive.CC> <out.png> [--glyphs 128|256]
-tools/cc.py font-import <in.png> <archive.CC> <out.CC>
+# CC archives — one-offs; the build makes the fonts itself
+npm run kbr cc-list <archive.CC>
+npm run kbr cc-extract <archive.CC> <id-hex> <out.bin>
+npm run kbr cc-replace <archive.CC> <id-hex> <in.bin> <out.CC>
+npm run kbr font-export <archive.CC> <out.png> [glyphs]
+npm run kbr font-import <in.png> <archive.CC> <out.CC>
+npm run kbr font-bake                      the raw font member alone, for the web bundle
+
+# the code itself
+npm run typecheck                          nothing is emitted, so this is what "build" means
+npm run format                             Prettier owns the layout of every .ts and .md
 
 # analysis — diagnostic only, never part of a build (see "Ghidra" below)
 tools/ghidra.py gui                        open the GUI on the project
@@ -74,24 +72,27 @@ DumpDecomp.java [outdir]                   decompiled C for every function + a s
 Needs your own copy of the game in `game/`: `KB.EXE`, `256.CC` and `416.CC` (nothing reads the
 `KB!.COM` launcher — the patch disables the protection itself).
 
-Run `tools/build.py`, which runs the four steps in order and stages `dist/`; run them
-individually when only one part changed. **Pure Python 3 stdlib**. Every step takes no
-arguments and reads its paths from **`tools/paths.py`**, which is the one place that knows the
-layout — put a path there, not in a script.
+`npm install`, then `npm run build`: the four chain steps in their only valid order, no
+arguments and nothing to configure. Node runs the TypeScript sources directly — nothing is
+ever compiled or emitted. Every path comes from **`cli/paths.ts`**, which is the one place
+that knows the layout: put a path there, not in a command.
+
+The build ends at `build/` and stages no distributable. What a player gets is a zip the web
+patcher hands back, built from their own copy in their own browser.
 
 To test: `dosbox-x -conf dosbox-x.conf` from the repo root (C: is `build/`), then `KBR`. That
-config is the development one — it keeps the debugger usable and does not touch `dist/`; what
-players get is `res/dosbox.conf`.
+config is the development one — it keeps the debugger usable; what players get is
+`res/dosbox.conf`.
 
 ## Translating
 
 The text sits in one contiguous block in `KBU2.EXE` at fixed offsets: **~2,650 words of
 prose**, ~740 phrase lines, plus menus/items/spells. Extracts are not kept in the repo (they
-are game data) — re-extract with `strings` / `find_ref.py`. **Encoding is CP866**, one byte per
+are game data) — re-extract with `strings` / `find-ref`. **Encoding is CP866**, one byte per
 Cyrillic letter, so the byte budget equals the character count.
 
 The **memory slot** limit is handled automatically: write a `string` row when you have the
-string's offset, a `reloc` row when you have its refs from `find_ref.py`, and the build picks
+string's offset, a `reloc` row when you have its refs from `find-ref`, and the build picks
 in-place or pool by measuring. Never hand-convert a fitting `reloc` row — it already inlines,
 and says so.
 
@@ -100,7 +101,7 @@ its UI field.
 
 Two hard rules, both enforced by the tools:
 
-- **Every `reloc` ref must come from `find_ref.py`, never hand-picked.** A 2-byte value that
+- **Every `reloc` ref must come from `find-ref`, never hand-picked.** A 2-byte value that
   merely _happens_ to equal a string's DS offset looks like a pointer; repointing it corrupts
   whatever it really was, and the failure surfaces far from the edit.
 - **⛔ Never `reloc` a ref inside the copy-protection block (file `0xBFE0`–`0xCCA7`).**
@@ -108,7 +109,7 @@ Two hard rules, both enforced by the tools:
   rule is solid; the mechanism is UNKNOWN** — heap/stack exhaustion, pool placement and sum/XOR
   checks are all ruled out, so re-testing them is wasted effort.
 
-`find_ref.py` validates a table slot by _chaining_ — the next slot must point exactly one past
+`find-ref` validates a table slot by _chaining_ — the next slot must point exactly one past
 this one's NUL — and accepts a run of three, so a table's **first and last entry are
 reachable** too. A two-entry table still isn't: "no ref found" means "not repointable by this
 tool", not "not a pointer" — check the neighbouring slots before assuming computed access.
@@ -135,10 +136,12 @@ tools/ghidra.py run DumpDecomp.java tmp/decomp
 
 ## Constraints
 
-- `build/KBU2.EXE` is the single source of truth — regenerate `KBR.EXE` with the script, never
-  hand-hack headers. Keep `game/` untouched; rebuild the run-dir `.CC` copies from it with
-  `cc.py`.
+- `build/KBU2.EXE` is the single source of truth — regenerate `KBR.EXE` with `npm run build`,
+  never hand-hack headers. Keep `game/` untouched; the run-dir `.CC` copies are rebuilt from
+  it by the same command.
 - **Nothing game-derived is tracked in git** — no binaries, no disassembly, no extracted text.
   The repo carries only hand-written things.
-- **The build stays pure Python 3 stdlib.** Reach for a dependency only if something genuinely
-  cannot be written here; both the NWC packer and the PNG I/O are hand-written for that reason.
+- **`core/` runs anywhere.** Pure functions over `Uint8Array`: no `node:` imports, no DOM, no
+  I/O, no process access — everything platform-shaped lives in `cli/`, so the browser
+  front-end is additive and never forces a change inside. A dependency is welcome anywhere,
+  core included, as long as it runs in both a browser and Node.
