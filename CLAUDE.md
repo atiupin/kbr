@@ -106,20 +106,24 @@ pinned hash.
 - [x] Inject `gate_picker.asm` and `name_tables.asm`; retarget relocations, then
       `check_relocations` and the MZ page counts.
 
-**4 — Archives and font.** Gate: both `.CC` byte-identical, and the Python build retired.
+**4 — Archives and font.** Gate: both `.CC` byte-identical.
 
-- [ ] TOC read and archive rebuild.
-- [ ] `lzw_encode`. The width schedule is the subtle part — a wrong port still round-trips
+- [x] TOC read and archive rebuild.
+- [x] `lzw_encode`. The width schedule is the subtle part — a wrong port still round-trips
       through our own decoder and fails only in DOSBox, so trust the byte compare, not a
       round-trip test.
-- [ ] CLI-only: the PNG reader/writer and `font-export`/`font-import`, plus a bake step that
+- [x] CLI-only: the PNG reader/writer and `font-export`/`font-import`, plus a bake step that
       emits the 2048-byte font member for the web bundle to carry.
-- [ ] Update `README.md`'s tool table and the build instructions.
 
-**5 — Authoring aids.** Gate: same refs reported for a handful of known strings.
+**5 — Authoring aids.** Gate: same refs reported for a handful of known strings, then the
+Python build retired.
 
 - [ ] `find_ref`, chain validation and paste-ready row included.
 - [ ] `addr`.
+- [ ] Retire `tools/*.py` bar the Ghidra front-end: `OUT` becomes `BUILD`, `verify` keeps
+      whatever still gates without a reference build, and `README.md`'s tool table and build
+      instructions become the npm ones. `dist/` goes with it — the web patcher is what a
+      player gets, so no command stages a run dir.
 
 **6 — Web front-end.** A project of its own; gate: a patched zip that runs.
 
