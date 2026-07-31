@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Ghidra front-end for this project.
 
-    tools/ghidra.py gui                       open the GUI on the project
-    tools/ghidra.py run <Script.java> [args]  run a headless script on KBU2.EXE
-    tools/ghidra.py import <file> [opts]      import a binary into the project
+    ghidra/ghidra.py gui                       open the GUI on the project
+    ghidra/ghidra.py run <Script.java> [args]  run a headless script on KBU2.EXE
+    ghidra/ghidra.py import <file> [opts]      import a binary into the project
 
 Nothing in the build depends on Ghidra -- this is diagnostic, for when a patched
 string breaks something and you need to know what code touched it, or when you are
@@ -12,7 +12,7 @@ DOSBox-X breakpoint first; it is usually faster.
 
 This is the one Python left in the project -- it spawns a JVM and answers questions
 about the image, so it has nothing to share with the build, which is TypeScript.
-The hand-written parts are this script and the analysis scripts in tools/ghidra/.
+The hand-written parts are this script and the analysis scripts in scripts/.
 The project DATABASE lives in tmp/ (KBR.gpr / KBR.rep): it is game-derived and
 fully regenerable, so it is scratch, not source. It is kept only as a warm cache
 -- `-process` needs the program already imported, so without it every query
@@ -21,7 +21,7 @@ would re-run auto-analysis. Delete it freely; rebuild it per README.md.
 Ghidra allows a single writer, so close the GUI before `run`/`import`; this
 script checks and says so rather than letting Ghidra fail obscurely.
 
-To see what scripts exist: `ls tools/ghidra` (each one's first comment line says
+To see what scripts exist: `ls ghidra/scripts` (each one's first comment line says
 what it does).
 
 GUI orientation
@@ -29,7 +29,7 @@ GUI orientation
 Listing = disassembly, Decompiler = C-ish pseudocode, Window -> Bytes = hex
 (cursor-linked to the Listing), Window -> Defined Strings = all 877 strings.
 `G` = goto address, `D` = disassemble here. To run our scripts from the GUI,
-Script Manager -> Manage Script Directories -> add tools/ghidra; hit Refresh if a
+Script Manager -> Manage Script Directories -> add ghidra/scripts; hit Refresh if a
 script's version banner looks stale.
 
 Gotcha: Ghidra refuses a project path containing a dot-directory ("Path element
@@ -44,10 +44,10 @@ import subprocess
 import sys
 from pathlib import Path
 
-TOOLS = Path(__file__).resolve().parent
-PROJECT_DIR = TOOLS.parent / "tmp"         # scratch: the project is regenerable
+HERE = Path(__file__).resolve().parent
+PROJECT_DIR = HERE.parent / "tmp"          # scratch: the project is regenerable
 PROJECT_NAME = "KBR"
-SCRIPTS = TOOLS / "ghidra"                 # the .java analysis scripts
+SCRIPTS = HERE / "scripts"                 # the .java analysis scripts
 PROGRAM = "KBU2.EXE"                       # what `run` selects with -process
 
 # Ghidra logs its whole startup at INFO, and prefixes script output with
@@ -87,7 +87,7 @@ def check_project():
         die(f"no Ghidra project at {PROJECT_DIR / (PROJECT_NAME + '.gpr')} -- it is "
             f"gitignored scratch.\n"
             f"       Recreate it (see README.md, \"Ghidra\"):\n"
-            f"         tools/ghidra.py import build/KBU2.EXE")
+            f"         ghidra/ghidra.py import build/KBU2.EXE")
 
 
 def check_unlocked():
@@ -124,7 +124,7 @@ def main(argv):
 
     elif cmd == "run":
         if not rest:
-            die("usage: tools/ghidra.py run <Script.java> [args...]")
+            die("usage: ghidra/ghidra.py run <Script.java> [args...]")
         script, args = rest[0], rest[1:]
         if not (SCRIPTS / script).is_file():
             die(f"no such script: {SCRIPTS / script}")
@@ -136,7 +136,7 @@ def main(argv):
 
     elif cmd == "import":
         if not rest:
-            die("usage: tools/ghidra.py import <file> [extra analyzeHeadless opts]")
+            die("usage: ghidra/ghidra.py import <file> [extra analyzeHeadless opts]")
         PROJECT_DIR.mkdir(parents=True, exist_ok=True)   # may not exist yet
         check_unlocked()
         return headless(["-import", *rest])

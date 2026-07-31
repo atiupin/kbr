@@ -24,8 +24,8 @@ core/    *** the format work *** — pure functions over bytes: no I/O, no platf
          command line and the browser share one implementation.
 cli/     *** the shell around core *** — paths, files, argv, printing. Every command lives
          here; `cli/main.ts` is the only entry point.
-tools/   *** analysis, not the build *** — the diagnostic Ghidra front-end and its
-         ghidra/*.java scripts, the one thing here still written in Python.
+ghidra/  *** analysis, not the build *** — `ghidra.py`, the diagnostic front-end and the
+         one thing here still written in Python, and the `scripts/*.java` it runs.
 tmp/     *** scratch, gitignored *** — the Ghidra project DB and its dumps, DOSBox captures.
 ```
 
@@ -56,11 +56,11 @@ npm run typecheck                          nothing is emitted, so this is what "
 npm run format                             Prettier owns the layout of every .ts and .md
 
 # analysis — diagnostic only, never part of a build (see "Ghidra" below)
-tools/ghidra.py gui                        open the GUI on the project
-tools/ghidra.py run <Script.java> [args]   headless script on KBU2.EXE, output de-noised
-tools/ghidra.py import <file> [opts]       import a binary into the project
+ghidra/ghidra.py gui                        open the GUI on the project
+ghidra/ghidra.py run <Script.java> [args]   headless script on KBU2.EXE, output de-noised
+ghidra/ghidra.py import <file> [opts]       import a binary into the project
 
-# the scripts `run` takes, in tools/ghidra/
+# the scripts `run` takes, in ghidra/scripts/
 FindStringUsers.java "<text>" [dsbase]     what code references a string (Ghidra can't)
 DumpAsm.java <seg:off>                     one function's assembly, symbols resolved
 DumpDecomp.java [outdir]                   decompiled C for every function + a string map
@@ -121,7 +121,7 @@ tool", not "not a pointer" — check the neighbouring slots before assuming comp
 
 Nothing in the build calls Ghidra. What it is for is diagnostic: finding what code touches a
 string a patch broke, or reading the disassembly around a `bytes` row you are about to write.
-Always drive it through `tools/ghidra.py`, which presets the paths and explains every flag in
+Always drive it through `ghidra/ghidra.py`, which presets the paths and explains every flag in
 its docstring.
 
 **Ghidra cannot resolve string xrefs here** — it can't statically pin DS in segmented real
@@ -133,8 +133,8 @@ cache. Delete it freely, then rebuild (needs `build/KBU2.EXE`; the program must 
 **`KBU2.EXE`**, which is what `-process` selects):
 
 ```
-tools/ghidra.py import build/KBU2.EXE                       # then let auto-analysis run
-tools/ghidra.py run DumpDecomp.java tmp/decomp
+ghidra/ghidra.py import build/KBU2.EXE                       # then let auto-analysis run
+ghidra/ghidra.py run DumpDecomp.java tmp/decomp
 ```
 
 ## Constraints

@@ -88,7 +88,7 @@ const chains = (image: Uint8Array, i: number): boolean => {
  * 0x47eb is reported at file 0x5240, where the vouching 0xbf is the displacement of a `jz`,
  * not a `mov di`, and repointing it would rewrite a branch target. So when a string reports
  * BOTH a table entry and a lone immediate, disassemble the code site before trusting it
- * (tools/ghidra/FindStringUsers.java scans decoded instructions and settles it); a table
+ * (ghidra/scripts/FindStringUsers.java scans decoded instructions and settles it); a table
  * entry needs no such check, the chain already validated it.
  *
  * A slot is accepted when it sits in a run of THREE chained slots, in any of the three
