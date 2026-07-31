@@ -44,16 +44,6 @@ export const u32 = (b: Uint8Array, off: number): number => {
   return (b[off] | (b[off + 1] << 8) | (b[off + 2] << 16) | (b[off + 3] << 24)) >>> 0;
 };
 
-export const u16be = (b: Uint8Array, off: number): number => {
-  check(b, off, 2);
-  return (b[off] << 8) | b[off + 1];
-};
-
-export const u32be = (b: Uint8Array, off: number): number => {
-  check(b, off, 4);
-  return ((b[off] << 24) | (b[off + 1] << 16) | (b[off + 2] << 8) | b[off + 3]) >>> 0;
-};
-
 /** A run of little-endian u16s: the MZ header and the EXEPACK trailer are read that way. */
 export const u16s = (b: Uint8Array, off: number, n: number): number[] => {
   const out: number[] = [];
@@ -95,15 +85,6 @@ export const setU32 = (b: Uint8Array, off: number, v: number): void => {
   b[off + 3] = (v >>> 24) & 0xff;
 };
 
-export const setU32be = (b: Uint8Array, off: number, v: number): void => {
-  check(b, off, 4);
-  fits(v, 4);
-  b[off] = (v >>> 24) & 0xff;
-  b[off + 1] = (v >>> 16) & 0xff;
-  b[off + 2] = (v >>> 8) & 0xff;
-  b[off + 3] = v & 0xff;
-};
-
 export const packU16 = (v: number): Uint8Array => {
   const b = new Uint8Array(2);
   setU16(b, 0, v);
@@ -113,12 +94,6 @@ export const packU16 = (v: number): Uint8Array => {
 export const packU32 = (v: number): Uint8Array => {
   const b = new Uint8Array(4);
   setU32(b, 0, v);
-  return b;
-};
-
-export const packU32be = (v: number): Uint8Array => {
-  const b = new Uint8Array(4);
-  setU32be(b, 0, v);
   return b;
 };
 
