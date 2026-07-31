@@ -43,11 +43,11 @@ patched one, from a static page with no backend — their files never leave the 
 project still ships no game data.
 
 **`core/` is universal.** Pure functions over `Uint8Array`: no `node:` imports, no DOM, no I/O,
-no process access, nothing async. Everything platform-shaped — reading files, writing `dist/`,
-zip, printing — lives in a shell around it, so the web front-end is additive and never forces a
-change inside. Third-party libraries are allowed, but the domain code (LZW, EXEPACK, the CC
-container, CP866, the assembler) has no equivalent on npm and stays hand-written; core needs no
-runtime deps at all.
+no process access. Everything platform-shaped — reading files, writing `dist/`, zip, printing —
+lives in a shell around it, so the web front-end is additive and never forces a change inside.
+Dependencies are welcome anywhere, core included, as long as they run in both a browser and
+Node; what stays hand-written is only what npm has no equivalent for — LZW, EXEPACK, the CC
+container, CP866, the assembler.
 
 **Never the `function` keyword.** Every named function is a `const` bound to an arrow, at any
 level; an anonymous arrow passed inline stays inline. **File names are camelCase**, so a module
