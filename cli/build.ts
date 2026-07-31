@@ -1,10 +1,6 @@
 /**
  * The whole build in one command: the chain's four steps in their only valid
  * order.
- *
- * It ends at build/, and never stages a distributable: what a player gets is a
- * zip the web patcher hands back, built from their own copy in their own
- * browser, so nothing here assembles a run dir for anyone but the developer.
  */
 
 import { applyPatches } from "../core/applyPatches.ts";
@@ -52,5 +48,5 @@ export const build = (): void => {
   step(4, 4, "build the Cyrillic-extended fonts");
   fontBuild();
 
-  line("\nbuilt -- now run `npm run verify`");
+  line("\nbuilt -- C: is build/, so `dosbox-x -conf dosbox-x.conf` then KBR runs it");
 };

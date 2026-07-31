@@ -37,7 +37,6 @@ module's own header is the reference for what it does.
 ```
 # the whole build — this is the one to run
 npm run build                              game/KB.EXE + res/ -> build/
-npm run verify                             what a build can be held to: the pinned edit base
 
 # translating
 npm run kbr find-ref <offset | "text">     the refs pointing at a string; prints a reloc row
@@ -76,6 +75,10 @@ Needs your own copy of the game in `game/`: `KB.EXE`, `256.CC` and `416.CC` (not
 arguments and nothing to configure. Node runs the TypeScript sources directly — nothing is
 ever compiled or emitted. Every path comes from **`cli/paths.ts`**, which is the one place
 that knows the layout: put a path there, not in a command.
+
+A build carries its own gate, so nothing checks it afterwards: the patcher refuses any base
+but the **pinned `KBU2.EXE`** — which is what proves the two unpack steps — and checks every
+manifest row against that image as it applies it.
 
 The build ends at `build/` and stages no distributable. What a player gets is a zip the web
 patcher hands back, built from their own copy in their own browser.

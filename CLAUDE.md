@@ -75,8 +75,9 @@ Each phase ends on its stated gate, and the next one does not start until it hol
       phase below is measured against.
 
 Node runs the `.ts` sources directly, so imports carry a `.ts` extension and nothing is ever
-emitted; `npm run typecheck` is what a "build" means here. The chain writes to `build/`, and
-`npm run verify` gates it on the one hash that outlives any build: the pinned `KBU2.EXE`.
+emitted; `npm run typecheck` is what a "build" means here. The chain writes to `build/` and
+gates itself as it runs, on the one hash that outlives any build: the patcher takes no base
+but the pinned `KBU2.EXE`.
 
 **1 — Unpack chain.** Gate: `KBU1.EXE` and `KBU2.EXE` byte-identical, `KBU2` matching its
 pinned hash.
@@ -118,10 +119,10 @@ Python build retired.
 
 - [x] `find_ref`, chain validation and paste-ready row included.
 - [x] `addr`.
-- [x] Retire `tools/*.py` bar the Ghidra front-end: `OUT` becomes `BUILD`, `verify` keeps
-      whatever still gates without a reference build, and `README.md`'s tool table and build
-      instructions become the npm ones. `dist/` goes with it — the web patcher is what a
-      player gets, so no command stages a run dir.
+- [x] Retire `tools/*.py` bar the Ghidra front-end: `OUT` becomes `BUILD`, `verify` goes with
+      the reference build it compared against — the pin it checked is enforced inside the
+      patcher — and `README.md`'s tool table and build instructions become the npm ones.
+      `dist/` goes too: the web patcher is what a player gets, so no command stages a run dir.
 
 **6 — Web front-end.** A project of its own; gate: a patched zip that runs.
 

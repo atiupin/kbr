@@ -9,7 +9,6 @@
     "typecheck": "tsc -p core && tsc -p cli",
     "kbr": "node cli/main.ts",
     "build": "node cli/main.ts build",
-    "verify": "node cli/main.ts verify",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },

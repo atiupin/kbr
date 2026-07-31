@@ -13,13 +13,11 @@ import { fontBake, fontExport, fontImport } from "./font.ts";
 import { read, rel, write } from "./io.ts";
 import { line } from "./report.ts";
 import { selftest } from "./selftest.ts";
-import { verify } from "./verify.ts";
 import * as paths from "./paths.ts";
 
 const USAGE = `kbr <command> [args]
 
   build                      the whole chain: game/KB.EXE + res/ -> build/
-  verify                     the pinned edit base, and every artifact's sha256
   asm-selftest               reassemble two shipped routines, demand byte equality
 
   find-ref <offset|"text">   what points at a string; a reloc row, paste-ready
@@ -115,7 +113,6 @@ const cmdFontImport = (args: string[]): void =>
 
 const COMMANDS = new Map<string, (args: string[]) => void>([
   ["build", build],
-  ["verify", verify],
   ["asm-selftest", selftest],
   ["find-ref", findRef],
   ["addr", cmdAddr],
