@@ -15,6 +15,12 @@ const HIGH =
 const BYTE_OF = new Map<string, number>();
 for (let i = 0; i < HIGH.length; i++) BYTE_OF.set(HIGH[i], 0x80 + i);
 
+export const decodeCp866 = (bytes: Uint8Array): string => {
+  let text = "";
+  for (const byte of bytes) text += byte < 0x80 ? String.fromCharCode(byte) : HIGH[byte - 0x80];
+  return text;
+};
+
 export const encodeCp866 = (text: string): Uint8Array => {
   const out = new Uint8Array(text.length);
   for (let i = 0; i < text.length; i++) {

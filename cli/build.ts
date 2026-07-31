@@ -30,15 +30,24 @@ export const build = (): void => {
   emit(paths.KBU2, unpackExepack(read(paths.KBU1)));
 
   step(3, 4, "apply patches");
-  emit(
-    paths.KBR,
-    applyPatches({
-      base: read(paths.KBU2),
-      patchesCsv: readText(paths.PATCHES_CSV),
-      gatePickerAsm: readText(paths.GATE_PICKER_ASM),
-      nameTablesAsm: readText(paths.NAME_TABLES_ASM),
-    }),
+  const patched = applyPatches({
+    base: read(paths.KBU2),
+    patchesCsv: readText(paths.PATCHES_CSV),
+    gatePickerAsm: readText(paths.GATE_PICKER_ASM),
+    nameTablesAsm: readText(paths.NAME_TABLES_ASM),
+  });
+  const { rows, inlined, pooled, poolUsed, poolSize, gate, names } = patched.summary;
+  line(`${rows} row(s): ${pooled} to the pool, ${inlined} reloc row(s) inlined into their slot`);
+  line(`pool ${poolUsed}B of ${poolSize}B used`);
+  line(
+    `gate picker ${gate.code}B + ${gate.stub}B stub, ${gate.sites} far call(s): ` +
+      `${gate.reaimed} relocation entr(ies) re-aimed, ${gate.added} appended`,
   );
+  line(
+    `name tables ${names.tables}B (keymap DS 0x${names.keymap.toString(16)}, ` +
+      `translit DS 0x${names.translit.toString(16)})`,
+  );
+  emit(paths.KBR, patched.image);
 
   step(4, 4, "build the Cyrillic-extended fonts");
   fontBuild();

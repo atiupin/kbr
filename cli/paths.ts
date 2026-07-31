@@ -35,11 +35,3 @@ export const FONT_PNG = join(RES, "font.png");
 export const GATE_PICKER_ASM = join(RES, "gate_picker.asm");
 export const NAME_TABLES_ASM = join(RES, "name_tables.asm");
 export const DOSBOX_CONF = join(RES, "dosbox.conf");
-
-/**
- * KBU2.EXE's SHA-256. Every tool that reads KBU2 gates on this: the file offsets
- * in patches.csv are only meaningful against this exact image, so a mismatch
- * means the offsets would land somewhere else entirely. Update it only when the
- * base image legitimately changes.
- */
-export const KBU2_SHA256 = "a0ad8832b6a9afa7b28c7d0054a13e286d7952a558eaa12a38f6146e77339d49";

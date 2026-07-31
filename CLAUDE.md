@@ -96,14 +96,14 @@ pinned hash.
 
 **3 — Patcher.** Gate: `KBR.EXE` byte-identical.
 
-- [ ] The `\xNN` and `\\` escapes on top of the CP866 encode table the assembler already uses.
-- [ ] Strict CSV reader — a line at a time, text after a closing quote rejected. Its strictness
+- [x] The `\xNN` and `\\` escapes on top of the CP866 encode table the assembler already uses.
+- [x] Strict CSV reader — a line at a time, text after a closing quote rejected. Its strictness
       is load-bearing; nothing off the shelf reproduces it.
-- [ ] Row shape check, `resolve`, and the copy-protection fence on `reloc` refs.
-- [ ] Verification pass: `expect` against the pristine image, deref every ref, one row per
+- [x] Row shape check, `resolve`, and the copy-protection fence on `reloc` refs.
+- [x] Verification pass: `expect` against the pristine image, deref every ref, one row per
       string, no overlapping in-place writes.
-- [ ] Pool allocation and ref repointing, inlining whatever fits its own slot.
-- [ ] Inject `gate_picker.asm` and `name_tables.asm`; retarget relocations, then
+- [x] Pool allocation and ref repointing, inlining whatever fits its own slot.
+- [x] Inject `gate_picker.asm` and `name_tables.asm`; retarget relocations, then
       `check_relocations` and the MZ page counts.
 
 **4 — Archives and font.** Gate: both `.CC` byte-identical, and the Python build retired.

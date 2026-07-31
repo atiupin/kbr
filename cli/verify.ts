@@ -11,6 +11,7 @@
 
 import { join } from "node:path";
 
+import { KBU2_SHA256 } from "../core/applyPatches.ts";
 import { sha256 } from "../core/sha256.ts";
 import { exists, read, rel } from "./io.ts";
 import { heading, item } from "./report.ts";
@@ -30,7 +31,7 @@ const ARTIFACTS: readonly Artifact[] = [
     name: "KBU2.EXE",
     reference: join(paths.BUILD, "KBU2.EXE"),
     ours: paths.KBU2,
-    pin: paths.KBU2_SHA256,
+    pin: KBU2_SHA256,
   },
   { name: "KBR.EXE", reference: join(paths.BUILD, "KBR.EXE"), ours: paths.KBR },
   { name: "256.CC", reference: join(paths.BUILD, "256.CC"), ours: paths.BUILD_CC[256] },
