@@ -1,9 +1,7 @@
 /**
- * Every filesystem touch in the build, so core never grows one.
- *
- * read returns a plain Uint8Array rather than Node's Buffer: core is typed
- * against the former, and a Buffer leaking in would let Buffer-only methods
- * compile there once cli/ is in the same pass.
+ * read returns a plain Uint8Array rather than Node's Buffer: core is typed against the
+ * former, and a Buffer leaking in would let Buffer-only methods compile there once cli/ is
+ * in the same pass.
  */
 
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";

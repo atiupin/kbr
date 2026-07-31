@@ -17,7 +17,8 @@ for (let i = 0; i < HIGH.length; i++) BYTE_OF.set(HIGH[i], 0x80 + i);
 
 export const decodeCp866 = (bytes: Uint8Array): string => {
   let text = "";
-  for (const byte of bytes) text += byte < 0x80 ? String.fromCharCode(byte) : HIGH[byte - 0x80];
+  for (const byte of bytes)
+    text += byte < 0x80 ? String.fromCharCode(byte) : HIGH[byte - 0x80];
   return text;
 };
 
@@ -26,7 +27,8 @@ export const encodeCp866 = (text: string): Uint8Array => {
   for (let i = 0; i < text.length; i++) {
     const code = text.charCodeAt(i);
     const byte = code < 0x80 ? code : BYTE_OF.get(text[i]);
-    if (byte === undefined) throw new RangeError(`${JSON.stringify(text[i])} has no CP866 byte`);
+    if (byte === undefined)
+      throw new RangeError(`${JSON.stringify(text[i])} has no CP866 byte`);
     out[i] = byte;
   }
   return out;

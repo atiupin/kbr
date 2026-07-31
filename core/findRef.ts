@@ -1,21 +1,18 @@
 /**
- * What points at a string. An authoring aid, not a build step -- but a hard
- * dependency of one: a `reloc` row's refs must come from here and nowhere else,
- * because a 2-byte value that merely happens to equal a string's DS offset looks
- * exactly like a pointer.
+ * What points at a string. An authoring aid, not a build step — but a hard dependency of
+ * one: a `reloc` row's refs must come from here and nowhere else, because a 2-byte value
+ * that merely happens to equal a string's DS offset looks exactly like a pointer.
  *
- * Game text is reached through 2-byte NEAR offsets (DS-relative). A ref sits
- * either in a DGROUP pointer table or inside a code instruction as an immediate
- * operand. Most box/bio lines have exactly one; several means the string is used
- * from several places and all its pointers must move together, so they belong in
- * ONE manifest row.
+ * Game text is reached through 2-byte NEAR offsets (DS-relative). A ref sits either in a
+ * DGROUP pointer table or inside a code instruction as an immediate operand. Most box/bio
+ * lines have exactly one; several means the string is used from several places and all its
+ * pointers must move together, so they belong in ONE manifest row.
  *
- * No ref found means "not repointable by this tool", never "not a pointer": the
- * string is reached by computed/indexed access, or sits in a table too short to
- * prove itself. A `table` verdict says nothing about liveness either -- tables
- * are read base+index, often from several bases into one array, so no immediate
- * ever equals such a slot's own DS offset and grepping for one cannot prove a
- * slot dead. Only a screenshot settles that.
+ * No ref found means "not repointable by this tool", never "not a pointer": the string is
+ * reached by computed/indexed access, or sits in a table too short to prove itself. A
+ * `table` verdict says nothing about liveness either — tables are read base+index, often
+ * from several bases into one array, so no immediate ever equals such a slot's own DS
+ * offset and grepping for one cannot prove a slot dead. Only a screenshot settles that.
  */
 
 import { DS_BASE, PROT_HI, PROT_LO } from "./applyPatches.ts";
@@ -41,7 +38,7 @@ export interface Ref {
  *
  * The EMPTY string counts (length 0). Tables here pad an unused slot with a pointer to the
  * NUL that ends the previous string, and `chains` has to step through such a slot to reach
- * the entries on the far side of it -- the artifact table at 0x183a8 is three quarters
+ * the entries on the far side of it — the artifact table at 0x183a8 is three quarters
  * padding of exactly that kind.
  */
 const stringLen = (image: Uint8Array, dsoff: number): number | undefined => {
@@ -56,7 +53,7 @@ const stringLen = (image: Uint8Array, dsoff: number): number | undefined => {
 /**
  * True when the slots at `i` and `i + 2` are CONSECUTIVE entries of a pointer table.
  *
- * Not "both look like strings" -- that test is far too weak, it promotes any coincidental
+ * Not "both look like strings" — that test is far too weak, it promotes any coincidental
  * byte pair to a ref, and a slot in a descending counter table (file 0x18855) passes it.
  * This asks the arithmetic question instead:
  *
@@ -78,24 +75,24 @@ const chains = (image: Uint8Array, i: number): boolean => {
  * Every ref pointing at the string at file offset `strOff`.
  *
  * Conservative by design: a false ref corrupts whatever it lands on, so a site is only
- * reported when it is structurally a pointer -- an immediate operand of a known load
+ * reported when it is structurally a pointer — an immediate operand of a known load
  * instruction, or a slot whose neighbours are themselves string pointers and which is
  * ordered like a real table.
  *
  * Conservative is not the same as sound, and `immediate` is the weaker of the two tests: it
- * only asks whether the PRECEDING BYTE is a load opcode, and nothing here tracks instruction
- * boundaries. A jump whose displacement happens to equal a load opcode fakes one -- DS
- * 0x47eb is reported at file 0x5240, where the vouching 0xbf is the displacement of a `jz`,
- * not a `mov di`, and repointing it would rewrite a branch target. So when a string reports
- * BOTH a table entry and a lone immediate, disassemble the code site before trusting it
- * (ghidra/scripts/FindStringUsers.java scans decoded instructions and settles it); a table
- * entry needs no such check, the chain already validated it.
+ * only asks whether the PRECEDING BYTE is a load opcode, and nothing here tracks
+ * instruction boundaries. A jump whose displacement happens to equal a load opcode fakes
+ * one — DS 0x47eb is reported at file 0x5240, where the vouching 0xbf is the displacement
+ * of a `jz`, not a `mov di`, and repointing it would rewrite a branch target. So when a
+ * string reports BOTH a table entry and a lone immediate, disassemble the code site before
+ * trusting it (ghidra/scripts/FindStringUsers.java scans decoded instructions and settles
+ * it); a table entry needs no such check, the chain already validated it.
  *
  * A slot is accepted when it sits in a run of THREE chained slots, in any of the three
- * positions -- which is what reaches a table's first and last entry. TWO chained slots are
+ * positions — which is what reaches a table's first and last entry. TWO chained slots are
  * not enough: an arithmetic ramp fakes one link whenever its step equals a string length
- * there, as the menu table at 0x18cc8 (step 9) does, offering DS 0x102 -- two bytes into
- * ' Controls ' -- as a pointer. Its second link fails, so the run test rejects it.
+ * there, as the menu table at 0x18cc8 (step 9) does, offering DS 0x102 — two bytes into
+ * ' Controls ' — as a pointer. Its second link fails, so the run test rejects it.
  */
 export const findRefs = (image: Uint8Array, strOff: number): Ref[] => {
   const refs: Ref[] = [];
@@ -117,7 +114,8 @@ export const findRefs = (image: Uint8Array, strOff: number): Ref[] => {
  * Refs here are genuine pointers, but repointing one hangs the game much later on an
  * unrelated screen. Reported, never offered as part of a paste-ready row.
  */
-export const inProtection = (offset: number): boolean => offset >= PROT_LO && offset <= PROT_HI;
+export const inProtection = (offset: number): boolean =>
+  offset >= PROT_LO && offset <= PROT_HI;
 
 /** File offsets of the strings in the text region containing `needle`, ascending. */
 export const findStrings = (image: Uint8Array, needle: Uint8Array): number[] => {
@@ -134,7 +132,8 @@ export const findStrings = (image: Uint8Array, needle: Uint8Array): number[] => 
 export const stringAt = (image: Uint8Array, strOff: number): string =>
   decodeCp866(cstring(image, strOff));
 
-export const hexOffset = (offset: number): string => `0x${offset.toString(16).padStart(6, "0")}`;
+export const hexOffset = (offset: number): string =>
+  `0x${offset.toString(16).padStart(6, "0")}`;
 
 /** One manifest text column: the escapes the patcher reads, plus CSV quote doubling. */
 const field = (text: string): string => {
@@ -143,7 +142,8 @@ const field = (text: string): string => {
     const code = ch.codePointAt(0) ?? 0;
     if (ch === "\\") out += "\\\\";
     else if (ch === '"') out += '""';
-    else if (code < 0x20 || code === 0x7f) out += `\\x${code.toString(16).padStart(2, "0")}`;
+    else if (code < 0x20 || code === 0x7f)
+      out += `\\x${code.toString(16).padStart(2, "0")}`;
     else out += ch;
   }
   return out;

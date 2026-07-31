@@ -8,19 +8,21 @@
 
 ## Writing
 
-- **Comment only the non-obvious, and briefly.** A comment earns its place by recording a
-  finding, a constraint, or the reason behind a choice — never by restating the code,
-  narrating how something ordinary works, or walking through examples. One dense sentence
-  beats a paragraph; if it would only tell a competent reader what they can see, drop it.
-- **Document a finding in the script that owns it**, next to the code that enforces it —
-  not in `README.md`. That file says what the project is, where things live, and which
-  rules must not be broken; everything else belongs in a docstring.
-- **Comments and docs state what is true now, never how they got that way** — no earlier
-  wording, no corrections, no "previously", no progress or status. Git holds the history,
-  and a mistake still worth guarding against becomes a present-tense constraint. Nothing in
-  the project is "a port of" anything: a module documents what it does, never what it was
-  translated from or which file it replaces.
-- Prose in the repo is English; only the translated game text itself is Russian.
+- **A comment is earned, never owed.** It records a finding, a constraint or the reason for
+  a choice — never what the code already shows, and never because of where it sits. One
+  dense sentence beats a paragraph.
+- **The finding belongs in the script that enforces it**, not `README.md`, which says only
+  what the project is, where things live and which rules must not be broken.
+- **Only what is true now** — no earlier wording, no corrections, no "previously", no
+  progress. Git holds the history; a mistake still worth guarding against becomes a
+  present-tense constraint, and nothing here is "a port of" anything.
+- **Form follows scope.** A `/** … */` binds to the one declaration under it, so a note over
+  a group is a `//` block under a `// --- section ---` rule; in a body `//` goes above the
+  statement, never trailing — the exception is a gloss on a value, where a column of short
+  notes reads as part of the data.
+- **92 columns for everything**: `printWidth`, comments, Markdown, the width a section rule
+  pads to. Hand-aligned tables and samples keep their own layout.
+- Prose is English; only the translated game text is Russian.
 
 ## Commits
 
@@ -45,9 +47,10 @@
   condition (`fits`, `chains`), and a command, which is named after itself (`build`).
 - **Imports carry a `.ts` extension.** Node runs the sources directly and nothing is ever
   emitted, so `npm run typecheck` is what a "build" means here.
-- **Validate yourself before reporting anything done**: `npm run typecheck && npm run format`,
-  after every change, including a one-line edit and including changes to Markdown. Whatever
-  else a task is gated on comes on top of this, never instead of it.
+- **Validate yourself before reporting anything done**:
+  `npm run typecheck && npm run format`, after every change, including a one-line edit and
+  including changes to Markdown. Whatever else a task is gated on comes on top of this,
+  never instead of it.
 - **Every stage emits bytes deterministically**, so a change is judged by `sha256`, never by
   "it looks right".
 - Ghidra stays in Python: it spawns a JVM and is diagnostic, not part of the build.
@@ -56,8 +59,8 @@
 
 One implementation serves both the command line and the browser: a player drops in a zip of
 their own game copy and downloads a patched one, from a static page with no backend — their
-files never leave the machine, and the project still ships no game data. A project of its own;
-gate: a patched zip that runs. Bare HTML and one bundled script — no framework, no CSS
+files never leave the machine, and the project still ships no game data. A project of its
+own; gate: a patched zip that runs. Bare HTML and one bundled script — no framework, no CSS
 framework, no template engine.
 
 - [x] Bundler and a static build that deploys as a plain directory.

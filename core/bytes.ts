@@ -1,14 +1,14 @@
 /**
  * The struct/find layer every other core module sits on.
  *
- * Two guarantees this code leans on and JavaScript does not give for free: a
- * read past the end raises instead of yielding NaN, and a write is checked
- * against the field's width. Without them an off-by-one in a header offset
- * surfaces as a corrupt image many stages later.
+ * Two guarantees this code leans on and JavaScript does not give for free: a read past the
+ * end raises instead of yielding NaN, and a write is checked against the field's width.
+ * Without them an off-by-one in a header offset surfaces as a corrupt image many stages
+ * later.
  *
- * Byte strings are Uint8Array throughout. latin1 is the one text codec that
- * belongs here -- the transparent byte<->char mapping for eyeballing raw data;
- * CP866, the game's actual encoding, lives with the patcher.
+ * Byte strings are Uint8Array throughout. latin1 is the one text codec that belongs here —
+ * the transparent byte<->char mapping for eyeballing raw data; CP866, the game's actual
+ * encoding, lives with the patcher.
  */
 
 const check = (b: Uint8Array, off: number, width: number): void => {
@@ -18,7 +18,8 @@ const check = (b: Uint8Array, off: number, width: number): void => {
 };
 
 const fits = (v: number, width: number): void => {
-  const max = width === 1 ? 0xff : width === 2 ? 0xffff : width === 3 ? 0xffffff : 0xffffffff;
+  const max =
+    width === 1 ? 0xff : width === 2 ? 0xffff : width === 3 ? 0xffffff : 0xffffffff;
   if (!Number.isInteger(v) || v < 0 || v > max) {
     throw new RangeError(`${v} does not fit in ${width} unsigned byte(s)`);
   }
@@ -115,7 +116,8 @@ export const findByte = (hay: Uint8Array, byte: number, from = 0): number =>
 /** Every index at which `needle` occurs, overlaps included. */
 export const findAll = (hay: Uint8Array, needle: Uint8Array, from = 0): number[] => {
   const hits: number[] = [];
-  for (let i = find(hay, needle, from); i !== -1; i = find(hay, needle, i + 1)) hits.push(i);
+  for (let i = find(hay, needle, from); i !== -1; i = find(hay, needle, i + 1))
+    hits.push(i);
   return hits;
 };
 
@@ -154,7 +156,8 @@ export const fromLatin1 = (s: string): Uint8Array => {
   const out = new Uint8Array(s.length);
   for (let i = 0; i < s.length; i++) {
     const c = s.charCodeAt(i);
-    if (c > 0xff) throw new RangeError(`U+${c.toString(16).toUpperCase()} is not a latin1 char`);
+    if (c > 0xff)
+      throw new RangeError(`U+${c.toString(16).toUpperCase()} is not a latin1 char`);
     out[i] = c;
   }
   return out;

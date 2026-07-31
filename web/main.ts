@@ -1,11 +1,7 @@
 /**
- * The browser shell: a zip of the player's own copy in, a zip that runs out,
- * through the same core/ chain the command line runs -- cli/build.ts is these
- * same steps against the filesystem.
- *
- * Nothing is fetched and nothing is sent: res/ is bundled into this script, the
- * zip comes from the File the page was handed, and the result goes back as an
- * object URL. The patch path makes no network call at all.
+ * Nothing is fetched and nothing is sent: res/ is bundled into this script, the zip comes
+ * from the File the page was handed, and the result goes back as an object URL. The patch
+ * path makes no network call at all.
  */
 
 import { KBU2_SHA256, applyPatches } from "../core/applyPatches.ts";
@@ -41,8 +37,8 @@ const patch = async (zip: Uint8Array): Promise<Uint8Array> => {
   const kbu2 = unpackExepack(nwc.image);
   say("распакован EXEPACK");
 
-  // applyPatches gates on this hash as well; checking it here is what turns the
-  // build's byte-level complaint into the one thing a player can act on.
+  // applyPatches gates on this hash as well; checking it here is what turns the build's
+  // byte-level complaint into the one thing a player can act on.
   if (sha256(kbu2) !== KBU2_SHA256) {
     throw new Error("this is not the release the patch targets");
   }

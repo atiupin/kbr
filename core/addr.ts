@@ -1,6 +1,4 @@
 /**
- * File offset <-> the seg:off a disassembler shows, both ways.
- *
  * Three coordinate systems are in play:
  *
  *     file offset    what a hex editor shows    (image offset + the header)
@@ -22,7 +20,9 @@ export interface Address {
   off: number;
 }
 
-/** `seg` expresses the result in a chosen segment; the default is the paragraph it sits in. */
+/**
+ * `seg` expresses the result in a chosen segment; the default is the paragraph it sits in.
+ */
 export const fromFile = (file: number, seg?: number): Address => {
   const linear = file + SKEW;
   const base = seg ?? linear >>> 4;

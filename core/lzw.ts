@@ -1,9 +1,9 @@
 /**
- * The NWC variable-width LZW codec: LSB-first, 9->12 bits, clear 0x100, end
- * 0x101, first dictionary code 0x102.
+ * The NWC variable-width LZW codec: LSB-first, 9->12 bits, clear 0x100, end 0x101, first
+ * dictionary code 0x102.
  *
- * Its own module because two unrelated things are the same stream -- the members
- * of a CC archive, and the outer layer KB.EXE ships packed in.
+ * Its own module because two unrelated things are the same stream — the members of a CC
+ * archive, and the outer layer KB.EXE ships packed in.
  */
 
 const CLEAR = 0x100;
@@ -21,9 +21,9 @@ const extend = (entry: Uint8Array, byte: number): Uint8Array => {
 };
 
 /**
- * Decode one stream, stopping at `declen` bytes, the end code, or a code the
- * dictionary cannot explain -- a truncated or corrupt stream yields what it
- * decoded rather than throwing, so the caller decides what a short result means.
+ * Decode one stream, stopping at `declen` bytes, the end code, or a code the dictionary
+ * cannot explain — a truncated or corrupt stream yields what it decoded rather than
+ * throwing, so the caller decides what a short result means.
  */
 export const decodeLzw = (stream: Uint8Array, declen: number): Uint8Array => {
   let out = new Uint8Array(Math.max(declen, 64));
@@ -83,17 +83,16 @@ export const decodeLzw = (stream: Uint8Array, declen: number): Uint8Array => {
 };
 
 /**
- * Encode a stream the game's decompressor accepts: a leading CLEAR, and another
- * whenever the dictionary fills, so no code ever exceeds MAXBITS.
+ * Encode a stream the game's decompressor accepts: a leading CLEAR, and another whenever
+ * the dictionary fills, so no code ever exceeds MAXBITS.
  *
- * The width schedule is the delicate part. decodeLzw skips its dictionary add on
- * the first code after a CLEAR, so its `next` runs one behind this side's;
- * growing the width at `next > 1 << width` here against the decoder's `>=` is
- * what keeps the two reading the same bit boundaries.
+ * The width schedule is the delicate part. decodeLzw skips its dictionary add on the first
+ * code after a CLEAR, so its `next` runs one behind this side's; growing the width at
+ * `next > 1 << width` here against the decoder's `>=` is what keeps the two reading the
+ * same bit boundaries.
  *
- * A dictionary entry is always some earlier entry plus one byte, so a code and a
- * byte identify it -- hence the (prefix, byte) key rather than the string it
- * stands for.
+ * A dictionary entry is always some earlier entry plus one byte, so a code and a byte
+ * identify it — hence the (prefix, byte) key rather than the string it stands for.
  */
 export const encodeLzw = (data: Uint8Array): Uint8Array => {
   const bits: number[] = [];

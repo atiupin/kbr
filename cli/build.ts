@@ -1,8 +1,3 @@
-/**
- * The whole build in one command: the chain's four steps in their only valid
- * order.
- */
-
 import { applyPatches } from "../core/applyPatches.ts";
 import { unpackExepack } from "../core/unpackExepack.ts";
 import { unpackNwc } from "../core/unpackNwc.ts";
@@ -33,7 +28,10 @@ export const build = (): void => {
     nameTablesAsm: readText(paths.NAME_TABLES_ASM),
   });
   const { rows, inlined, pooled, poolUsed, poolSize, gate, names } = patched.summary;
-  line(`${rows} row(s): ${pooled} to the pool, ${inlined} reloc row(s) inlined into their slot`);
+  line(
+    `${rows} row(s): ${pooled} to the pool, ` +
+      `${inlined} reloc row(s) inlined into their slot`,
+  );
   line(`pool ${poolUsed}B of ${poolSize}B used`);
   line(
     `gate picker ${gate.code}B + ${gate.stub}B stub, ${gate.sites} far call(s): ` +

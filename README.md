@@ -72,8 +72,8 @@ DumpDecomp.java [outdir]                   decompiled C for every function + a s
 
 ## Build
 
-Needs your own copy of the game in `game/`: `KB.EXE`, `256.CC` and `416.CC` (nothing reads the
-`KB!.COM` launcher — the patch disables the protection itself).
+Needs your own copy of the game in `game/`: `KB.EXE`, `256.CC` and `416.CC` (nothing reads
+the `KB!.COM` launcher — the patch disables the protection itself).
 
 `npm install`, then `npm run build`: the four chain steps in their only valid order, no
 arguments and nothing to configure. Node runs the TypeScript sources directly — nothing is
@@ -87,8 +87,8 @@ manifest row against that image as it applies it.
 The build ends at `build/` and stages no distributable. What a player gets is a zip the web
 patcher hands back, built from their own copy in their own browser.
 
-To test: `dosbox-x -conf dosbox-x.conf` from the repo root (C: is `build/`), then `KBR`. That
-config is the development one — it keeps the debugger usable; what players get is
+To test: `dosbox-x -conf dosbox-x.conf` from the repo root (C: is `build/`), then `KBR`.
+That config is the development one — it keeps the debugger usable; what players get is
 `res/dosbox.conf`.
 
 ## Translating
@@ -100,41 +100,42 @@ Cyrillic letter, so the byte budget equals the character count.
 
 The **memory slot** limit is handled automatically: write a `string` row when you have the
 string's offset, a `reloc` row when you have its refs from `find-ref`, and the build picks
-in-place or pool by measuring. Never hand-convert a fitting `reloc` row — it already inlines,
-and says so.
+in-place or pool by measuring. Never hand-convert a fitting `reloc` row — it already
+inlines, and says so.
 
-What still bites is the **on-screen box width**: a string can fit in memory and still overflow
-its UI field.
+What still bites is the **on-screen box width**: a string can fit in memory and still
+overflow its UI field.
 
 Two hard rules, both enforced by the tools:
 
 - **Every `reloc` ref must come from `find-ref`, never hand-picked.** A 2-byte value that
-  merely _happens_ to equal a string's DS offset looks like a pointer; repointing it corrupts
-  whatever it really was, and the failure surfaces far from the edit.
+  merely _happens_ to equal a string's DS offset looks like a pointer; repointing it
+  corrupts whatever it really was, and the failure surfaces far from the edit.
 - **⛔ Never `reloc` a ref inside the copy-protection block (file `0xBFE0`–`0xCCA7`).**
   Repointing one immediate there hangs the game minutes later on an unrelated screen. **The
-  rule is solid; the mechanism is UNKNOWN** — heap/stack exhaustion, pool placement and sum/XOR
-  checks are all ruled out, so re-testing them is wasted effort.
+  rule is solid; the mechanism is UNKNOWN** — heap/stack exhaustion, pool placement and
+  sum/XOR checks are all ruled out, so re-testing them is wasted effort.
 
 `find-ref` validates a table slot by _chaining_ — the next slot must point exactly one past
 this one's NUL — and accepts a run of three, so a table's **first and last entry are
-reachable** too. A two-entry table still isn't: "no ref found" means "not repointable by this
-tool", not "not a pointer" — check the neighbouring slots before assuming computed access.
+reachable** too. A two-entry table still isn't: "no ref found" means "not repointable by
+this tool", not "not a pointer" — check the neighbouring slots before assuming computed
+access.
 
 ## Ghidra
 
 Nothing in the build calls Ghidra. What it is for is diagnostic: finding what code touches a
-string a patch broke, or reading the disassembly around a `bytes` row you are about to write.
-Always drive it through `ghidra/ghidra.py`, which presets the paths and explains every flag in
-its docstring.
+string a patch broke, or reading the disassembly around a `bytes` row you are about to
+write. Always drive it through `ghidra/ghidra.py`, which presets the paths and explains
+every flag in its docstring.
 
 **Ghidra cannot resolve string xrefs here** — it can't statically pin DS in segmented real
 mode, so only 3 of 877 strings link to code. Don't ask it "who prints this string"; use
 `FindStringUsers.java` or a DOSBox-X breakpoint.
 
-The project DB in `tmp/` is scratch: game-derived, no hand-made annotation, kept only as a warm
-cache. Delete it freely, then rebuild (needs `build/KBU2.EXE`; the program must end up named
-**`KBU2.EXE`**, which is what `-process` selects):
+The project DB in `tmp/` is scratch: game-derived, no hand-made annotation, kept only as a
+warm cache. Delete it freely, then rebuild (needs `build/KBU2.EXE`; the program must end up
+named **`KBU2.EXE`**, which is what `-process` selects):
 
 ```
 ghidra/ghidra.py import build/KBU2.EXE                       # then let auto-analysis run
@@ -143,12 +144,12 @@ ghidra/ghidra.py run DumpDecomp.java tmp/decomp
 
 ## Constraints
 
-- `build/KBU2.EXE` is the single source of truth — regenerate `KBR.EXE` with `npm run build`,
-  never hand-hack headers. Keep `game/` untouched; the run-dir `.CC` copies are rebuilt from
-  it by the same command.
-- **Nothing game-derived is tracked in git** — no binaries, no disassembly, no extracted text.
-  The repo carries only hand-written things.
-- **`core/` runs anywhere.** Pure functions over `Uint8Array`: no `node:` imports, no DOM, no
-  I/O, no process access — everything platform-shaped lives in `cli/`, so the browser
+- `build/KBU2.EXE` is the single source of truth — regenerate `KBR.EXE` with
+  `npm run build`, never hand-hack headers. Keep `game/` untouched; the run-dir `.CC` copies
+  are rebuilt from it by the same command.
+- **Nothing game-derived is tracked in git** — no binaries, no disassembly, no extracted
+  text. The repo carries only hand-written things.
+- **`core/` runs anywhere.** Pure functions over `Uint8Array`: no `node:` imports, no DOM,
+  no I/O, no process access — everything platform-shaped lives in `cli/`, so the browser
   front-end is additive and never forces a change inside. A dependency is welcome anywhere,
   core included, as long as it runs in both a browser and Node.

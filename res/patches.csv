@@ -79,8 +79,8 @@ reloc,0x01674e,"a character.","героя."
 
 # ---- header
 # FUN_1207_0c36 prints header + counter label + ":%d" as one line, so the two share the
-# original's 34 columns — the day count reaches 900, and 36 columns overflows on screen.
-# The label is padded to keep the colon in a fixed column across both counters.
+# original's 34 columns — the day count reaches 900, and 36 columns overflows on screen. The
+# label is padded to keep the colon in a fixed column across both counters.
 string,0x0157A5,"Options / Controls / ","О:Помощь  C:Опции    "
 reloc,0x004a88," Options "," О:Помощь "
 string,0x015790," Controls "," C:Опции "
@@ -116,9 +116,9 @@ string,0x01AB66,"  U Use Magic","  U Колдовать"
 string,0x01AB74,"  V View Character","  V Герой"
 string,0x01AB87,"  W Wait End Week","  W Ждать неделю"
 reloc,0x018BBD,"  Q Quit and Save","  Q Запись и выход"
-# The last three are one indexed mini-table (`mov ax,[bx+0x353b]`) feeding this list's single
-# mutable line -- so find-ref sees no ref -- and Fly doubles as a combat entry. All three
-# pad to 17 to erase each other on redraw.
+# The last three are one indexed mini-table (`mov ax,[bx+0x353b]`) feeding this list's
+# single mutable line — so find-ref sees no ref — and Fly doubles as a combat entry. All
+# three pad to 17 to erase each other on redraw.
 string,0x01ABF1,"  N New Continent","  N Континент"
 string,0x01AC03,"  L Land         ","  L Приземлиться "
 string,0x01AC15,"  F Fly          ","  F Лететь       "
@@ -132,10 +132,10 @@ reloc,0x018950,"Press Control-Q to Quit or","Нажмите Ctrl+Q чтобы в
 reloc,0x018952,"any other key to continue.","или пробел чтобы продолжить."
 
 # ==== VIEW MAP ============================================================================
-# FUN_1c2c_0f0d joins four table slots into the foot hint that SPC toggles:
-# <exit>< / SPC: ><whole|your>< map>, and nothing clears the line between the two, so the
-# your-line skeleton carries one trailing space per character the whole word is longer --
-# two for Полная over Ваша.
+# FUN_1c2c_0f0d joins four table slots into the foot hint that SPC toggles: <exit>< / SPC:
+# ><whole|your>< map>, and nothing clears the line between the two, so the your-line
+# skeleton carries one trailing space per character the whole word is longer — two for
+# Полная over Ваша.
 reloc,0x00f289,"X=%2d Position Y=%2d","Позиция: X=%2d Y=%2d"
 reloc,0x0188f6,"'ESC' to exit","ESC: Выйти"
 reloc,0x0188fe," / 'SPC' "," / SPC: "
@@ -154,8 +154,8 @@ string,0x016237,"HitPts:","Жизни: "
 string,0x01623F,"SL:   MV:      Damage:","Ур:   Ходы:    Урон:  "
 # FUN_19fe_0cc8 places the cursor once and then prints either the move value or the flying
 # word, so both start at the same column and the word cannot cover the label. The rewrite
-# picks the column before that gotoxy -- 19 for the digit, 13 for "Летает", which lands on
-# "Ходы:" -- and keeps the tail (the two prints) byte-identical. Two NOPs pad the run; the
+# picks the column before that gotoxy — 19 for the digit, 13 for "Летает", which lands on
+# "Ходы:" — and keeps the tail (the two prints) byte-identical. Two NOPs pad the run; the
 # three far calls slide, so the row after repoints their relocation entries, and the flying
 # word's ref slides with them, 0xCE13 -> 0xCE11.
 bytes,0xCDD0,"8a 46 06 b4 00 8b d8 8a 87 71 32 b4 00 05 0a 00 50 b8 11 00 50 9a b7 0f 68 11 59 59 8a 46 ff b4 00 8b d8 80 bf f2 02 00 74 18 8a 46 ff b4 00 8b d8 8a 87 f2 02 b4 00 05 30 00 50 9a eb 05 68 11 eb 09 b8 c6 0b 50 9a 63 10 68 11 59","8a 5e 06 b7 00 8a 9f 71 32 b7 00 8d bf 0a 00 8a 5e ff b7 00 b8 0d 00 80 bf f2 02 00 74 02 b0 13 53 57 50 9a b7 0f 68 11 59 59 5b 8a 87 f2 02 b4 00 08 c0 74 0b 05 30 00 50 9a eb 05 68 11 eb 09 b8 c6 0b 50 9a 63 10 68 11 59 90 90"
@@ -173,8 +173,8 @@ reloc,0x01594E,"High","Выс."
 # ==== GARRISON SCREEN =====================================================================
 
 # ---- army list
-# FUN_18ac_0be5's right column, 8 chars measured: <verb1> / "(A-E) " on rows 0-1, "Space to" /
-# <verb2> on rows 3-4, and the caller swaps the verbs, so each has to read in both slots.
+# FUN_18ac_0be5's right column, 8 chars measured: <verb1> / "(A-E) " on rows 0-1, "Space to"
+# / <verb2> on rows 3-4, and the caller swaps the verbs, so each has to read in both slots.
 reloc,0x0186e5,"Remove","Забрать"
 reloc,0x0186e7,"Garrison","Оставить"
 reloc,0x0186e9,"Space to","Пробел:"
@@ -203,8 +203,9 @@ reloc,0x018983,"Dismiss last army (y/n)?","Распустить? (y/n) "
 
 # ==== SEARCH PROMPT =======================================================================
 # Four draws at col 1 plus the y/n line at col 16; the 28-char English line 2 is the budget.
-# The day count prints inside line 2, between its two strings, so no wording can move it off;
-# it is always 10 -- the byte making it 1 (cmp DS:0x6457 at 0xE107) is BSS and never written.
+# The day count prints inside line 2, between its two strings, so no wording can move it
+# off; it is always 10 — the byte making it 1 (cmp DS:0x6457 at 0xE107) is BSS and never
+# written.
 reloc,0x018e7f,"Search...","Раскопки"
 reloc,0x018e81,"It will take ","Тут работы на "
 reloc,0x018e83," days to do a"," дней -"
@@ -242,9 +243,9 @@ reloc,0x0186f9,"Accept (y/n)?","Принять? (y/n)"
 
 # ==== COMBAT SCREEN =======================================================================
 # ---- menu bar
-# Entries 0-9 (the movement keys, A/C) are drawn by the same loop as the map's, then the index
-# jumps to 19 -- these six. "  F Fly" is printed in between, from the map's block below: the
-# one entry the two lists genuinely share.
+# Entries 0-9 (the movement keys, A/C) are drawn by the same loop as the map's, then the
+# index jumps to 19 — these six. "  F Fly" is printed in between, from the map's block
+# below: the one entry the two lists genuinely share.
 reloc,0x01086f,"Options / ","О:Помощь  "
 reloc,0x018bbf,"  G Give Up","  G Сдаться"
 reloc,0x018bc1,"  S Shoot","  S Стрелять"
@@ -255,8 +256,8 @@ reloc,0x018bc9,"  SPC Pass","SPC Пропустить ход"
 
 # ---- status line: the acting army's flags
 # Same top line, right of the name: comma-joined single letters, each a putchar immediate in
-# FUN_1d9b_0cc7 rather than a string, so `bytes` rows are the only handle. Fly is a flag, the
-# other two carry a count -- Л(етает), Х(оды), В(ыстрелы).
+# FUN_1d9b_0cc7 rather than a string, so `bytes` rows are the only handle. Fly is a flag,
+# the other two carry a count — Л(етает), Х(оды), В(ыстрелы).
 bytes,0x106E1,"46","8B"
 bytes,0x107A7,"4D","95"
 bytes,0x10829,"53","82"
@@ -264,7 +265,7 @@ bytes,0x10829,"53","82"
 # ---- action log
 # One line in the lower bar: the acting army's name (FUN_1d9b_1663), then fragments at the
 # cursor (FUN_1f51_1024). Every shape, all sized to a 35-column budget:
-#   <army> vs <army> killing <n>     melee -- the widest English line is exactly 35
+#   <army> vs <army> killing <n>     melee — the widest English line is exactly 35
 #   <army> shoot <army> killing <n>  " vs " skipped, " shoot " already named the target
 #   <army> retaliate killing <n>     the retaliator's name replaces "<vs> <army>"
 #   <army> vs <army>, <n> die        same melee, shorter: NWC's guard for the 16 pairings
@@ -279,8 +280,9 @@ reloc,0x01263c," shoot "," \xB0\xB1\xB2\xB3 "
 reloc,0x0128a1," retaliate"," отвечают"
 reloc,0x01887a," vs "," \xB0\xB1\xB2\xB3 "
 reloc,0x01887c," killing ",", убито "
-# That shorter tally is "7 die" / "1 dies": the 's' is verb agreement, appended when the count
-# is 1. With "убито" ahead of the number the trailing slot empties, so that branch always jumps.
+# That shorter tally is "7 die" / "1 dies": the 's' is verb agreement, appended when the
+# count is 1. With "убито" ahead of the number the trailing slot empties, so that branch
+# always jumps.
 reloc,0x018880,", ",", убито "
 reloc,0x01887e," die",""
 bytes,0x0129F8,"75","EB"
@@ -295,21 +297,21 @@ reloc,0x0187d2,"Shoot","Не могут стрелять"
 reloc,0x01356c,"HALF","1/2!"
 
 # ---- victory
-# The box is 36 columns wide, so "(пробел)" -- a char wider -- needs its gotoxy 28 -> 27.
+# The box is 36 columns wide, so "(пробел)" — a char wider — needs its gotoxy 28 -> 27.
 reloc,0x0115ff,"Victory!","Победа!"
 bytes,0x118D4,"1C","1B"
 reloc,0x0118df,"(space)","(пробел)"
 
 # ---- victory, the spoils
-# Table DS 0x308e, read only by FUN_1f51_0000 -- the combat screen, not the king's castle.
+# Table DS 0x308e, read only by FUN_1f51_0000 — the combat screen, not the king's castle.
 # Text starts at column 1 of the same 36-column box, so 35 chars clip. Line 1 also carries
-# the name (10 max) + " the " + rank (9 max) and a comma the code drops on column 35, so
-# NWC sized it to the byte: the prefix has 13.
+# the name (10 max) + " the " + rank (9 max) and a comma the code drops on column 35, so NWC
+# sized it to the byte: the prefix has 13.
 reloc,0x01871e,"Well done ","Отлично, "
 reloc,0x018720,"you have successfully vanquished","вы блестяще одолели очередного"
 reloc,0x018722,"yet another foe.","противника."
-# Blanking the " and the" that trails the purse gives "capture of " a line of its own --
-# the only way to name an undeclinable villain ("Царь Николай Безумный", 21 + 9 = 30).
+# Blanking the " and the" that trails the purse gives "capture of " a line of its own — the
+# only way to name an undeclinable villain ("Царь Николай Безумный", 21 + 9 = 30).
 reloc,0x018724,"Spoils of War: ","Трофеи: "
 reloc,0x018738," gold"," зол."
 reloc,0x018726," and the",""
@@ -363,7 +365,7 @@ reloc,0x00e4ce," spell (A-G)?"," заклинание? (A-G) "
 reloc,0x00e654,"You don't know that spell!","Вы не знаете это заклинание!"
 
 # ---- combat target prompts
-# Line limit 35. The leading space is the centring fix -- FUN_2168_1063 centres over the
+# Line limit 35. The leading space is the centring fix — FUN_2168_1063 centres over the
 # width less the cursor column, and FUN_1207_0caf leaves the cursor at col 1, so every line
 # rounds a column left; unlike patching 1063 it reaches only this sprintf. The bytes row
 # swaps the sprintf arguments so the spell name leads (Turbo C has no %1$s); the blocks are
@@ -377,11 +379,11 @@ reloc,0x00e89f,"Select army to %s"," %s: выберите свой отряд"
 reloc,0x0188f2,"Select new location","Куда телепортировать?"
 
 # ---- combat spell effects
-# Appended to a unit name (nominative plural, so the verb goes plural). Clone and Resurrect led
-# with printnum(n), a numeral in front of a nominative; each site is one 68-byte run of four
-# print blocks, reordered to name, verb, ' ', printnum(n). The count rides SI, which Turbo C
-# callees preserve. Far calls slide here, so the row after each repoints their four contiguous
-# relocation entries; Clone's ref slides too, 0xE863 -> 0xE848.
+# Appended to a unit name (nominative plural, so the verb goes plural). Clone and Resurrect
+# led with printnum(n), a numeral in front of a nominative; each site is one 68-byte run of
+# four print blocks, reordered to name, verb, ' ', printnum(n). The count rides SI, which
+# Turbo C callees preserve. Far calls slide here, so the row after each repoints their four
+# contiguous relocation entries; Clone's ref slides too, 0xE863 -> 0xE848.
 bytes,0xE828,"b8 20 00 50 b8 01 00 50 56 9a 55 12 68 11 83 c4 06 b8 20 00 50 9a eb 05 68 11 59 a0 33 b5 b4 00 b1 04 d3 e0 8b d8 8a 87 98 63 b4 00 d1 e0 8b d8 ff b7 88 02 9a 63 10 68 11 59 b8 c9 0c 50 9a 63 10 68 11 59","a0 33 b5 b4 00 b1 04 d3 e0 8b d8 8a 87 98 63 b4 00 d1 e0 8b d8 ff b7 88 02 9a 63 10 68 11 59 b8 c9 0c 50 9a 63 10 68 11 59 b8 20 00 50 9a eb 05 68 11 59 b8 20 00 50 b8 01 00 50 56 9a 55 12 68 11 83 c4 06"
 bytes,0x15A0,"69 c8 00 00 5f c8 00 00 40 c8 00 00 34 c8 00 00","67 c8 00 00 58 c8 00 00 4e c8 00 00 44 c8 00 00"
 bytes,0xEAD7,"b8 20 00 50 b8 01 00 50 56 9a 55 12 68 11 83 c4 06 b8 20 00 50 9a eb 05 68 11 59 a0 33 b5 b4 00 b1 04 d3 e0 8b d8 8a 87 98 63 b4 00 d1 e0 8b d8 ff b7 88 02 9a 63 10 68 11 59 ff 36 5c 32 9a 63 10 68 11 59","a0 33 b5 b4 00 b1 04 d3 e0 8b d8 8a 87 98 63 b4 00 d1 e0 8b d8 ff b7 88 02 9a 63 10 68 11 59 ff 36 5c 32 9a 63 10 68 11 59 b8 20 00 50 9a eb 05 68 11 59 b8 20 00 50 b8 01 00 50 56 9a 55 12 68 11 83 c4 06"
@@ -391,12 +393,13 @@ reloc,0x0188ec," resurrected"," воскрешены:"
 reloc,0x0188e8," are frozen"," заморожены"
 
 # ---- combat damage log
-# Was <spell name> + " kills " + FUN_1f51_1024's "<count> <unit name>", a tail no Russian verb
-# can govern: the numeral wants a genitive the helper never prints. The line ends on the count
-# instead. The subject is Огненный шар, Молния or Экзорцизм, so the verb must be 3sg present to
-# skip gender agreement and intransitive to need no object; that leaves it 20 chars.
-# The bytes row drops the unit name by forcing the guard at 0x12A08 (jz -> jmp) that already
-# skips it for the helper's other callers, so no far call moves and no relocation entry with it.
+# Was <spell name> + " kills " + FUN_1f51_1024's "<count> <unit name>", a tail no Russian
+# verb can govern: the numeral wants a genitive the helper never prints. The line ends on
+# the count instead. The subject is Огненный шар, Молния or Экзорцизм, so the verb must be
+# 3sg present to skip gender agreement and intransitive to need no object; that leaves it 20
+# chars. The bytes row drops the unit name by forcing the guard at 0x12A08 (jz -> jmp) that
+# already skips it for the helper's other callers, so no far call moves and no relocation
+# entry with it.
 bytes,0x12A08,"74","eb"
 reloc,0x0188ea," kills "," разит цель. Убито: "
 
@@ -435,7 +438,7 @@ reloc,0x0186D1,"Dungeon","Темница"
 reloc,0x0186D9,"-------","-------"
 
 # ---- recruit dialogue
-# The count printed first -- "150 Скелеты", a numeral in front of a nominative plural. The
+# The count printed first — "150 Скелеты", a numeral in front of a nominative plural. The
 # block at 0xACCD splits 15/42/15/19/10 = A/B/C/D/E and is rewritten A+D+E+B + "eb 0d" +
 # filler, putting the count at the cursor; the dropped goto(5,0x98) pays for the jmp and its
 # filler keeps a 68 11 at 0xAD2F so no relocation target changes value. The second row
@@ -530,9 +533,9 @@ reloc,0x0184f3,"B) Cancel boat rental","B) Вернуть корабль"
 reloc,0x0184ed,"C) Gather information","C) Собрать сведения"
 # The spell line is "D) " + spell name + " spell " + '(' + price + ')'. Russian cannot
 # decline the name after the noun, so the noun moves in front of it as an abbreviated label
-# on the "D) " prefix, and " spell " shrinks to the space before the price.
-# Budget: the 9-char prefix leaves 16 for name + price digits, so a 4-digit spell may not
-# exceed 12 chars ("Призыв войск"); the longest lines land on exactly 28.
+# on the "D) " prefix, and " spell " shrinks to the space before the price. Budget: the
+# 9-char prefix leaves 16 for name + price digits, so a 4-digit spell may not exceed 12
+# chars ("Призыв войск"); the longest lines land on exactly 28.
 reloc,0x0184ef,"D) ","D) Закл. "
 reloc,0x009660," spell "," "
 reloc,0x0184f1,"E) Buy seige weapons (3000)","E) Купить катапульту (3000)"
@@ -552,10 +555,10 @@ reloc,0x009843,"'s",""
 reloc,0x009865," rule",""
 
 # ---- spell purchase
-# Refusal is two centred lines at columns 4 and 3.
-# The tally is "You can learn " + N + " more spell" + 's' + '.', where the 's' is an
-# unconditional English plural, so the branch that appends it becomes a jump that always
-# skips it (JZ -> JMP), the same fix as the king's audience above.
+# Refusal is two centred lines at columns 4 and 3. The tally is "You can learn " + N + "
+# more spell" + 's' + '.', where the 's' is an unconditional English plural, so the branch
+# that appends it becomes a jump that always skips it (JZ -> JMP), the same fix as the
+# king's audience above.
 reloc,0x00a7bd,"You have learned your","Вы выучили предельное"
 reloc,0x00a7d6,"maximum number of spells.","   число заклинаний."
 reloc,0x00a841,"You can learn ","Можно выучить ещё: "
@@ -571,7 +574,8 @@ string,0x1A181," the ",", "
 # ---- gold amounts (town, dwellings, etc.)
 reloc,0x005E82,"GP=","Зол:"
 
-# ---- empty-list placeholder; res/gate_picker.asm hardcodes DS 0x0d9e, so this must stay in place
+# ---- empty-list placeholder
+# res/gate_picker.asm hardcodes DS 0x0d9e, so this string must stay where it is.
 string,0x01642E,"(none)","(нет)"
 
 # ==== BOAT TRAVEL MENU ====================================================================
@@ -603,21 +607,21 @@ reloc,0x018958,"Boat","Корабль"
 reloc,0x01895a,"Army","Армия"
 reloc,0x01895c,"Balance","Итого"
 # Slot 6 of the same table; the ledger loop only reads slots 1-5, so this one is not drawn
-# anywhere we could find -- translated just in case.
+# anywhere we could find — translated just in case.
 reloc,0x01895e,"Leave","Ушли"
 reloc,0x00d870,"Leave","Ушли"
 
-# ==== ENDINGS ==============================================================================
-# FUN_1207_2b88 draws 20 rows from table DS 0x37fd -- victory slots 0-19, defeat 20-39 --
-# into box 13, x 16..159, the ending picture flush against it at x 160: 18 columns, of which
-# the text uses 16 from column 1. The row count is fixed and the last slot of each stays
-# empty: victory's would land on row 20, where the caller draws the score (fixed y 0xb6),
-# and defeat's is the bottom margin. The hero's name follows slot 0 (victory: alone on its
-# row, leaving slot 1 unused) or slot 20, and the rank title from the class table opens the
-# next row for slot 2 / 21 to continue -- those two rows lose the longest rank's 9 chars.
+# ==== ENDINGS =============================================================================
+# FUN_1207_2b88 draws 20 rows from table DS 0x37fd — victory slots 0-19, defeat 20-39 — into
+# box 13, x 16..159, the ending picture flush against it at x 160: 18 columns, of which the
+# text uses 16 from column 1. The row count is fixed and the last slot of each stays empty:
+# victory's would land on row 20, where the caller draws the score (fixed y 0xb6), and
+# defeat's is the bottom margin. The hero's name follows slot 0 (victory: alone on its row,
+# leaving slot 1 unused) or slot 20, and the rank title from the class table opens the next
+# row for slot 2 / 21 to continue — those two rows lose the longest rank's 9 chars.
 
 # ---- margins: text starts at column 1, row 1
-# The five `xor ax,ax` are the cursor's x argument -- row loop, victory name row, both rank
+# The five `xor ax,ax` are the cursor's x argument — row loop, victory name row, both rank
 # rows (via FUN_1207_2de4), score row in the caller; `mov al,1` is the same length and AH is
 # already 0 from the y computation. The sixth patch is the row counter's initial value.
 bytes,0x006BC0,33C0,B001
@@ -803,8 +807,8 @@ reloc,0x016a26,"Xelox","Ксилокс"
 reloc,0x016a28,"Yeneverre","Эневерре"
 reloc,0x016a2a,"Zyzzarzaz","Зиззарзаз"
 # Slot 26 is the king's castle: unreachable here (the contract screen indexes 0..25), but
-# kept in step with the other copy's slot 26, which the castle screen prints. That screen
-# is the only reader of either, and it is 27 chars wide after "Замок ", not 13.
+# kept in step with the other copy's slot 26, which the castle screen prints. That screen is
+# the only reader of either, and it is 27 chars wide after "Замок ", not 13.
 reloc,0x016a2c,"of King Maximus","короля Максимуса"
 reloc,0x01842e,"Azram","Азрам"
 reloc,0x018430,"Basefit","Бейсфит"
@@ -864,13 +868,12 @@ reloc,0x0184e7,"Zaezoizu","Заэзойзу"
 
 # ==== CONTRACT SCREENS ====================================================================
 # 17 records, each a 14-entry pointer table (villain 1 at 0x016A2E, stride 28), so every
-# line is reloc-able and the labels repeat once per record.
-# Width: 27 chars for lines 1-5 (name, alias, reward, last seen, castle), 34 for lines 6-14
-# (the features header and the description); 35 clips.
-# Descriptions are reloc by default, but Russian usually fits its own slot: all 17 records
-# land at ~2.1 KB of pool, well inside POOL_SIZE, so no budget change was needed.
-# Rows that fit their own slot are written in place as 'string'; that is a byte budget, not
-# a limit -- find-ref reaches every slot of these tables.
+# line is reloc-able and the labels repeat once per record. Width: 27 chars for lines 1-5
+# (name, alias, reward, last seen, castle), 34 for lines 6-14 (the features header and the
+# description); 35 clips. Descriptions are reloc by default, but Russian usually fits its
+# own slot: all 17 records land at ~2.1 KB of pool, well inside POOL_SIZE, so no budget
+# change was needed. Rows that fit their own slot are written in place as 'string'; that is
+# a byte budget, not a limit — find-ref reaches every slot of these tables.
 
 # ---- shared with every record
 reloc,0x0051d3,"Unknown","Неизвестен"
@@ -1259,7 +1262,7 @@ reloc,0x0183f2,"defeat its fearsome guardian","и побеждаете его г
 reloc,0x0183f4,"and gain possession of: The","стража. Вам достается Меч"
 string,0x01998E,"Sword of Prowess...","доблести..."
 
-# ==== SIGNPOSTS ==========================================================================
+# ==== SIGNPOSTS ===========================================================================
 reloc,0x00a04f,"A sign reads:","Знак гласит:"
 
 reloc,0x018288,"Treasure Island","Остров сокровищ"

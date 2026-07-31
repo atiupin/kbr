@@ -1,26 +1,25 @@
 /**
- * The NWC "CC" archive container: a u16 count, 8-byte TOC entries, then members
- * looked up by a hash of their filename rather than by index. Each member is a
- * u32 decoded length followed by an LZW stream, which lzw.ts owns.
+ * The NWC "CC" archive container: a u16 count, 8-byte TOC entries, then members looked up
+ * by a hash of their filename rather than by index. Each member is a u32 decoded length
+ * followed by an LZW stream, which lzw.ts owns.
  *
  *     [u16 count]
  *     count * 8:  [u16 id][u24 offset][u16 size][1 pad]
  *     member data, the first member right after the TOC at 2 + count*8
  *
- * The id is what the loader computes from the requested filename
- * (hash = rol16(hash, 1) + upper(ch) per char), so a member has no name here and
- * ids are the only handle on one.
+ * The id is what the loader computes from the requested filename (hash = rol16(hash, 1) +
+ * upper(ch) per char), so a member has no name here and ids are the only handle on one.
  *
- * The PNG side of the font work is deliberately absent -- a browser already has
- * an image decoder, so it lives in the shell.
+ * The PNG side of the font work is deliberately absent — a browser already has an image
+ * decoder, so it lives in the shell.
  */
 
 import { concat, packU32, setU16, setU24, u16, u24, u32 } from "./bytes.ts";
 import { decodeLzw, encodeLzw } from "./lzw.ts";
 
 /**
- * The font member, byte-identical in both archives -- glyph bitmaps are display
- * mode independent, so the two builds differ only in what surrounds it.
+ * The font member, byte-identical in both archives — glyph bitmaps are display mode
+ * independent, so the two builds differ only in what surrounds it.
  */
 export const FONT_ID = 0x9bb2;
 
@@ -46,7 +45,8 @@ export const readToc = (archive: Uint8Array): TocEntry[] => {
 
 const entryOf = (archive: Uint8Array, id: number): TocEntry => {
   const entry = readToc(archive).find((e) => e.id === id);
-  if (entry === undefined) throw new Error(`no member 0x${id.toString(16)} in this archive`);
+  if (entry === undefined)
+    throw new Error(`no member 0x${id.toString(16)} in this archive`);
   return entry;
 };
 
@@ -63,16 +63,22 @@ export const decodeMember = (archive: Uint8Array, id: number): Uint8Array => {
   return raw;
 };
 
-const encodeMember = (raw: Uint8Array): Uint8Array => concat([packU32(raw.length), encodeLzw(raw)]);
+const encodeMember = (raw: Uint8Array): Uint8Array =>
+  concat([packU32(raw.length), encodeLzw(raw)]);
 
 /** A new archive with the given members replaced, everything else byte-for-byte. */
-export const rebuild = (archive: Uint8Array, replacements: Map<number, Uint8Array>): Uint8Array => {
+export const rebuild = (
+  archive: Uint8Array,
+  replacements: Map<number, Uint8Array>,
+): Uint8Array => {
   const entries = readToc(archive);
   const tocSize = 2 + entries.length * 8;
 
   const blobs = entries.map((e) => {
     const raw = replacements.get(e.id);
-    return raw === undefined ? archive.subarray(e.offset, e.offset + e.size) : encodeMember(raw);
+    return raw === undefined
+      ? archive.subarray(e.offset, e.offset + e.size)
+      : encodeMember(raw);
   });
 
   const toc = new Uint8Array(tocSize);

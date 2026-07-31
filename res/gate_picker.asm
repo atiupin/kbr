@@ -1,17 +1,17 @@
-; Town/Castle Gate destination picker -- replaces the gate's two-character letter list
-; with a named list in its own window, drawn the way the spell book draws.
+; Town/Castle Gate destination picker — replaces the gate's two-character letter list with a
+; named list in its own window, drawn the way the spell book draws.
 ;
-; The point is the naming, not the layout. In English the listed letter IS the town's
-; first letter, so nothing is looked up; no Cyrillic scheme reproduces that, because the
-; letter a Russian player presses for "А" depends on whether they think in translit (A)
-; or in keyboard position (F), and those two disagree on every letter of the alphabet.
-; Printing the name beside the key removes the question: the letter becomes a menu key
-; with no relation to the spelling, exactly as the spell book's own A-G column already is.
+; The point is the naming, not the layout. In English the listed letter IS the town's first
+; letter, so nothing is looked up; no Cyrillic scheme reproduces that, because the letter a
+; Russian player presses for "А" depends on whether they think in translit (A) or in
+; keyboard position (F), and those two disagree on every letter of the alphabet. Printing
+; the name beside the key removes the question: the letter becomes a menu key with no
+; relation to the spelling, exactly as the spell book's own A-G column already is.
 ;
 ; The letter stays bound to the destination, not to the position in the list: castle 1 is
 ; always B, so an unvisited one leaves a gap. Numbering the visited ones consecutively
-; instead would silently send a player who knows B is Basefit to whatever took the slot,
-; and would throw away what the gap tells them -- that there is a B castle still to find.
+; instead would silently send a player who knows B is Basefit to whatever took the slot, and
+; would throw away what the gap tells them — that there is a B castle still to find.
 ;
 ; far, cdecl:  picker(word flag)     flag 0 = castles, nonzero = towns
 ; returns AL = slot index 0..25 for the caller's existing coordinate lookup, 0xFF to cancel.
@@ -19,7 +19,7 @@
 ; Assembled into DGROUP above the string pool, so labels are DS offsets and CS == DS at run
 ; time. Every callf needs an MZ relocation entry.
 
-; ---- engine entry points ------------------------------------------------------------
+; ---- engine entry points -----------------------------------------------------------------
 VID         equ 0x1168          ; window and text library
 ADV         equ 0x0207          ; adventure-screen helpers
 CRT         equ 0x0000          ; Turbo C runtime
@@ -38,7 +38,7 @@ GETKEY      equ 0x006c          ; ADV (lo, hi) -> key, or 0x1b for ESC
 RESTORE     equ 0x0c36          ; ADV, redraws the adventure screen
 TOUPPER     equ 0x0c46          ; CRT
 
-; ---- game data ----------------------------------------------------------------------
+; ---- game data ---------------------------------------------------------------------------
 CURWIN      equ 0x59c8          ; pointer to the current window struct
 WINCOLOUR   equ 0x01ed
 TOWN_REMAP  equ 0x3007          ; slot -> town index
@@ -52,14 +52,14 @@ HDR_TOWN    equ 0x2fb5
 ASK_TOWN    equ 0x2fb7
 NONE_STR    equ 0x0d9e          ; "(none)" -- fits its own slot, so a plain `string` row
 
-; ---- layout -------------------------------------------------------------------------
+; ---- layout ------------------------------------------------------------------------------
 ; 26 destinations at most, so two columns of 13. Each column is 17 cells: 15 for the widest
 ; entry ("A) Приют Короля") and 2 of gutter, inside a 36-cell window.
 ;
 ; Window edges snap to the 8px cell grid while the text inside them does not, and the play
-; area leaves only 2 scanlines above the window and 6 below -- so this is the lowest row
-; that fits, and the bottom border lands on the play frame's own line rather than short of
-; it. Moving the block down any further means shrinking it.
+; area leaves only 2 scanlines above the window and 6 below — so this is the lowest row that
+; fits, and the bottom border lands on the play frame's own line rather than short of it.
+; Moving the block down any further means shrinking it.
 WIN_X1      equ 2
 WIN_Y1      equ 4
 WIN_X2      equ 37
@@ -75,7 +75,7 @@ ROWS        equ 13
 ASK_Y       equ 174
 SLOTS       equ 26
 
-; ---- locals -------------------------------------------------------------------------
+; ---- locals ------------------------------------------------------------------------------
 ;   [bp-1] slot 0..25      [bp-2] entry number      [bp-3] resolved town/castle index
 ;   [bp-4] row             [bp-5] column            [bp-6] result
 
@@ -130,7 +130,7 @@ opened:
     callf ADV:FRAME
     add  sp,8
 
-; ---- title, centred -----------------------------------------------------------------
+; ---- title, centred ----------------------------------------------------------------------
     mov  ax,2
     push ax
     callf VID:WIN_JUST
@@ -155,7 +155,7 @@ title_put:
     mov  bx,[CURWIN]
     mov  byte [bx+0xa],0        ; back to left-justified; WIN_JUST only ever sets bits
 
-; ---- one line per visited destination ------------------------------------------------
+; ---- one line per visited destination ----------------------------------------------------
     mov  byte [bp-1],0
     mov  byte [bp-2],0
     mov  byte [bp-4],0
@@ -256,7 +256,7 @@ scan_done:
     pop  cx
 ask_prompt:
 
-; ---- prompt and choice ---------------------------------------------------------------
+; ---- prompt and choice -------------------------------------------------------------------
     mov  ax,ASK_Y
     push ax
     mov  ax,2

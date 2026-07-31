@@ -1,9 +1,9 @@
 /**
  * find-ref: what points at a string, and the manifest row to paste.
  *
- * A run-once discovery aid. The build never scans -- it just applies the offsets
- * recorded here, against the one image they mean anything against, which is why
- * this command refuses to run on anything but the pinned KBU2.
+ * A run-once discovery aid. The build never scans — it just applies the offsets recorded
+ * here, against the one image they mean anything against, which is why this command refuses
+ * to run on anything but the pinned KBU2.
  */
 
 import { DS_BASE, KBU2_SHA256 } from "../core/applyPatches.ts";
@@ -24,7 +24,8 @@ import * as paths from "./paths.ts";
 const NUMBER_RE = /^(0x[0-9a-fA-F]+|[0-9]+)$/;
 
 const pristine = (): Uint8Array => {
-  if (!exists(paths.KBU2)) throw new Error(`${rel(paths.KBU2)} is not built -- run npm run build`);
+  if (!exists(paths.KBU2))
+    throw new Error(`${rel(paths.KBU2)} is not built -- run npm run build`);
   const image = read(paths.KBU2);
   if (sha256(image) !== KBU2_SHA256) {
     throw new Error(`${rel(paths.KBU2)} is not pristine -- the offsets would be wrong`);
@@ -32,7 +33,9 @@ const pristine = (): Uint8Array => {
   return image;
 };
 
-/** The string the argument names: its own file offset, or the one substring search finds. */
+/**
+ * The string the argument names: its own file offset, or the one substring search finds.
+ */
 const resolve = (image: Uint8Array, target: string): number => {
   if (NUMBER_RE.test(target)) return Number(target);
 
@@ -42,7 +45,8 @@ const resolve = (image: Uint8Array, target: string): number => {
   }
   if (hits.length > 1) {
     line(`note: ${hits.length} strings contain ${JSON.stringify(target)}:`);
-    for (const hit of hits) line(`  ${hexOffset(hit)}  ${JSON.stringify(stringAt(image, hit))}`);
+    for (const hit of hits)
+      line(`  ${hexOffset(hit)}  ${JSON.stringify(stringAt(image, hit))}`);
     line("re-run with the exact file offset you want.\n");
   }
   return hits[0];

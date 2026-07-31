@@ -25,8 +25,8 @@
  *         whatever took its place. A slid `b8` that a `reloc` row names moves that row's
  *         ref too. Both are legal when declared: repoint the relocation entries in their
  *         own `bytes` row and give the `reloc` row the ref's new offset. checkRelocations
- *         rejects an undeclared slide. Prefer moving the OUTPUT to moving code -- the
- *         drawing calls take absolute columns -- and reorder only when the print order
+ *         rejects an undeclared slide. Prefer moving the OUTPUT to moving code — the
+ *         drawing calls take absolute columns — and reorder only when the print order
  *         itself is the bug.
  *
  * string: CP866 written in place, NUL-terminated. `expect` is the complete original (its
@@ -34,7 +34,7 @@
  *         error, never an automatic reloc: upgrading needs refs the row does not carry,
  *         and could silently repoint inside the copy-protection block (see PROT_LO).
  *
- * reloc : `offset` is NOT the string -- it is the REF, the file offset of the 2-byte near
+ * reloc : `offset` is NOT the string — it is the REF, the file offset of the 2-byte near
  *         pointer reaching it, from find_ref. `expect` is still the English: the pointer
  *         is dereferenced and what it lands on must match.
  *
@@ -44,19 +44,18 @@
  *         also covers what find_ref cannot see (computed or indexed access, a pointer
  *         table's first/last slot), which would otherwise keep showing English.
  *
- *         One row per string, not per ref -- all its pointers must move together:
+ *         One row per string, not per ref — all its pointers must move together:
  *             reloc,0x0185CB 0x018F02,"lost!","потеряно!"
  *
  * Every reloc ref MUST come from find_ref, which proves the site is a real code immediate
  * or table slot. A hand-picked 2-byte value that merely happens to equal the string's DS
- * offset repoints something else -- a slot inside a counter table, say -- and the
- * corruption surfaces far from the edit.
+ * offset repoints something else — a slot inside a counter table, say — and the corruption
+ * surfaces far from the edit.
  *
  * Two stages are not manifest-driven, both assembled and injected after the pool:
  * res/gate_picker.asm (see injectGatePicker) and res/name_tables.asm (see
  * injectNameTables). They are code and code-addressed data, not translation, and carry
- * relocation bookkeeping and resolved DS addresses the four-column manifest cannot
- * express.
+ * relocation bookkeeping and resolved DS addresses the four-column manifest cannot express.
  */
 
 import { assemble, type Assembled } from "./asm16.ts";
@@ -68,7 +67,8 @@ import { sha256 } from "./sha256.ts";
  * The edit base this manifest describes. Every offset in patches.csv is only meaningful
  * against this exact image, so a mismatch means they would land somewhere else entirely.
  */
-export const KBU2_SHA256 = "a0ad8832b6a9afa7b28c7d0054a13e286d7952a558eaa12a38f6146e77339d49";
+export const KBU2_SHA256 =
+  "a0ad8832b6a9afa7b28c7d0054a13e286d7952a558eaa12a38f6146e77339d49";
 
 const COLUMNS = ["type", "offset", "expect", "write"] as const;
 const KINDS = ["bytes", "string", "reloc"] as const;
@@ -79,40 +79,40 @@ const HEX_RE = /^[0-9a-fA-F]+$/;
 export const DS_BASE = 0x15690;
 
 // Pool placement, measured from MEMDUMP.BIN (heavy session, puzzle map open): heap
-// high-water DS 0xb6cf, stack low-water DS 0xfe2c -- a 17.8 KB cold band above _end, the
-// heap floor at DS 0xb64c. The pool sits mid-band, so heap and stack each keep KB of
-// slack, and c0's BSS wipe stops at _end, so its file-loaded bytes survive startup.
-// DGROUP is left FLOATING (_heaplen 0): capping it buys nothing and costs stack headroom.
+// high-water DS 0xb6cf, stack low-water DS 0xfe2c — a 17.8 KB cold band above _end, the
+// heap floor at DS 0xb64c. The pool sits mid-band, so heap and stack each keep KB of slack,
+// and c0's BSS wipe stops at _end, so its file-loaded bytes survive startup. DGROUP is left
+// FLOATING (_heaplen 0): capping it buys nothing and costs stack headroom.
 //
 // To re-measure: DOSBox-X debugger, `MEMDUMPBIN 0000:0000 100000`. DS:0000 sits 4 bytes
-// below the "Turbo C++ - Copyright 1990 Borla..." literal; RAM boots zeroed, so the
-// highest nonzero byte above _end and the lowest below 0xffff are the real water marks.
+// below the "Turbo C++ - Copyright 1990 Borla..." literal; RAM boots zeroed, so the highest
+// nonzero byte above _end and the lowest below 0xffff are the real water marks.
 //
 // That reading holds only on a FRESHLY STARTED DOSBox running the game ONCE. DOS clears
 // nothing on load, so a later run leaves earlier builds' pool tails standing above its own
-// image end -- byte-exact translated strings, layered, each build's image covering the head
+// image end — byte-exact translated strings, layered, each build's image covering the head
 // of the one before. They read as live writes past the pool and are nothing of the sort.
 const POOL_DSOFF = 0xd000; // pool base, mid cold band
 const POOL_SIZE = 0x1800; // 6 KB
 const POOL_END_DSOFF = POOL_DSOFF + POOL_SIZE; // hard cap; clear of the stack's descent
 
-// Copy-protection segment (Ghidra 19fe:0000-0cc7). `reloc` rows MUST NOT repoint a ref
-// in here. THE RULE IS SOLID; THE MECHANISM IS UNKNOWN -- distrust any explanation.
+// Copy-protection segment (Ghidra 19fe:0000-0cc7). `reloc` rows MUST NOT repoint a ref in
+// here. THE RULE IS SOLID; THE MECHANISM IS UNKNOWN — distrust any explanation.
 //
 // One repointed immediate plays for minutes, then hangs in an INT 6 loop on entering the
 // king's castle. It is not a simple checksum: repointing to another string inside the
-// original image hangs too, and so does swapping two immediates, which leaves both the
-// byte sum and the XOR unchanged. Heap exhaustion, stack exhaustion and pool placement
-// are all ruled out -- re-testing those is wasted effort.
+// original image hangs too, and so does swapping two immediates, which leaves both the byte
+// sum and the XOR unchanged. Heap exhaustion, stack exhaustion and pool placement are all
+// ruled out — re-testing those is wasted effort.
 //
 // Not "any byte here is fatal": our own flip at 0xC40A is exactly what KB!.COM patches at
-// runtime, so nothing can guard it. The fence is conservative and costs nothing -- every
+// runtime, so nothing can guard it. The fence is conservative and costs nothing — every
 // string reached from here is protection UI that fits its own slot as a `string` row.
 // Rejected at parse time: an inlined reloc is harmless today, one rewording from fatal.
 export const PROT_LO = 0xbfe0; // file offsets, inclusive
 export const PROT_HI = 0xcca7;
 
-// --- Town/Castle Gate destination picker (res/gate_picker.asm) ------------------------
+// --- Town/Castle Gate destination picker (res/gate_picker.asm) ---------------------------
 // Why the gate needs a window of its own is in that file's header; what matters here is
 // placement. The routine lands at CODE_DSOFF, the pool's hard cap: the pool bump-allocates
 // upward and can never reach it, so string growth and code never compete. DGROUP is the
@@ -127,22 +127,21 @@ const GATE_RESUME = 0xf900; // past the visited re-check, now unreachable
 const GATE_EXIT = 0xf979; // pop si / mov sp,bp / pop bp / retf
 const STUB_PAD = 0x90;
 
-// --- Cyrillic hero names (res/name_tables.asm) ----------------------------------------
+// --- Cyrillic hero names (res/name_tables.asm) -------------------------------------------
 // Neither site can be a manifest row: both need the DS address of a table that only exists
 // once the tables are placed. What each table is for is in that file's header.
 //
 // NAME_AT is the accept path of the name field's key loop. It is rewritten whole because
 // the mapping must happen before the byte is BOTH stored and echoed, and because loading
-// the key into AL once -- the original re-reads [bp-1] at every test -- is what pays for
-// the xlat.
+// the key into AL once — the original re-reads [bp-1] at every test — is what pays for the
+// xlat.
 //
 // FNAME_AT is the save-file name builder's per-character test, "A-Z, or else '_'". The
-// table answers that for every byte, so the test collapses into a lookup plus a jump to
-// the store the block already ends with. Only the first 6 bytes are rewritten and the rest
-// is left as dead code, which keeps the relocation entry at 0x8FED pinning the word it
-// always pinned. Overwriting that word means re-aiming the entry, and the replacement has
-// no far call to re-aim it at; jumping over it costs nothing since nothing there runs any
-// more.
+// table answers that for every byte, so the test collapses into a lookup plus a jump to the
+// store the block already ends with. Only the first 6 bytes are rewritten and the rest is
+// left as dead code, which keeps the relocation entry at 0x8FED pinning the word it always
+// pinned. Overwriting that word means re-aiming the entry, and the replacement has no far
+// call to re-aim it at; jumping over it costs nothing since nothing there runs any more.
 const TABLES_DSOFF = 0xec00; // clear of the gate picker below, the stack above
 const NAME_AT = 0x6750;
 const NAME_END = 0x6776;
@@ -283,7 +282,8 @@ const csvFields = (line: string, where: string): string[] => {
       if (ch === '"') state = "closing";
       else field += ch;
     } else if (state === "closing" && ch === '"') {
-      field += '"'; // a doubled quote is one literal quote
+      // a doubled quote is one literal quote
+      field += '"';
       state = "quoted";
     } else if (ch === ",") {
       fields.push(field);
@@ -305,8 +305,8 @@ const csvFields = (line: string, where: string): string[] => {
 
 /**
  * Encode one manifest text field to CP866. `\xNN` writes raw byte NN, `\\` a literal
- * backslash. The escape is for glyphs CP866 will not round-trip: the movement menu's
- * arrows are bytes 0x18-0x1b, which the codec maps to the C0 controls.
+ * backslash. The escape is for glyphs CP866 will not round-trip: the movement menu's arrows
+ * are bytes 0x18-0x1b, which the codec maps to the C0 controls.
  */
 const encodeText = (text: string, label: string, column: string): Uint8Array => {
   const out: number[] = [];
@@ -359,7 +359,8 @@ const encodeText = (text: string, label: string, column: string): Uint8Array => 
 const unhex = (text: string): Uint8Array => {
   const packed = text.replace(/ /g, "");
   const out = new Uint8Array(packed.length / 2);
-  for (let i = 0; i < out.length; i++) out[i] = Number.parseInt(packed.slice(i * 2, i * 2 + 2), 16);
+  for (let i = 0; i < out.length; i++)
+    out[i] = Number.parseInt(packed.slice(i * 2, i * 2 + 2), 16);
   return out;
 };
 
@@ -368,13 +369,17 @@ const checkRow = (row: Row): void => {
   const { where, type, offset, expect, write } = row;
 
   if (!(KINDS as readonly string[]).includes(type)) {
-    throw new Error(`${where}: type ${JSON.stringify(type)} -- want one of ${KINDS.join(", ")}`);
+    throw new Error(
+      `${where}: type ${JSON.stringify(type)} -- want one of ${KINDS.join(", ")}`,
+    );
   }
 
   const toks = offset.split(/\s+/).filter((t) => t !== "");
   if (toks.length === 0) throw new Error(`${where}: offset is empty`);
   if (type !== "reloc" && toks.length > 1) {
-    throw new Error(`${where}: ${toks.length} offsets, but only 'reloc' rows may list several`);
+    throw new Error(
+      `${where}: ${toks.length} offsets, but only 'reloc' rows may list several`,
+    );
   }
   for (const tok of toks) {
     if (!OFFSET_RE.test(tok)) {
@@ -385,7 +390,9 @@ const checkRow = (row: Row): void => {
   }
 
   if (expect === "") {
-    throw new Error(`${where}: expect is empty -- it is what pins the row to the right bytes`);
+    throw new Error(
+      `${where}: expect is empty -- it is what pins the row to the right bytes`,
+    );
   }
 
   if (type === "bytes") {
@@ -402,8 +409,8 @@ const checkRow = (row: Row): void => {
       }
     }
   } else {
-    // Validation only; resolve encodes for real. An empty write is legal -- it blanks
-    // the string.
+    // Validation only; resolve encodes for real. An empty write is legal — it blanks the
+    // string.
     encodeText(expect, where, "expect");
     encodeText(write, where, "write");
   }
@@ -442,7 +449,6 @@ const loadManifest = (text: string): Row[] => {
   });
 };
 
-/** One shape-checked row into the edit it describes. Every error names its manifest line. */
 const resolve = (row: Row): Patch => {
   const label = row.where;
   const offs = row.offset
@@ -456,7 +462,8 @@ const resolve = (row: Row): Patch => {
     const payload = unhex(row.write);
     if (expect.length !== payload.length) {
       throw new Error(
-        `${label}: bytes expect/write differ in length (${expect.length} vs ${payload.length})`,
+        `${label}: bytes expect/write differ in length ` +
+          `(${expect.length} vs ${payload.length})`,
       );
     }
     return { kind, label, off: offs[0], expect, payload };
@@ -472,7 +479,13 @@ const resolve = (row: Row): Patch => {
           `-- use a 'reloc' row`,
       );
     }
-    return { kind, label, off: offs[0], expect, payload: concat([text, new Uint8Array(1)]) };
+    return {
+      kind,
+      label,
+      off: offs[0],
+      expect,
+      payload: concat([text, new Uint8Array(1)]),
+    };
   }
 
   for (const ref of offs) {
@@ -490,11 +503,11 @@ const resolve = (row: Row): Patch => {
   return { kind, label, offs, expect, text: concat([text, new Uint8Array(1)]) };
 };
 
-/**
- * Follow the near pointer at file offset `ref` and return the string it aims at, with the
- * file offset it lives at.
- */
-const deref = (data: Uint8Array, ref: number, label: string): { src: number; text: Uint8Array } => {
+const deref = (
+  data: Uint8Array,
+  ref: number,
+  label: string,
+): { src: number; text: Uint8Array } => {
   if (ref + 2 > data.length)
     throw new Error(`${label}: ref ${at(ref)} is past the end of the image`);
   const dsoff = u16(data, ref);
@@ -511,7 +524,7 @@ const deref = (data: Uint8Array, ref: number, label: string): { src: number; tex
 
 /**
  * One string, one row. Two rows repointing the same string mean its pointers were split
- * across rows -- they must move together, so list every ref in one row.
+ * across rows — they must move together, so list every ref in one row.
  */
 const checkRelocSources = (placed: readonly Placed[]): void => {
   const seen = new Map<number, Placed>();
@@ -531,11 +544,13 @@ const checkRelocSources = (placed: readonly Placed[]): void => {
 };
 
 /**
- * Only in-place writes can collide (pool appends are bump-allocated) -- including inlined
+ * Only in-place writes can collide (pool appends are bump-allocated) — including inlined
  * `reloc` rows, whose slot can land on a `string` row.
  */
 const checkOverlaps = (spans: readonly Span[]): void => {
-  const sorted = [...spans].sort((a, b) => a.off - b.off || a.payload.length - b.payload.length);
+  const sorted = [...spans].sort(
+    (a, b) => a.off - b.off || a.payload.length - b.payload.length,
+  );
   for (let i = 1; i < sorted.length; i++) {
     const a = sorted[i - 1];
     const b = sorted[i];
@@ -550,11 +565,8 @@ const checkOverlaps = (spans: readonly Span[]): void => {
 };
 
 interface RelocTable {
-  /** Entry count. */
   count: number;
-  /** Header size in bytes. */
   hdr: number;
-  /** File offset of the table itself. */
   tbl: number;
 }
 
@@ -568,10 +580,15 @@ const relocTarget = (data: Uint8Array, ent: number, hdr: number): number =>
   hdr + u16(data, ent + 2) * 16 + u16(data, ent);
 
 /**
- * Aim one entry at a file offset. The image's own entries all use seg=0, which only
- * reaches the first 64K; the injected routine is past that, so the offset is split.
+ * Aim one entry at a file offset. The image's own entries all use seg=0, which only reaches
+ * the first 64K; the injected routine is past that, so the offset is split.
  */
-const setRelocEntry = (data: Uint8Array, ent: number, target: number, hdr: number): void => {
+const setRelocEntry = (
+  data: Uint8Array,
+  ent: number,
+  target: number,
+  hdr: number,
+): void => {
   const seg = Math.floor((target - hdr) / 16);
   if (seg > 0xffff)
     throw new Error(`relocation target ${at(target)} is past the addressable image`);
@@ -583,9 +600,9 @@ const setRelocEntry = (data: Uint8Array, ent: number, target: number, hdr: numbe
  * Re-aim every entry pointing into [lo,hi) at one of `sites`, then append the rest.
  *
  * Both halves matter. An entry left pointing into overwritten code has DOS add the load
- * segment to whatever byte pair took its place -- silent corruption far from the edit. A
- * new far call with no entry keeps its link-time segment and calls into whatever the
- * loader put there.
+ * segment to whatever byte pair took its place — silent corruption far from the edit. A new
+ * far call with no entry keeps its link-time segment and calls into whatever the loader put
+ * there.
  */
 const retargetRelocations = (
   data: Uint8Array,
@@ -624,8 +641,8 @@ const retargetRelocations = (
 };
 
 /**
- * Gate the "no code motion" rule instead of trusting it: a relocation target's word may
- * not change.
+ * Gate the "no code motion" rule instead of trusting it: a relocation target's word may not
+ * change.
  *
  *   entry untouched -> the word must still be what pristine KBU2 had there
  *   entry repointed -> its new target must be a far call's segment word (`9a` +3)
@@ -642,10 +659,14 @@ const checkRelocations = (orig: Uint8Array, data: Uint8Array): void => {
     throw new Error("the MZ relocation table itself moved -- unsupported");
   }
   if (now.count < was.count) {
-    throw new Error(`the relocation table shrank (${was.count} -> ${now.count}) -- unsupported`);
+    throw new Error(
+      `the relocation table shrank (${was.count} -> ${now.count}) -- unsupported`,
+    );
   }
   if (now.tbl + 4 * now.count > now.hdr) {
-    throw new Error(`the relocation table (${now.count} entries) ran past the end of the header`);
+    throw new Error(
+      `the relocation table (${now.count} entries) ran past the end of the header`,
+    );
   }
 
   const onFarCall = (target: number, what: string): void => {
@@ -658,15 +679,21 @@ const checkRelocations = (orig: Uint8Array, data: Uint8Array): void => {
   };
 
   for (let i = was.count; i < now.count; i++) {
-    onFarCall(relocTarget(data, now.tbl + 4 * i, now.hdr), `appended relocation entry ${i}`);
+    onFarCall(
+      relocTarget(data, now.tbl + 4 * i, now.hdr),
+      `appended relocation entry ${i}`,
+    );
   }
 
   for (let i = 0; i < was.count; i++) {
     const ent = now.tbl + 4 * i;
     const target = relocTarget(data, ent, now.hdr);
     if (!equal(data.subarray(ent, ent + 4), orig.subarray(ent, ent + 4))) {
-      onFarCall(target, `relocation entry ${i} at ${at(ent)}, repointed,`); // on purpose
-    } else if (!equal(data.subarray(target, target + 2), orig.subarray(target, target + 2))) {
+      // a changed entry is deliberate code motion, so it only has to land on a far call
+      onFarCall(target, `relocation entry ${i} at ${at(ent)}, repointed,`);
+    } else if (
+      !equal(data.subarray(target, target + 2), orig.subarray(target, target + 2))
+    ) {
       throw new Error(
         `a patch changed the word at ${at(target)}, which relocation entry ${i} ` +
           `(${at(ent)}) pins.\n` +
@@ -694,7 +721,6 @@ const padTo = (data: Uint8Array, size: number): Uint8Array => {
   return out;
 };
 
-/** Assemble res/gate_picker.asm into the image and hand the gate spell over to it. */
 const injectGatePicker = (
   image: Uint8Array,
   source: string,
@@ -721,8 +747,8 @@ const injectGatePicker = (
   const codeAt = DS_BASE + CODE_DSOFF;
   if (image.length > codeAt) {
     throw new Error(
-      `the overflow pool reached DS ${hex16(image.length - DS_BASE)}, past the code region ` +
-        `at DS ${hex16(CODE_DSOFF)} -- lower POOL_SIZE or move CODE_DSOFF`,
+      `the overflow pool reached DS ${hex16(image.length - DS_BASE)}, past the code ` +
+        `region at DS ${hex16(CODE_DSOFF)} -- lower POOL_SIZE or move CODE_DSOFF`,
     );
   }
   const data = padTo(image, codeAt + code.length);
@@ -730,7 +756,10 @@ const injectGatePicker = (
   data.fill(STUB_PAD, STUB_AT + stub.length, STUB_END);
   data.set(code, codeAt);
 
-  const sites = [...stubAsm.relocs.map((r) => STUB_AT + r), ...codeRelocs.map((r) => codeAt + r)];
+  const sites = [
+    ...stubAsm.relocs.map((r) => STUB_AT + r),
+    ...codeRelocs.map((r) => codeAt + r),
+  ];
   for (const site of sites) {
     // the entry is only ever correct on a `9a` +3
     if (data[site - 3] !== 0x9a) {
@@ -744,7 +773,6 @@ const injectGatePicker = (
   };
 };
 
-/** Place res/name_tables.asm in DGROUP and point the two name sites at it. */
 const injectNameTables = (
   image: Uint8Array,
   source: string,
@@ -761,8 +789,8 @@ const injectNameTables = (
     throw new Error("name tables: both a keymap: and a translit: label are needed");
   }
 
-  // Both tables are indexed by the raw byte, so a label IS its xlat base -- and a row of
-  // the wrong length would silently shift every entry past it instead of failing.
+  // Both tables are indexed by the raw byte, so a label IS its xlat base — and a row of the
+  // wrong length would silently shift every entry past it instead of failing.
   const spans = [
     { name: "keymap", lo: keymap, hi: translit, want: 0x80 },
     { name: "translit", lo: translit, hi: TABLES_DSOFF + tables.length, want: 0x100 },
@@ -770,8 +798,8 @@ const injectNameTables = (
   for (const { name, lo, hi, want } of spans) {
     if (hi - lo !== want) {
       throw new Error(
-        `name tables: ${name} spans ${hi - lo}B, want ${want}B -- it must cover its whole ` +
-          `index range, 16 bytes to the row`,
+        `name tables: ${name} spans ${hi - lo}B, want ${want}B -- it must cover ` +
+          `its whole index range, 16 bytes to the row`,
       );
     }
   }
@@ -813,8 +841,9 @@ const injectNameTables = (
  * keeping it guarantees at least the original extra memory.
  */
 const fixMzHeader = (data: Uint8Array): void => {
-  setU16(data, 0x02, data.length % 512); // bytes on the last page
-  setU16(data, 0x04, Math.ceil(data.length / 512)); // pages
+  // e_cblp, then e_cp
+  setU16(data, 0x02, data.length % 512);
+  setU16(data, 0x04, Math.ceil(data.length / 512));
 };
 
 export const applyPatches = (inputs: PatchInputs): PatchResult => {
@@ -833,7 +862,8 @@ export const applyPatches = (inputs: PatchInputs): PatchResult => {
   for (const p of patches) {
     if (p.kind === "reloc") continue;
     const end = p.off + p.expect.length;
-    const need = p.kind === "string" ? end + 1 : end; // a string needs its NUL too
+    // a string needs its NUL too
+    const need = p.kind === "string" ? end + 1 : end;
     if (need > data.length) {
       throw new Error(
         `${p.label}: ${at(p.off)}+${p.expect.length}B runs past the end of the image ` +
@@ -842,7 +872,9 @@ export const applyPatches = (inputs: PatchInputs): PatchResult => {
     }
     const got = data.subarray(p.off, end);
     if (!equal(got, p.expect)) {
-      throw new Error(`${p.label}: expected ${hex(p.expect)} at ${at(p.off)}, found ${hex(got)}`);
+      throw new Error(
+        `${p.label}: expected ${hex(p.expect)} at ${at(p.off)}, found ${hex(got)}`,
+      );
     }
     if (p.kind === "string" && data[end] !== 0) {
       throw new Error(
@@ -852,10 +884,10 @@ export const applyPatches = (inputs: PatchInputs): PatchResult => {
     }
   }
 
-  // `bytes` rows land first, so a row that deliberately moves a `b8 <dsoff>` is resolved
-  // at the ref's NEW offset -- pristine would still show the pre-motion instruction there.
-  // `expect` is unchanged, so a wrong offset is still caught; it now just has to name
-  // where the ref ends up. The in-place pass below rewrites these identically.
+  // `bytes` rows land first, so a row that deliberately moves a `b8 <dsoff>` is resolved at
+  // the ref's NEW offset — pristine would still show the pre-motion instruction there.
+  // `expect` is unchanged, so a wrong offset is still caught; it now just has to name where
+  // the ref ends up. The in-place pass below rewrites these identically.
   for (const p of patches) if (p.kind === "bytes") data.set(p.payload, p.off);
 
   const relocs = patches.filter((p) => p.kind === "reloc");
@@ -889,7 +921,8 @@ export const applyPatches = (inputs: PatchInputs): PatchResult => {
     .filter((p) => p.kind !== "reloc")
     .map((p) => ({ off: p.off, payload: p.payload, label: p.label }));
   for (const p of placed) {
-    if (p.inlined) inplace.push({ off: p.src, payload: p.patch.text, label: p.patch.label });
+    if (p.inlined)
+      inplace.push({ off: p.src, payload: p.patch.text, label: p.patch.label });
   }
   checkOverlaps(inplace);
   for (const span of inplace) data.set(span.payload, span.off);
@@ -909,12 +942,13 @@ export const applyPatches = (inputs: PatchInputs): PatchResult => {
       const grown = padTo(data, data.length + p.patch.text.length);
       grown.set(p.patch.text, data.length);
       data = grown;
-      for (const ref of p.patch.offs) setU16(data, ref, dsoff); // all pointers move together
+      // all pointers move together
+      for (const ref of p.patch.offs) setU16(data, ref, dsoff);
     }
   }
 
   // After the pool: the routine sits at the pool's cap, so it must be placed once the pool
-  // has stopped growing. Measure the pool first -- injection pads the file out to the code
+  // has stopped growing. Measure the pool first — injection pads the file out to the code
   // region, which would otherwise read as a full pool.
   const poolUsed = Math.max(0, data.length - (DS_BASE + POOL_DSOFF));
   const picker = injectGatePicker(data, inputs.gatePickerAsm);

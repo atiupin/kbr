@@ -1,9 +1,3 @@
-/**
- * argv in, exit code out -- the only entry point, and the only place that ends
- * the process. Commands report through report.ts and signal failure by throwing;
- * anything thrown, from here or from core, prints one line and exits 1.
- */
-
 import { fromFile, fromSegOff } from "../core/addr.ts";
 import { decodeMember, readToc, rebuild } from "../core/cc.ts";
 import { u32 } from "../core/bytes.ts";

@@ -1,8 +1,3 @@
-/**
- * Holds the assembler to the game's own bytes: each case reassembles a routine that is
- * already in KBU2.EXE, and the only passing result is byte equality at its own offset.
- */
-
 import { SELFTEST_CASES, assemble } from "../core/asm16.ts";
 import { equal } from "../core/bytes.ts";
 import { read } from "./io.ts";
@@ -26,7 +21,10 @@ export const selftest = (): void => {
     const at = `0x${test.at.toString(16)}`;
     if (equal(code, want)) {
       const fixups = relocs.map((r) => `0x${r.toString(16)}`).join(" ");
-      line(`ok   ${test.name}: ${code.length} bytes byte-identical at ${at}  relocs [${fixups}]`);
+      line(
+        `ok   ${test.name}: ${code.length} bytes byte-identical at ${at}  ` +
+          `relocs [${fixups}]`,
+      );
       continue;
     }
     bad++;
@@ -41,5 +39,6 @@ export const selftest = (): void => {
     }
   }
 
-  if (bad > 0) throw new Error(`${bad} of ${SELFTEST_CASES.length} routines do not reassemble`);
+  if (bad > 0)
+    throw new Error(`${bad} of ${SELFTEST_CASES.length} routines do not reassemble`);
 };

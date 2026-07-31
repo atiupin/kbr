@@ -1,9 +1,3 @@
-/**
- * The one place that knows where things live: put a path here, not in a
- * command. Paths are absolute and derived from this file's own location, so
- * every command works from any working directory.
- */
-
 import { dirname, join } from "node:path";
 
 export const CLI = import.meta.dirname;
@@ -12,17 +6,17 @@ export const GAME = join(ROOT, "game");
 export const BUILD = join(ROOT, "build");
 export const RES = join(ROOT, "res");
 
-// --- inputs: the user's own copy, never modified -----------------------------
+// --- inputs: the user's own copy, never modified -----------------------------------------
 export const KB_EXE = join(GAME, "KB.EXE");
 export const GAME_CC = { 256: join(GAME, "256.CC"), 416: join(GAME, "416.CC") } as const;
 
-// --- the build chain: KB.EXE -> KBU1 -> KBU2 -> KBR --------------------------
+// --- the build chain: KB.EXE -> KBU1 -> KBU2 -> KBR --------------------------------------
 export const KBU1 = join(BUILD, "KBU1.EXE"); // minus the outer NWC packer
 export const KBU2 = join(BUILD, "KBU2.EXE"); // flat, unpacked: the edit base
 export const KBR = join(BUILD, "KBR.EXE"); // KBU2 + patches.csv: our build
 export const BUILD_CC = { 256: join(BUILD, "256.CC"), 416: join(BUILD, "416.CC") } as const;
 
-// --- hand-written build inputs (tracked) -------------------------------------
+// --- hand-written build inputs (tracked) -------------------------------------------------
 export const PATCHES_CSV = join(RES, "patches.csv");
 export const FONT_PNG = join(RES, "font.png");
 export const GATE_PICKER_ASM = join(RES, "gate_picker.asm");

@@ -1,13 +1,14 @@
 /**
- * Assembles 16-bit real-mode 8086, for patches that need new code rather than a new constant.
+ * Assembles 16-bit real-mode 8086, for patches that need new code rather than a new
+ * constant.
  *
  * Hand-encoding a 200-byte routine into a `bytes` row is a one-way door: every later edit
  * reflows the whole blob. This is the smallest assembler that covers what a patch routine
- * needs -- no macros, no expressions, no segment arithmetic.
+ * needs — no macros, no expressions, no segment arithmetic.
  *
- * `relocs` lists the offsets, relative to the start of `code`, of `callf` segment words. Each
- * one MUST get an MZ relocation entry, or DOS leaves it holding a link-time segment and the
- * call lands in whatever is loaded there.
+ * `relocs` lists the offsets, relative to the start of `code`, of `callf` segment words.
+ * Each one MUST get an MZ relocation entry, or DOS leaves it holding a link-time segment
+ * and the call lands in whatever is loaded there.
  *
  * Encoding follows Turbo C's choices wherever the ISA offers one, so reassembled game code
  * comes out byte-identical and SELFTEST_CASES means something: accumulator short forms for
@@ -94,15 +95,16 @@ type Operand =
 
 const w16 = (v: number): number[] => [v & 0xff, (v >> 8) & 0xff];
 
-/** An opcode plus the mod=11 modrm byte pairing `reg` with a register operand. */
-const regForm = (op: number, reg: number, rm: number): number[] => [op, 0xc0 | (reg << 3) | rm];
+const regForm = (op: number, reg: number, rm: number): number[] => [
+  op,
+  0xc0 | (reg << 3) | rm,
+];
 
-/** Appends the modrm byte for `reg` against a memory operand, plus its displacement. */
 const memModrm = (mem: Mem, reg: number, out: number[]): void => {
   if (mem.base === null) {
     out.push(0x06 | (reg << 3), ...w16(mem.disp));
   } else if (mem.disp === 0 && mem.base !== 6) {
-    // rm=6 has no no-displacement form -- that slot encodes a bare address instead.
+    // rm=6 has no no-displacement form — that slot encodes a bare address instead.
     out.push((reg << 3) | mem.base);
   } else if (mem.disp >= -0x80 && mem.disp <= 0x7f) {
     out.push(0x40 | (reg << 3) | mem.base, mem.disp & 0xff);
@@ -133,7 +135,8 @@ const parseOperand = (tok: string, symbols: Symbols, need: boolean): Operand => 
 
   // Only the base-register part folds case; the displacement may be a symbol.
   const inner = bracketed[1].trim();
-  const bare = RM16.get(inner.toLowerCase()); // a base pair first: [bx+si] is not bx plus si
+  // a base pair first: [bx+si] is not bx plus si
+  const bare = RM16.get(inner.toLowerCase());
   if (bare !== undefined) return { kind: "mem", mem: { base: bare, disp: 0 } };
   const split = /^([a-zA-Z+]+?)\s*([+-])\s*(\S+)$/.exec(inner);
   const base = split === null ? undefined : RM16.get(split[1].toLowerCase());
@@ -178,7 +181,7 @@ const stripSize = (ops: string[]): { size: string | null; ops: string[] } => {
 
 /**
  * Where a branch goes, for sizing as much as for emission. An unseen label sizes as `pc`,
- * not 0 -- guessing 0 makes every forward jump look like a huge backward one and widens it
+ * not 0 — guessing 0 makes every forward jump look like a huge backward one and widens it
  * to rel16. Literal addresses are known on the first pass and must not get that treatment,
  * or they size short instead.
  */
@@ -217,7 +220,8 @@ const encode = (
     if (m === null) throw new AsmError("callf wants seg:off");
     const seg = parseNum(m[1], symbols, need);
     const off = parseNum(m[2], symbols, need);
-    return { bytes: [0x9a, ...w16(off), ...w16(seg)], relocs: [3] }; // DOS fixes up the segment word
+    // DOS fixes up the segment word
+    return { bytes: [0x9a, ...w16(off), ...w16(seg)], relocs: [3] };
   }
 
   const cc = JCC.get(mnem);
@@ -247,7 +251,9 @@ const encode = (
       memModrm(op.mem, mnem === "push" ? 6 : 0, out);
       return plain(out);
     }
-    throw new AsmError(`${mnem} takes a word register or memory; 8086 has no push-immediate`);
+    throw new AsmError(
+      `${mnem} takes a word register or memory; 8086 has no push-immediate`,
+    );
   }
 
   if (mnem === "inc" || mnem === "dec") {
@@ -265,15 +271,18 @@ const encode = (
   const shift = SHIFT.get(mnem);
   if (shift !== undefined) {
     const op = parseOperand(ops[0], symbols, need);
-    if (op.kind !== "r16" && op.kind !== "r8") throw new AsmError(`${mnem} takes a register`);
-    if (parseNum(ops[1], symbols, need) !== 1) throw new AsmError("only shift-by-1 is supported");
+    if (op.kind !== "r16" && op.kind !== "r8")
+      throw new AsmError(`${mnem} takes a register`);
+    if (parseNum(ops[1], symbols, need) !== 1)
+      throw new AsmError("only shift-by-1 is supported");
     return plain(regForm(op.kind === "r16" ? 0xd1 : 0xd0, shift, op.reg));
   }
 
   const unary = UNARY.get(mnem);
   if (unary !== undefined) {
     const op = parseOperand(ops[0], symbols, need);
-    if (op.kind !== "r16" && op.kind !== "r8") throw new AsmError(`${mnem} takes a register`);
+    if (op.kind !== "r16" && op.kind !== "r8")
+      throw new AsmError(`${mnem} takes a register`);
     return plain(regForm(op.kind === "r16" ? 0xf7 : 0xf6, unary, op.reg));
   }
 
@@ -289,7 +298,8 @@ const encMov = (rawOps: string[], symbols: Symbols, need: boolean): number[] => 
   const s = parseOperand(ops[1], symbols, need);
   if (d.kind === "r16" && s.kind === "imm") return [0xb8 + d.reg, ...w16(s.value)];
   if (d.kind === "r8" && s.kind === "imm") return [0xb0 + d.reg, s.value & 0xff];
-  if (d.kind === "r16" && s.kind === "r16") return regForm(0x8b, d.reg, s.reg); // Turbo C's direction
+  // Turbo C's direction
+  if (d.kind === "r16" && s.kind === "r16") return regForm(0x8b, d.reg, s.reg);
   if (d.kind === "r8" && s.kind === "r8") return regForm(0x8a, d.reg, s.reg);
   if ((d.kind === "r16" || d.kind === "r8") && s.kind === "mem") {
     // ax/al with a bare address has a one-byte-shorter form the compiler always takes.
@@ -317,7 +327,12 @@ const encMov = (rawOps: string[], symbols: Symbols, need: boolean): number[] => 
   throw new AsmError(`unsupported mov form: ${ops.join(",")}`);
 };
 
-const encAlu = (mnem: string, rawOps: string[], symbols: Symbols, need: boolean): number[] => {
+const encAlu = (
+  mnem: string,
+  rawOps: string[],
+  symbols: Symbols,
+  need: boolean,
+): number[] => {
   const op = ALU.indexOf(mnem);
   const { size, ops } = stripSize(rawOps);
   const d = parseOperand(ops[0], symbols, need);
@@ -347,7 +362,8 @@ const encAlu = (mnem: string, rawOps: string[], symbols: Symbols, need: boolean)
     return out;
   }
   if (d.kind === "mem" && s.kind === "imm") {
-    if (size === null) throw new AsmError(`${mnem} of an immediate needs \`byte\` or \`word\``);
+    if (size === null)
+      throw new AsmError(`${mnem} of an immediate needs \`byte\` or \`word\``);
     const out = [size === "byte" ? 0x80 : 0x81];
     memModrm(d.mem, op, out);
     return [...out, ...(size === "byte" ? [s.value & 0xff] : w16(s.value))];
@@ -411,7 +427,12 @@ interface Pass {
  * One layout or emission pass. `final` decides both whether bytes are kept and whether an
  * unresolved name is an error or a placeholder.
  */
-const onePass = (lines: readonly Line[], org: number, symbols: Symbols, final: boolean): Pass => {
+const onePass = (
+  lines: readonly Line[],
+  org: number,
+  symbols: Symbols,
+  final: boolean,
+): Pass => {
   const pass = new Map(symbols);
   const defined = new Set<string>();
   const boundaries = new Set<number>();
@@ -425,7 +446,8 @@ const onePass = (lines: readonly Line[], org: number, symbols: Symbols, final: b
       // one wins, and every earlier branch to that name silently retargets.
       if (defined.has(line.name)) {
         throw new AsmError(
-          `${JSON.stringify(line.name)} is defined twice -- branches to it would go to the later one`,
+          `${JSON.stringify(line.name)} is defined twice -- ` +
+            `branches to it would go to the later one`,
         );
       }
       defined.add(line.name);
@@ -466,7 +488,7 @@ const sameSymbols = (a: Symbols, b: Symbols): boolean =>
 export const assemble = (source: string, org = 0): Assembled => {
   const lines = parseLines(source);
 
-  // A jump that widens moves every label after it, which can widen another -- so size to a
+  // A jump that widens moves every label after it, which can widen another — so size to a
   // fixed point, then emit and demand nothing moved. A label that shifts between the two is
   // a silently wrong branch target.
   let symbols: Symbols = new Map();
@@ -476,7 +498,8 @@ export const assemble = (source: string, org = 0): Assembled => {
     settled = sameSymbols(next, symbols);
     symbols = next;
   }
-  if (!settled) throw new AsmError("instruction sizes did not settle -- a jump is oscillating");
+  if (!settled)
+    throw new AsmError("instruction sizes did not settle -- a jump is oscillating");
 
   const final = onePass(lines, org, symbols, true);
   const moved = [...final.symbols]
@@ -500,9 +523,9 @@ export const assemble = (source: string, org = 0): Assembled => {
 };
 
 /**
- * Reassembling shipped code byte-for-byte is the only check that this encoder makes the same
- * choices as the compiler that built the image -- a wrong-but-valid encoding would pass every
- * other test and silently shift every label in a real patch.
+ * Reassembling shipped code byte-for-byte is the only check that this encoder makes the
+ * same choices as the compiler that built the image — a wrong-but-valid encoding would pass
+ * every other test and silently shift every label in a real patch.
  */
 export interface SelftestCase {
   name: string;
