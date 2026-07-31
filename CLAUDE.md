@@ -53,9 +53,10 @@
 One implementation serves both the command line and the browser: a player drops in a zip of
 their own game copy and downloads a patched one, from a static page with no backend — their
 files never leave the machine, and the project still ships no game data. A project of its own;
-gate: a patched zip that runs.
+gate: a patched zip that runs. Bare HTML and one bundled script — no framework, no CSS
+framework, no template engine.
 
-- [ ] Bundler and a static build that deploys as a plain directory.
+- [x] Bundler and a static build that deploys as a plain directory.
 - [ ] Design: drop target, the run's log, the download.
 - [ ] Zip through `fflate` — `unzipSync` in, store-only out since the payload is already
       compressed — in the web shell and nowhere else.

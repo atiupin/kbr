@@ -24,6 +24,10 @@ core/    *** the format work *** — pure functions over bytes: no I/O, no platf
          command line and the browser share one implementation.
 cli/     *** the shell around core *** — paths, files, argv, printing. Every command lives
          here; `cli/main.ts` is the only entry point.
+web/     *** the browser shell around core *** — bare HTML and the one script that
+         becomes the static page a player patches their own copy on.
+bundle/  *** generated *** — that page, built: a plain static directory. `bundle.mjs` in
+         the root is what builds it, a tool beside the project and no part of `kbr`.
 ghidra/  *** analysis, not the build *** — `ghidra.py`, the diagnostic front-end and the
          one thing here still written in Python, and the `scripts/*.java` it runs.
 tmp/     *** scratch, gitignored *** — the Ghidra project DB and its dumps, DOSBox captures.
@@ -37,6 +41,8 @@ module's own header is the reference for what it does.
 ```
 # the whole build — this is the one to run
 npm run build                              game/KB.EXE + res/ -> build/
+npm run bundle                             the browser patcher -> bundle/, a static dir
+npm run dev                                the same bundle, watched and served on :8000
 
 # translating
 npm run kbr find-ref <offset | "text">     the refs pointing at a string; prints a reloc row
@@ -52,7 +58,7 @@ npm run kbr font-import <in.png> <archive.CC> <out.CC>
 
 # the code itself
 npm run typecheck                          nothing is emitted, so this is what "build" means
-npm run format                             Prettier owns the layout of every .ts and .md
+npm run format                             Prettier owns the layout of every source file
 
 # analysis — diagnostic only, never part of a build (see "Ghidra" below)
 ghidra/ghidra.py run <Script.java> [args]   headless script on KBU2.EXE, output de-noised

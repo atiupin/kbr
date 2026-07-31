@@ -1,5 +1,5 @@
 build/
-dist/
+bundle/
 tmp/
 game/
 node_modules/

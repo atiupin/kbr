@@ -6,15 +6,18 @@
     "node": ">=22.18"
   },
   "scripts": {
-    "typecheck": "tsc -p core && tsc -p cli",
+    "typecheck": "tsc -p core && tsc -p cli && tsc -p web",
     "kbr": "node cli/main.ts",
     "build": "node cli/main.ts build",
+    "bundle": "node bundle.mjs",
+    "dev": "node bundle.mjs --serve",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
     "@types/pngjs": "^6.0.5",
+    "esbuild": "^0.28.1",
     "prettier": "^3.9.6",
     "typescript": "^7.0.2"
   },
