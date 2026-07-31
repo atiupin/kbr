@@ -56,7 +56,6 @@ npm run typecheck                          nothing is emitted, so this is what "
 npm run format                             Prettier owns the layout of every .ts and .md
 
 # analysis — diagnostic only, never part of a build (see "Ghidra" below)
-ghidra/ghidra.py gui                        open the GUI on the project
 ghidra/ghidra.py run <Script.java> [args]   headless script on KBU2.EXE, output de-noised
 ghidra/ghidra.py import <file> [opts]       import a binary into the project
 

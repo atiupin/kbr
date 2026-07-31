@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Ghidra front-end for this project.
 
-    ghidra/ghidra.py gui                       open the GUI on the project
     ghidra/ghidra.py run <Script.java> [args]  run a headless script on KBU2.EXE
     ghidra/ghidra.py import <file> [opts]      import a binary into the project
 
@@ -26,11 +25,11 @@ what it does).
 
 GUI orientation
 ---------------
-Listing = disassembly, Decompiler = C-ish pseudocode, Window -> Bytes = hex
-(cursor-linked to the Listing), Window -> Defined Strings = all 877 strings.
-`G` = goto address, `D` = disassemble here. To run our scripts from the GUI,
-Script Manager -> Manage Script Directories -> add ghidra/scripts; hit Refresh if a
-script's version banner looks stale.
+Open it with `ghidraRun` and pick tmp/KBR.gpr. Listing = disassembly, Decompiler =
+C-ish pseudocode, Window -> Bytes = hex (cursor-linked to the Listing), Window ->
+Defined Strings = all 877 strings. `G` = goto address, `D` = disassemble here. To
+run our scripts from the GUI, Script Manager -> Manage Script Directories -> add
+ghidra/scripts; hit Refresh if a script's version banner looks stale.
 
 Gotcha: Ghidra refuses a project path containing a dot-directory ("Path element
 starting with '.' is not permitted"), which is why PROJECT_DIR below is the
@@ -117,12 +116,7 @@ def main(argv):
     cmd = argv[1] if len(argv) > 1 else ""
     rest = argv[2:]
 
-    if cmd == "gui":
-        check_project()
-        launcher = shutil.which("ghidraRun") or str(ghidra_home() / "ghidraRun")
-        os.execv(launcher, [launcher, str(PROJECT_DIR / f"{PROJECT_NAME}.gpr")])
-
-    elif cmd == "run":
+    if cmd == "run":
         if not rest:
             die("usage: ghidra/ghidra.py run <Script.java> [args...]")
         script, args = rest[0], rest[1:]
