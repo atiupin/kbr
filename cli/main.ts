@@ -9,7 +9,7 @@ import { decodeMember, readToc, rebuild } from "../core/cc.ts";
 import { u32 } from "../core/bytes.ts";
 import { build } from "./build.ts";
 import { findRef } from "./findRef.ts";
-import { fontBake, fontExport, fontImport } from "./font.ts";
+import { fontExport, fontImport } from "./font.ts";
 import { read, rel, write } from "./io.ts";
 import { line } from "./report.ts";
 import { selftest } from "./selftest.ts";
@@ -29,7 +29,6 @@ const USAGE = `kbr <command> [args]
   cc-replace <archive.CC> <id-hex> <in.bin> <out.CC>
   font-export <archive.CC> <out.png> [glyphs]
   font-import <in.png> <archive.CC> <out.CC>
-  font-bake                  res/font.png -> the raw font member, for the web bundle
 `;
 
 const cmdAddr = (args: string[]): void => {
@@ -121,7 +120,6 @@ const COMMANDS = new Map<string, (args: string[]) => void>([
   ["cc-replace", cmdCcReplace],
   ["font-export", cmdFontExport],
   ["font-import", cmdFontImport],
-  ["font-bake", fontBake],
 ]);
 
 const main = (argv: string[]): void => {

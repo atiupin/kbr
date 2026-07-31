@@ -9,9 +9,9 @@
  * interlaced, and pngjs normalizes all of it to the 8-bit RGBA core/font.ts
  * wants.
  *
- * Files and messages only: core/font.ts knows what a glyph is. It stays in the
- * shell because a browser decodes images itself -- the web patcher carries a
- * pre-baked font member and will never load any of this.
+ * Files and messages only: core/font.ts knows what a glyph is, and takes raw
+ * RGBA so the decoder stays platform-shaped: pngjs here, createImageBitmap in a
+ * browser, one sheetToMember behind both.
  */
 
 import { PNG } from "pngjs";
@@ -61,11 +61,4 @@ export const fontBuild = (): void => {
   for (const mode of [256, 416] as const) {
     fontImport(paths.FONT_PNG, paths.GAME_CC[mode], paths.BUILD_CC[mode]);
   }
-};
-
-/** The font member on its own, for the web bundle to carry instead of a PNG decoder. */
-export const fontBake = (): void => {
-  const font = sheetToMember(readSheet(paths.FONT_PNG));
-  write(paths.FONT_BIN, font);
-  line(`${rel(paths.FONT_BIN)}  (${font.length} bytes)`);
 };

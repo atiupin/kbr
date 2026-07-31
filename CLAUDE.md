@@ -111,8 +111,9 @@ pinned hash.
 - [x] `lzw_encode`. The width schedule is the subtle part — a wrong port still round-trips
       through our own decoder and fails only in DOSBox, so trust the byte compare, not a
       round-trip test.
-- [x] CLI-only: the PNG reader/writer and `font-export`/`font-import`, plus a bake step that
-      emits the 2048-byte font member for the web bundle to carry.
+- [x] `font-export`/`font-import`. The PNG decode is the only part that stays in the shell —
+      `core/font.ts` takes raw RGBA, so a browser reaches it through `createImageBitmap`
+      and needs neither `pngjs` nor a pre-baked member.
 
 **5 — Authoring aids.** Gate: same refs reported for a handful of known strings, then the
 Python build retired.
@@ -130,6 +131,6 @@ Python build retired.
 - [ ] Design: drop target, the run's log, the download.
 - [ ] Zip through `fflate` — `unzipSync` in, store-only out since the payload is already
       compressed — in the web shell and nowhere else.
-- [ ] Bundle `patches.csv`, the baked font member and `dosbox.conf` as assets.
+- [ ] Bundle `res/` as assets: `patches.csv`, `font.png`, both `.asm` and `dosbox.conf`.
 - [ ] Every failure as UI, the KBU2 hash gate reading "not the release this patch targets".
 - [ ] Confirm nothing leaves the page — no network call on the patch path.

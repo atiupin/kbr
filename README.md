@@ -49,7 +49,6 @@ npm run kbr cc-extract <archive.CC> <id-hex> <out.bin>
 npm run kbr cc-replace <archive.CC> <id-hex> <in.bin> <out.CC>
 npm run kbr font-export <archive.CC> <out.png> [glyphs]
 npm run kbr font-import <in.png> <archive.CC> <out.CC>
-npm run kbr font-bake                      the raw font member alone, for the web bundle
 
 # the code itself
 npm run typecheck                          nothing is emitted, so this is what "build" means
