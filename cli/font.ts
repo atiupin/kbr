@@ -5,10 +5,9 @@
  * res/font.png is the editable sheet: its top 8 rows are the game's original
  * glyphs and its bottom 8 the Cyrillic. font-export and font-import round-trip
  * it, so an image editor's own save is a valid input -- which is why reading
- * goes through pngjs, the project's one dependency. Nothing on npm speaks
- * LZW-in-a-CC-member or EXEPACK, but PNG is thoroughly solved, and the sheet can
- * come back palette, greyscale, 16-bit or interlaced; pngjs normalizes all of it
- * to the 8-bit RGBA core/font.ts wants.
+ * goes through pngjs: the sheet can come back palette, greyscale, 16-bit or
+ * interlaced, and pngjs normalizes all of it to the 8-bit RGBA core/font.ts
+ * wants.
  *
  * Files and messages only: core/font.ts knows what a glyph is. It stays in the
  * shell because a browser decodes images itself -- the web patcher carries a

@@ -69,7 +69,7 @@ Each phase ends on its stated gate, and the next one does not start until it hol
 - [x] `package.json` and a strict `tsconfig`; `core/` compiled without the DOM lib, so a stray
       `document` or `node:fs` is a type error rather than a runtime surprise.
 - [x] Module per Python script, plus `bytes.ts` for the `struct`/`find` helpers every one of
-      them needs, and a synchronous `sha256.ts` — `crypto.subtle` is async and core is not.
+      them needs, and `sha256.ts` over `@noble/hashes`.
 - [x] `cli/` shell: paths, argv, a reporter that prints, thrown error -> exit 1.
 - [x] Byte-equality harness: hash `KBU1.EXE`, `KBU2.EXE`, `KBR.EXE`, `256.CC`, `416.CC` from
       the Python build, then assert the TypeScript output matches. This is the gate every
