@@ -7,6 +7,8 @@ const options = {
   loader: {
     ".csv": "text",
     ".asm": "text",
+    ".conf": "text",
+    ".png": "binary",
     ".html": "copy",
   },
   logLevel: "info",

@@ -1,8 +1,6 @@
 {
   "extends": "../tsconfig.json",
   "compilerOptions": {
-    // The browser half: the DOM instead of node, and no ambient node types, so
-    // an accidental `node:fs` here is the same error it is in core/.
     "lib": ["ES2023", "DOM"],
     "types": []
   },

@@ -1,15 +1,26 @@
 /**
- * The browser shell: a KB.EXE in, a patched KBR.EXE out, the same core/ chain
- * the command line runs. Nothing is fetched and nothing is sent -- res/ is
- * bundled as text and the file is read through FileReader.
+ * The browser shell: a zip of the player's own copy in, a zip that runs out,
+ * through the same core/ chain the command line runs -- cli/build.ts is these
+ * same steps against the filesystem.
+ *
+ * Nothing is fetched and nothing is sent: res/ is bundled into this script, the
+ * zip comes from the File the page was handed, and the result goes back as an
+ * object URL. The patch path makes no network call at all.
  */
 
-import { applyPatches } from "../core/applyPatches.ts";
+import { KBU2_SHA256, applyPatches } from "../core/applyPatches.ts";
+import { sha256 } from "../core/sha256.ts";
 import { unpackExepack } from "../core/unpackExepack.ts";
 import { unpackNwc } from "../core/unpackNwc.ts";
+
+import { patchFont, readZip, requireFile, writeZip } from "./utils.ts";
+import dosboxConf from "../res/dosbox.conf";
 import gatePickerAsm from "../res/gate_picker.asm";
 import nameTablesAsm from "../res/name_tables.asm";
 import patchesCsv from "../res/patches.csv";
+
+/** The run dir, a folder inside the zip so unpacking never scatters files. */
+const DIR = "KBR";
 
 const log = document.getElementById("log") as HTMLPreElement;
 const out = document.getElementById("out") as HTMLParagraphElement;
@@ -19,33 +30,48 @@ const say = (text: string): void => {
   log.textContent += `${text}\n`;
 };
 
-const patch = (kbExe: Uint8Array): Uint8Array => {
-  const nwc = unpackNwc(kbExe);
-  for (const warning of nwc.warnings) say(`warning: ${warning}`);
+const patch = async (zip: Uint8Array): Promise<Uint8Array> => {
+  const files = readZip(zip);
+  say("архив распакован");
+
+  const nwc = unpackNwc(requireFile(files, "KB.EXE"));
+  for (const warning of nwc.warnings) say(`внимание: ${warning}`);
   say("распакован NWC");
 
   const kbu2 = unpackExepack(nwc.image);
   say("распакован EXEPACK");
 
-  const patched = applyPatches({
-    base: kbu2,
-    patchesCsv,
-    gatePickerAsm,
-    nameTablesAsm,
-  });
+  // applyPatches gates on this hash as well; checking it here is what turns the
+  // build's byte-level complaint into the one thing a player can act on.
+  if (sha256(kbu2) !== KBU2_SHA256) {
+    throw new Error("this is not the release the patch targets");
+  }
+
+  const patched = applyPatches({ base: kbu2, patchesCsv, gatePickerAsm, nameTablesAsm });
   const { rows, pooled, inlined } = patched.summary;
   say(`${rows} строк(и) перевода: ${pooled} в пул, ${inlined} на месте`);
-  return patched.image;
+
+  const [cc256, cc416] = await Promise.all(
+    ([256, 416] as const).map((mode) => patchFont(requireFile(files, `${mode}.CC`))),
+  );
+  say("кириллический шрифт встроен в 256.CC и 416.CC");
+
+  return writeZip(
+    new Map([
+      [`${DIR}/KBR.EXE`, patched.image],
+      [`${DIR}/256.CC`, cc256],
+      [`${DIR}/416.CC`, cc416],
+      [`${DIR}/dosbox.conf`, new TextEncoder().encode(dosboxConf)],
+    ]),
+  );
 };
 
-const offer = (image: Uint8Array): void => {
-  const url = URL.createObjectURL(
-    new Blob([image as BlobPart], { type: "application/octet-stream" }),
-  );
+const offer = (zip: Uint8Array): void => {
+  const url = URL.createObjectURL(new Blob([zip as BlobPart], { type: "application/zip" }));
   const link = document.createElement("a");
   link.href = url;
-  link.download = "KBR.EXE";
-  link.textContent = `Скачать KBR.EXE (${image.length} байт)`;
+  link.download = `${DIR}.zip`;
+  link.textContent = `Скачать ${DIR}.zip (${zip.length} байт)`;
   out.replaceChildren(link);
 };
 
@@ -55,7 +81,7 @@ input.addEventListener("change", async () => {
   log.textContent = "";
   out.replaceChildren();
   try {
-    offer(patch(new Uint8Array(await file.arrayBuffer())));
+    offer(await patch(new Uint8Array(await file.arrayBuffer())));
   } catch (error) {
     say(`ошибка: ${error instanceof Error ? error.message : String(error)}`);
   }

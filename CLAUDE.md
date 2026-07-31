@@ -58,8 +58,8 @@ framework, no template engine.
 
 - [x] Bundler and a static build that deploys as a plain directory.
 - [ ] Design: drop target, the run's log, the download.
-- [ ] Zip through `fflate` — `unzipSync` in, store-only out since the payload is already
+- [x] Zip through `fflate` — `unzipSync` in, store-only out since the payload is already
       compressed — in the web shell and nowhere else.
-- [ ] Bundle `res/` as assets: `patches.csv`, `font.png`, both `.asm` and `dosbox.conf`.
-- [ ] Every failure as UI, the KBU2 hash gate reading "not the release this patch targets".
-- [ ] Confirm nothing leaves the page — no network call on the patch path.
+- [x] Bundle `res/` as assets: `patches.csv`, `font.png`, both `.asm` and `dosbox.conf`.
+- [x] Every failure as UI, the KBU2 hash gate reading "not the release this patch targets".
+- [x] Confirm nothing leaves the page — no network call on the patch path.
