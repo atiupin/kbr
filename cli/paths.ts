@@ -16,7 +16,6 @@ export const ROOT = dirname(CLI);
 export const GAME = join(ROOT, "game");
 export const BUILD = join(ROOT, "build");
 export const OUT = join(BUILD, "ts");
-export const DIST = join(ROOT, "dist");
 export const RES = join(ROOT, "res");
 
 // --- inputs: the user's own copy, never modified -----------------------------

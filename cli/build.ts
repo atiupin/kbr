@@ -2,9 +2,9 @@
  * The whole build in one command: the chain's four steps in their only valid
  * order.
  *
- * It stops there rather than staging dist/. Until `verify` reports every
- * artifact byte-identical this output has no business in a player's run dir --
- * and that directory holds saves no build gets to overwrite on a hunch.
+ * It ends at build/, and never stages a distributable: what a player gets is a
+ * zip the web patcher hands back, built from their own copy in their own
+ * browser, so nothing here assembles a run dir for anyone but the developer.
  */
 
 import { applyPatches } from "../core/applyPatches.ts";
