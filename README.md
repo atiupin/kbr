@@ -24,8 +24,8 @@ core/    *** the format work *** — pure functions over bytes: no I/O, no platf
          command line and the browser share one implementation.
 cli/     *** the shell around core *** — paths, files, argv, printing. Every command lives
          here; `cli/main.ts` is the only entry point.
-web/     *** the browser shell around core *** — bare HTML and the one script that
-         becomes the static page a player patches their own copy on.
+web/     *** the browser shell around core *** — bare HTML, one stylesheet and the one
+         script that become the static page a player patches their own copy on.
 bundle/  *** generated *** — that page, built: a plain static directory. `bundle.mjs` in
          the root is what builds it, a tool beside the project and no part of `kbr`.
 ghidra/  *** analysis, not the build *** — `ghidra.py`, the diagnostic front-end and the

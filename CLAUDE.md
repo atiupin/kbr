@@ -53,19 +53,3 @@
 - **Every stage emits bytes deterministically**, so judge a change by `sha256`, never by "it
   looks right".
 - Ghidra stays in Python: it spawns a JVM and is diagnostic, not part of the build.
-
-## Web Front-End
-
-One implementation serves both the command line and the browser: a player drops in a zip of
-their own game copy and downloads a patched one, from a static page with no backend — their
-files never leave the machine, and the project still ships no game data. A project of its
-own; gate: a patched zip that runs. Bare HTML and one bundled script — no framework, no CSS
-framework, no template engine.
-
-- [x] Bundler and a static build that deploys as a plain directory.
-- [ ] Design: drop target, the run's log, the download.
-- [x] Zip through `fflate` — `unzipSync` in, store-only out since the payload is already
-      compressed — in the web shell and nowhere else.
-- [x] Bundle `res/` as assets: `patches.csv`, `font.png`, both `.asm` and `dosbox.conf`.
-- [x] Every failure as UI, the KBU2 hash gate reading "not the release this patch targets".
-- [x] Confirm nothing leaves the page — no network call on the patch path.

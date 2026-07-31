@@ -3,17 +3,17 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>King's Bounty — русский перевод</title>
+    <title>Русский перевод King's Bounty</title>
+    <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <h1>King's Bounty — русский перевод</h1>
-    <p>
-      Выберите zip со своей копией игры (<code>KB.EXE</code>, <code>256.CC</code>,
-      <code>416.CC</code>). Файлы не покидают браузер.
-    </p>
-    <input id="file" type="file" accept=".zip,application/zip" />
-    <pre id="log"></pre>
-    <p id="out"></p>
+    <main id="screen">
+      <pre id="intro-box"></pre>
+      <pre id="drop-box" class="button"></pre>
+      <input id="file-input" type="file" accept=".zip,application/zip" hidden />
+      <pre id="log-box" hidden></pre>
+      <a id="download-box" class="button" hidden></a>
+    </main>
     <script src="main.js"></script>
   </body>
 </html>

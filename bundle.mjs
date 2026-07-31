@@ -1,7 +1,7 @@
 import * as esbuild from "esbuild";
 
 const options = {
-  entryPoints: ["web/main.ts", "web/index.html"],
+  entryPoints: ["web/main.ts", "web/style.css", "web/index.html"],
   bundle: true,
   outdir: "bundle",
   loader: {
