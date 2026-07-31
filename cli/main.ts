@@ -9,6 +9,7 @@ import { fileToSegOff, segOffToFile } from "../core/addr.ts";
 import { build } from "./build.ts";
 import { read } from "./io.ts";
 import { line } from "./report.ts";
+import { selftest } from "./selftest.ts";
 import { verify } from "./verify.ts";
 import * as paths from "./paths.ts";
 
@@ -16,6 +17,7 @@ const USAGE = `kbr <command> [args]
 
   build                      the whole chain: game/KB.EXE -> build/ts/
   verify                     every artifact against the reference build, by sha256
+  asm-selftest               reassemble two shipped routines, demand byte equality
 
   find-ref <offset|"text">   what points at a string; a reloc row, paste-ready
   addr <0xoffset|seg:off>    file offset <-> Ghidra address
@@ -45,6 +47,7 @@ const cmdAddr = (args: string[]): void => {
 const COMMANDS = new Map<string, (args: string[]) => void>([
   ["build", build],
   ["verify", verify],
+  ["asm-selftest", selftest],
   ["find-ref", cmdFindRef],
   ["addr", cmdAddr],
 ]);

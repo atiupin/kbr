@@ -89,14 +89,14 @@ pinned hash.
 
 **2 — Assembler.** Gate: `selftest` reassembles both shipped routines byte-identically.
 
-- [ ] Line parse, `Mem`/modrm, `encode` with `enc_mov`, `enc_alu`, `enc_data`.
-- [ ] Fixed-point sizing loop; the symbol-table compare needs an explicit deep equality.
-- [ ] The two safety checks that make it trustworthy: labels must not move during emission,
+- [x] Line parse, `Mem`/modrm, `encode` with `enc_mov`, `enc_alu`, `enc_data`.
+- [x] Fixed-point sizing loop; the symbol-table compare needs an explicit deep equality.
+- [x] The two safety checks that make it trustworthy: labels must not move during emission,
       branch targets must land on an instruction boundary.
 
 **3 — Patcher.** Gate: `KBR.EXE` byte-identical.
 
-- [ ] CP866 encode table, with the `\xNN` and `\\` escapes.
+- [ ] The `\xNN` and `\\` escapes on top of the CP866 encode table the assembler already uses.
 - [ ] Strict CSV reader — a line at a time, text after a closing quote rejected. Its strictness
       is load-bearing; nothing off the shelf reproduces it.
 - [ ] Row shape check, `resolve`, and the copy-protection fence on `reloc` refs.
