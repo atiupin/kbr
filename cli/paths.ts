@@ -28,6 +28,7 @@ export const KBU1 = join(OUT, "KBU1.EXE"); // minus the outer NWC packer
 export const KBU2 = join(OUT, "KBU2.EXE"); // flat, unpacked: the edit base
 export const KBR = join(OUT, "KBR.EXE"); // KBU2 + patches.csv: our build
 export const BUILD_CC = { 256: join(OUT, "256.CC"), 416: join(OUT, "416.CC") } as const;
+export const FONT_BIN = join(OUT, "font.bin"); // the font member alone, for the web bundle
 
 // --- hand-written build inputs (tracked) -------------------------------------
 export const PATCHES_CSV = join(RES, "patches.csv");
