@@ -29,10 +29,7 @@ jobs:
           node-version: "24"
           cache: npm
       - run: npm ci
-      # What ships is the committed bundle/, so a rebuild from the same sources must
-      # reproduce it byte for byte — a difference means someone changed web/, core/ or
-      # res/ without rebuilding, and the page would go live stale.
-      - run: npm run bundle && git diff --exit-code -- bundle/
+      - run: npm run bundle
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

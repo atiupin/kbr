@@ -1,4 +1,5 @@
 build/
+bundle/
 tmp/
 node_modules/
 /game/*

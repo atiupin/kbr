@@ -26,12 +26,11 @@ cli/     *** the shell around core *** — paths, files, argv, printing. Every c
          here; `cli/main.ts` is the only entry point.
 web/     *** the browser shell around core *** — bare HTML, one stylesheet and the one
          script that become the static page a player patches their own copy on.
-bundle/  *** generated, and the one generated thing COMMITTED *** — that page, built: a
-         plain static directory, served as-is at https://atiupin.github.io/kbr/.
-         `bundle.mjs` in the root is what builds it, a tool beside the project and no part
-         of `kbr`.
-.github/ *** CI *** — one workflow, which rebuilds `bundle/` on every push to `master`,
-         fails if the committed bytes differ, and publishes it to GitHub Pages.
+bundle/  *** generated *** — that page, built: a plain static directory, and what CI serves
+         at https://atiupin.github.io/kbr/. `bundle.mjs` in the root is what builds it, a
+         tool beside the project and no part of `kbr`.
+.github/ *** CI *** — one workflow: it builds `bundle/` on every push to `master` and
+         publishes it to GitHub Pages, so nothing generated is ever committed.
 ghidra/  *** analysis, not the build *** — `ghidra.py`, the diagnostic front-end and the
          one thing here still written in Python, and the `scripts/*.java` it runs.
 tmp/     *** scratch, gitignored *** — the Ghidra project DB and its dumps, DOSBox captures.

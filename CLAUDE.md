@@ -5,9 +5,6 @@
 - **Never `rm -rf build/`.** Everything there is rebuildable except `*.DAT`, the in-game
   saves — nothing regenerates them, and `build/` is the run dir DOSBox writes saves into, so
   wiping it destroys play progress. Delete the generated files by name instead.
-- **`bundle/` is committed, so `npm run bundle` is part of any change to `web/`, `core/` or
-  `res/`** — the commit carries the rebuilt bytes, or CI rejects the push and the published
-  page stays stale.
 
 ## Writing
 
