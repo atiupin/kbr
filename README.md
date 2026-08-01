@@ -2,7 +2,8 @@
 
 Fan translation of the original 1990 DOS King's Bounty into Russian. This project ships
 without any game data. You have to find your own game files and run them through the
-[online patcher](https://atiupin.github.io/kbr/) or the CLI.
+[online patcher](https://atiupin.github.io/kbr/) or the CLI. Note that the patcher accepts
+only one specific `KB.EXE`, the 1990 release — the 1991 and 1995 versions will not work.
 
 Made by [Aleksandr Tiupin](https://t.me/luna_game). Font design by
 [Dmitry Sivukhin](https://t.me/dmitrysivukhin).
