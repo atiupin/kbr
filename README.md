@@ -1,13 +1,15 @@
 # King's Bounty — Russian Translation (KBR)
 
-Fan translation of the original 1990 DOS King's Bounty into Russian.
+Fan translation of the original 1990 DOS King's Bounty into Russian. This project ships
+without any game data. You have to find your own game files and run them through the
+[online patcher](https://atiupin.github.io/kbr/) or the CLI.
 
 Made by [Aleksandr Tiupin](https://t.me/luna_game). Font design by
 [Dmitry Sivukhin](https://t.me/dmitrysivukhin).
 
 King's Bounty © 1990 New World Computing; the trademark and the rights to the original game
 belong to their present holders. This is an unofficial fan project, not affiliated with or
-endorsed by them, and it ships no game data.
+endorsed by them.
 
 ## Project Layout
 
@@ -29,8 +31,6 @@ web/     *** the browser shell around core *** — bare HTML, one stylesheet and
 bundle/  *** generated *** — that page, built: a plain static directory, and what CI serves
          at https://atiupin.github.io/kbr/. `bundle.mjs` in the root is what builds it, a
          tool beside the project and no part of `kbr`.
-.github/ *** CI *** — one workflow: it builds `bundle/` on every push to `master` and
-         publishes it to GitHub Pages, so nothing generated is ever committed.
 ghidra/  *** analysis, not the build *** — `ghidra.py`, the diagnostic front-end and the
          one thing here still written in Python, and the `scripts/*.java` it runs.
 tmp/     *** scratch, gitignored *** — the Ghidra project DB and its dumps, DOSBox captures.
