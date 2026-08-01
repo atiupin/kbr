@@ -105,9 +105,9 @@ const POOL_END_DSOFF = POOL_DSOFF + POOL_SIZE; // hard cap; clear of the stack's
 // sum and the XOR unchanged. Heap exhaustion, stack exhaustion and pool placement are all
 // ruled out — re-testing those is wasted effort.
 //
-// Not "any byte here is fatal": our own flip at 0xC40A is exactly what KB!.COM patches at
-// runtime, so nothing can guard it. The fence is conservative and costs nothing — every
-// string reached from here is protection UI that fits its own slot as a `string` row.
+// Not "any byte here is fatal": our own flip at 0xC40A sits inside the block and plays
+// through. The fence is conservative and costs nothing — every string reached from here is
+// protection UI that fits its own slot as a `string` row.
 // Rejected at parse time: an inlined reloc is harmless today, one rewording from fatal.
 export const PROT_LO = 0xbfe0; // file offsets, inclusive
 export const PROT_HI = 0xcca7;

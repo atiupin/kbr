@@ -75,8 +75,8 @@ DumpDecomp.java [outdir]                   decompiled C for every function + a s
 
 ## Build
 
-Needs your own copy of the game in `game/`: `KB.EXE`, `256.CC` and `416.CC` (nothing reads
-the `KB!.COM` launcher — the patch disables the protection itself).
+Needs your own copy of the game in `game/`: `KB.EXE`, `256.CC` and `416.CC` — the patch
+disables the copy protection itself.
 
 `npm install`, then `npm run build`: the four chain steps in their only valid order, no
 arguments and nothing to configure. Node runs the TypeScript sources directly — nothing is
